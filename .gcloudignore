@@ -1,6 +1,5 @@
-# Ignorer les fichiers qui pourraient déclencher l'auto-détection de buildpack
-.gcloudignore
-.git
+# Fichiers à ignorer lors du déploiement Cloud Run
+.git/
 .gitignore
 __pycache__/
 *.pyc
@@ -15,6 +14,4 @@ ENV/
 *.swo
 *~
 .DS_Store
-README.md
-run_local.sh
-
+data.csv

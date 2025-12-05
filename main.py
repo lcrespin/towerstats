@@ -4,7 +4,7 @@ import csv
 import io
 import json
 from datetime import datetime
-from collections import defaultdict, Counter
+from collections import defaultdict
 
 # URL publique de la Google Sheet en CSV
 CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQE3KfSAHXOp3hNFuR5oq_lgtEdEUzJ6YiRcov5gDSdgVSvuJDuy6sFslSC76qIa3CPjYSl9sTwQUrO/pub?output=csv'
@@ -144,22 +144,6 @@ def get_global_ranking(sessions, group_id=None):
     ranking = sorted(player_totals.items(), key=lambda x: x[1], reverse=True)
     return ranking
 
-# def get_absolute_global_ranking(sessions):
-#     """Calcule le classement global absolu : somme de toutes les victoires de session (today) 
-#     de chaque joueur depuis le début, toutes sessions et tous groupes confondus."""
-#     player_total_wins = defaultdict(int)
-#     
-#     for session in sessions:
-#         players = parse_session_data(session)
-#         for player, stats in players.items():
-#             # Additionner toutes les "Victoires Session" (today) pour chaque joueur
-#             # depuis le début, toutes sessions et tous groupes confondus
-#             player_total_wins[player] += stats['today']
-#     
-#     # Trier par total décroissant
-#     ranking = sorted(player_total_wins.items(), key=lambda x: x[1], reverse=True)
-#     return ranking
-
 def group_sessions_by_date(sessions):
     """Groupe les sessions par date (soirée)."""
     sessions_by_date = defaultdict(list)
@@ -211,9 +195,6 @@ def generate_html(sessions):
     # Classement par défaut (groupe avec le meilleur score)
     default_group = sorted_groups[0] if sorted_groups else None
     default_ranking = rankings_by_group.get(default_group, []) if default_group else []
-    
-    # Calculer le classement global absolu (somme de toutes les victoires)
-    # absolute_global_ranking = get_absolute_global_ranking(sessions)
     
     # Calculer les dates de début et de fin
     all_dates = []
@@ -618,7 +599,6 @@ def generate_html(sessions):
     <nav>
         <ul>
             <li><a href="#statistiques">Statistiques</a></li>
-            <!-- <li><a href="#classement-global">Classement Général</a></li> -->
             <li><a href="#classement">Classement par Groupe</a></li>
             <li><a href="#derniere-soiree">Dernière Soirée</a></li>
         </ul>
@@ -664,23 +644,6 @@ def generate_html(sessions):
                 <div>Dernière soirée jouée le {date_fin_formatted}</div>
             </div>
         </section>
-        
-        <!-- Section Classement Général Actuel commentée
-        <section id="classement-global">
-            <h2>🏆 Classement Général Actuel</h2>
-            <table class="ranking-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Joueur</th>
-                        <th>Victoires</th>
-                    </tr>
-                </thead>
-                <tbody>
-                </tbody>
-            </table>
-        </section>
-        -->
         
         <section id="classement">
             <h2>🏆 Classement par Groupe</h2>
@@ -947,3 +910,68 @@ def display_stats(request):
     # Génère la page HTML
     html_response = generate_html(sheet_data)
     return html_response
+
+# Créer un objet app WSGI compatible avec Gunicorn
+# Cela permet à Cloud Run d'utiliser Gunicorn si un buildpack est détecté
+class WSGIRequest:
+    """Wrapper pour convertir une requête WSGI en objet request compatible avec functions-framework"""
+    def __init__(self, environ):
+        self.method = environ.get('REQUEST_METHOD', 'GET')
+        self.path = environ.get('PATH_INFO', '/')
+        self.headers = {}
+        for key, value in environ.items():
+            if key.startswith('HTTP_'):
+                header_name = key[5:].replace('_', '-').title()
+                self.headers[header_name] = value
+        # Lire le body si présent
+        try:
+            content_length = int(environ.get('CONTENT_LENGTH', 0))
+            if content_length > 0:
+                self.data = environ['wsgi.input'].read(content_length)
+            else:
+                self.data = b''
+        except (ValueError, KeyError):
+            self.data = b''
+
+def wsgi_app(environ, start_response):
+    """Application WSGI qui appelle display_stats"""
+    # Créer un objet request compatible avec functions-framework
+    request = WSGIRequest(environ)
+    
+    # Appeler la fonction display_stats
+    try:
+        result = display_stats(request)
+        
+        # Gérer la réponse (peut être un tuple (html, status) ou juste html)
+        if isinstance(result, tuple):
+            html, status_code = result
+            status = f"{status_code} OK" if status_code == 200 else f"{status_code} Error"
+        else:
+            html = result
+            status = "200 OK"
+        
+        # Convertir en bytes si nécessaire
+        if isinstance(html, str):
+            html = html.encode('utf-8')
+        
+        # Headers de réponse
+        headers = [
+            ('Content-Type', 'text/html; charset=utf-8'),
+            ('Content-Length', str(len(html)))
+        ]
+        
+        start_response(status, headers)
+        return [html]
+    except Exception as e:
+        # Gérer les erreurs
+        error_msg = f"<html><body><h1>Erreur</h1><pre>{str(e)}</pre></body></html>"
+        error_bytes = error_msg.encode('utf-8')
+        headers = [
+            ('Content-Type', 'text/html; charset=utf-8'),
+            ('Content-Length', str(len(error_bytes)))
+        ]
+        start_response("500 Internal Server Error", headers)
+        return [error_bytes]
+
+# Objet app que Gunicorn cherche
+app = wsgi_app
