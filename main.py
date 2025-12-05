@@ -494,6 +494,7 @@ def generate_html(sessions):
                 sorted_players = sorted(players.items(), key=lambda x: x[1]['today'], reverse=True)
                 all_sessions_data.append({
                     'id': session['id'],
+                    'group': session['id'],  # Le groupe est l'ID de la session
                     'date': session['date'],
                     'formatted_date': format_date(date),
                     'players': [{'name': p, 'today': s['today'], 'total': s['total']} for p, s in sorted_players]

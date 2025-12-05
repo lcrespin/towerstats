@@ -23,14 +23,14 @@
     </style>
 </head>
 
-<body class="text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] break-words">
+<body class="text-[10px] sm:text-[11px] md:text-[12px] lg:text-[13px] break-words">
     <header class="gap-2.5 sm:gap-5 p-4 sm:p-6 md:p-[25px] md:px-5 min-h-[35px] sm:min-h-[45px] md:min-h-[80px]">
         <div class="header-characters gap-0.5 sm:gap-1 md:gap-3">
             <img src="/images/pink-portrait-selected.png" alt="Pink Character" class="header-character left w-[12px] sm:w-[16px] md:w-[30px] lg:w-[90px] h-auto aspect-[3/4] max-w-[12px] sm:max-w-[16px] md:max-w-[30px] lg:max-w-[90px]">
             <img src="/images/green-portrait-selected.png" alt="Green Character" class="header-character left w-[12px] sm:w-[16px] md:w-[30px] lg:w-[90px] h-auto aspect-[3/4] max-w-[12px] sm:max-w-[16px] md:max-w-[30px] lg:max-w-[90px]">
             <img src="/images/altOrange-portrait-selected.png" alt="Orange Character" class="header-character left w-[12px] sm:w-[16px] md:w-[30px] lg:w-[90px] h-auto aspect-[3/4] max-w-[12px] sm:max-w-[16px] md:max-w-[30px] lg:max-w-[90px]">
         </div>
-        <h1 class="text-[6px] sm:text-[8px] md:text-[14px] lg:text-[20px] xl:text-[32px] m-0.5 sm:m-0.5 md:m-2.5 lg:m-[10px] h-auto min-h-[16px] sm:min-h-[21px] md:min-h-[40px] lg:min-h-[120px] p-0.5 sm:p-0.5 md:p-0.5 lg:p-0"><span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span> TOWERSTATS <span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span></h1>
+        <h1 class="text-[10px] sm:text-[18px] md:text-[20px] lg:text-[24px] xl:text-[32px] m-0.5 sm:m-0.5 md:m-2.5 lg:m-[10px] h-auto min-h-[16px] sm:min-h-[21px] md:min-h-[40px] lg:min-h-[120px] p-0.5 sm:p-0.5 md:p-0.5 lg:p-0"><span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span> TOWERSTATS <span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span></h1>
         <div class="header-characters gap-0.5 sm:gap-1 md:gap-3">
             <img src="/images/purple-portrait-selected.png" alt="Purple Character" class="header-character right w-[12px] sm:w-[16px] md:w-[30px] lg:w-[90px] h-auto aspect-[3/4] max-w-[12px] sm:max-w-[16px] md:max-w-[30px] lg:max-w-[90px]">
             <img src="/images/white-portrait-selected.png" alt="White Character" class="header-character right w-[12px] sm:w-[16px] md:w-[30px] lg:w-[90px] h-auto aspect-[3/4] max-w-[12px] sm:max-w-[16px] md:max-w-[30px] lg:max-w-[90px]">
@@ -109,6 +109,24 @@
                 ▼ Voir toutes les sessions
             </button>
             <div id="all-sessions-container" class="hidden">
+                <div class="filters-container mb-4 sm:mb-5 flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-5">
+                    <div class="filter-group flex-1">
+                        <label for="filter-player" class="block mb-1.5 sm:mb-2 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
+                            Filtrer par joueur:
+                        </label>
+                        <select id="filter-player" class="group-select w-full text-[5px] sm:text-[6px] md:text-[8px] p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
+                            <option value="">Tous les joueurs</option>
+                        </select>
+                    </div>
+                    <div class="filter-group flex-1">
+                        <label for="filter-group" class="block mb-1.5 sm:mb-2 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
+                            Filtrer par groupe:
+                        </label>
+                        <select id="filter-group" class="group-select w-full text-[5px] sm:text-[6px] md:text-[8px] p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
+                            <option value="">Tous les groupes</option>
+                        </select>
+                    </div>
+                </div>
                 <div id="all-sessions-list"></div>
                 <div class="pagination-controls flex justify-center items-center gap-3 sm:gap-4 md:gap-5 my-3 sm:my-4 md:my-5">
                     <button id="prev-page" class="pagination-button text-[5px] sm:text-[6px] md:text-[8px] p-1 sm:p-1.5 md:p-2 lg:p-2 lg:px-4">◄ Précédent</button>
@@ -127,7 +145,9 @@
         const allSessions = {SESSIONS_JSON};
         let currentPage = 1;
         const sessionsPerPage = 10;
-        const totalPages = Math.ceil(allSessions.length / sessionsPerPage);
+        // Initialiser filteredSessions avec toutes les sessions au chargement
+        let filteredSessions = allSessions.slice();
+        let totalPages = Math.ceil(filteredSessions.length / sessionsPerPage);
     </script>
 
     <!-- Chargement du JavaScript externe -->
