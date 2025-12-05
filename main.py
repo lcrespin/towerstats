@@ -38,6 +38,17 @@ PLAYER_TO_COLOR = {
     'ALEX': '#FFFF00'        # yellow
 }
 
+# Mapping inverse : joueurs vers couleurs (pour trouver la couleur dans les données v1)
+PLAYER_TO_COLOR_KEY = {
+    'MEHDI': 'pink',
+    'JULIEN': 'green',
+    'LOUIS': 'orange',
+    'BENOIT': 'blue2',
+    'DAVID': 'white',
+    'ERIC': 'purple',
+    'ALEX': 'yellow'
+}
+
 def get_player_color(player_name):
     """Retourne la couleur d'un joueur pour l'affichage."""
     return PLAYER_TO_COLOR.get(player_name.upper(), '#FFD700')  # Par défaut: or
@@ -69,11 +80,9 @@ def parse_date_with_hour(date_str):
 def filter_midnight_sessions(sessions):
     """Filtre les sessions qui passent minuit en ignorant celle avant minuit.
     
-    Si une session se termine à 23h et est suivie d'une session à 00h le jour suivant
-    avec le même groupe de joueurs, on ignore la session à 23h.
-    
-    Les dates peuvent être au format 'YYYY-MM-DD' ou 'YYYY-MM-DD-HH'.
-    Si l'heure n'est pas dans la date, on détecte les sessions consécutives avec le même ID.
+    Pour les sessions en version "v1", ignore des dates spécifiques.
+    Pour les autres sessions avec heure dans la date, ignore les sessions à 23h
+    si elles sont suivies d'une session à 00h le jour suivant avec le même ID.
     
     Args:
         sessions: Liste de sessions triées par date (plus récent en premier)
@@ -84,85 +93,111 @@ def filter_midnight_sessions(sessions):
     if not sessions:
         return sessions
     
+    # Dates à ignorer pour les sessions v1 (avant minuit)
+    v1_dates_to_ignore = {
+        '2025-06-02',
+        '2025-06-04',
+        '2025-09-11',
+        '2025-09-16',
+        '2025-10-01'
+    }
+    
     # Trier par date décroissante (plus récent en premier)
     sessions_sorted = sorted(sessions, key=lambda x: x['date'], reverse=True)
     
     sessions_to_keep = []
-    sessions_to_skip = set()
     
     # Parcourir les sessions et détecter les paires qui passent minuit
     for i, session in enumerate(sessions_sorted):
-        if i in sessions_to_skip:
+        # Vérifier si c'est une session v1
+        is_v1 = False
+        try:
+            if 'version' in session['data'] and session['data']['version'] == 'v1':
+                is_v1 = True
+        except (KeyError, TypeError):
+            pass
+        
+        # Pour les sessions v1, ignorer uniquement les dates spécifiques
+        # et ne pas appliquer la logique de détection des sessions consécutives
+        if is_v1:
+            try:
+                # Extraire la date (format YYYY-MM-DD)
+                date_str = session['date'][:10] if len(session['date']) >= 10 else session['date']
+                if date_str in v1_dates_to_ignore:
+                    # Ignorer cette session
+                    continue
+            except (ValueError, KeyError):
+                pass
+            # Pour les sessions v1, on garde la session (sauf si elle est dans la liste à ignorer)
+            # On ne vérifie pas les sessions consécutives
+            sessions_to_keep.append(session)
             continue
         
+        # Pour les sessions avec heure dans la date (format YYYY-MM-DD-HH)
         date_obj, hour = parse_date_with_hour(session['date'])
-        
-        # Si le format de date contient l'heure (format YYYY-MM-DD-HH)
         if date_obj is not None and hour is not None:
-            # Si cette session est à 23h, vérifier s'il y a une session à 00h le jour suivant
-            if hour == 23:
-                # Calculer la date du jour suivant
-                next_day = date_obj + timedelta(days=1)
+            # Vérifier s'il y a une session le jour suivant entre 00h et 05h (avant 6h du matin)
+            # avec le même ID. Si oui, cette session continue après minuit, donc on ignore
+            # la session actuelle (c'est la session de la veille qui continue).
+            # Les sessions peuvent commencer à n'importe quelle heure après 6h du matin.
+            # Calculer la date du jour suivant
+            next_day = date_obj + timedelta(days=1)
+            
+            # Chercher une session le jour suivant entre 00h et 05h avec le même groupe
+            # Les sessions sont triées par date décroissante, donc la session du jour suivant
+            # sera avant celle d'aujourd'hui (indice plus petit)
+            found_next_day_session = False
+            for j, other_session in enumerate(sessions_sorted):
+                if j >= i:  # On ne regarde que les sessions plus récentes (indices plus petits)
+                    continue
                 
-                # Chercher une session à 00h le jour suivant avec le même groupe
-                # Les sessions sont triées par date décroissante, donc la session à 00h du jour suivant
-                # sera avant celle à 23h (indice plus petit)
+                other_date_obj, other_hour = parse_date_with_hour(other_session['date'])
+                if other_date_obj is None or other_hour is None:
+                    continue
+                
+                # Vérifier si c'est le jour suivant entre 00h et 05h (avant 6h) avec le même groupe
+                if (other_date_obj.date() == next_day.date() and 
+                    0 <= other_hour <= 5 and  # Entre 00h et 05h (avant 6h)
+                    other_session['id'] == session['id']):
+                    # On a trouvé une session le jour suivant avant 6h avec le même groupe
+                    # On ignore la session actuelle (c'est la session de la veille qui continue)
+                    found_next_day_session = True
+                    break
+            
+            if found_next_day_session:
+                # Ignorer cette session (elle continue après minuit)
+                continue
+        else:
+            # Pour les sessions sans heure dans la date (format YYYY-MM-DD)
+            # Détecter les sessions consécutives avec le même ID
+            try:
+                # Parser la date au format YYYY-MM-DD
+                current_date = datetime.strptime(session['date'], '%Y-%m-%d')
+                next_day_date = current_date + timedelta(days=1)
+                
+                # Chercher une session le jour suivant avec le même ID
+                # Les sessions sont triées par date décroissante, donc la session du jour suivant
+                # sera avant celle d'aujourd'hui (indice plus petit)
                 found_next_day_session = False
                 for j, other_session in enumerate(sessions_sorted):
                     if j >= i:  # On ne regarde que les sessions plus récentes (indices plus petits)
                         continue
                     
-                    other_date_obj, other_hour = parse_date_with_hour(other_session['date'])
-                    if other_date_obj is None or other_hour is None:
-                        continue
-                    
-                    # Vérifier si c'est le jour suivant à 00h avec le même groupe
-                    if (other_date_obj.date() == next_day.date() and 
-                        other_hour == 0 and 
-                        other_session['id'] == session['id']):
-                        # On a trouvé une session à 00h le jour suivant avec le même groupe
-                        # On ignore la session à 23h
-                        found_next_day_session = True
-                        break
-                
-                if found_next_day_session:
-                    # Ignorer cette session (23h)
-                    continue
-        
-        # Si le format de date ne contient pas l'heure (format YYYY-MM-DD)
-        # On doit détecter les sessions consécutives avec le même ID
-        else:
-            try:
-                # Parser la date au format YYYY-MM-DD
-                current_date = datetime.strptime(session['date'], '%Y-%m-%d')
-                previous_day_date = current_date - timedelta(days=1)
-                
-                # Chercher une session le jour précédent avec le même ID
-                # Les sessions sont triées par date décroissante, donc la session du jour précédent
-                # sera après celle d'aujourd'hui (indice plus grand)
-                # Si on trouve une session le jour précédent avec le même ID, cela signifie que
-                # la session actuelle (jour N) est celle après minuit, et la session du jour précédent
-                # (jour N-1) est celle avant minuit qu'on doit ignorer
-                found_previous_day_session = False
-                for j, other_session in enumerate(sessions_sorted):
-                    if j <= i or j in sessions_to_skip:  # On ne regarde que les sessions moins récentes (indices plus grands)
-                        continue
-                    
                     try:
                         other_date = datetime.strptime(other_session['date'], '%Y-%m-%d')
-                        # Vérifier si c'est le jour précédent avec le même groupe
-                        if (other_date.date() == previous_day_date.date() and 
+                        # Vérifier si c'est le jour suivant avec le même groupe
+                        if (other_date.date() == next_day_date.date() and 
                             other_session['id'] == session['id']):
-                            # On a trouvé une session le jour précédent avec le même groupe
-                            # La session du jour précédent (j) est celle avant minuit, on doit l'ignorer
-                            found_previous_day_session = True
-                            sessions_to_skip.add(j)  # Marquer la session du jour précédent pour qu'elle soit ignorée
+                            # On a trouvé une session le jour suivant avec le même groupe
+                            # On ignore la session actuelle (c'est la session de la veille qui continue)
+                            found_next_day_session = True
                             break
                     except (ValueError, KeyError):
                         continue
                 
-                # Si on a trouvé une session le jour précédent, on continue (on garde la session actuelle)
-                # car c'est la session après minuit qu'on veut garder
+                if found_next_day_session:
+                    # Ignorer cette session (elle continue après minuit)
+                    continue
             except (ValueError, KeyError):
                 # Format de date non reconnu, on garde la session
                 pass
@@ -187,27 +222,31 @@ def get_sheet_data():
             if not row.get('value'):
                 continue
             
-            # Ignorer les sessions avec uniquement des joueurs à ignorer (AIJIMMY, P1, P2) dans l'ID
-            session_id = row.get('id', '')
-            if session_id:
-                players_in_id = [p.strip() for p in session_id.split('-')]
-                # Ignorer si tous les joueurs dans l'ID sont à ignorer
-                if all(should_ignore_player(p) for p in players_in_id):
-                    continue
+            # Note: On ne vérifie plus l'ID du document car on va le recalculer
+            # La vérification se fera après le parsing des données
                 
             try:
                 data = json.loads(row['value'])
                 session = {
-                    'id': row['id'],
+                    'id': '',  # Sera recalculé plus tard
                     'date': row['date'],
                     'data': data
                 }
+                # Recalculer l'ID à partir des joueurs présents dans la session
+                calculated_id = calculate_session_id_from_players(session)
+                if not calculated_id:
+                    # Si aucun joueur valide, ignorer la session
+                    continue
+                session['id'] = calculated_id
                 sessions.append(session)
             except json.JSONDecodeError:
                 continue
         
         # Filtrer les sessions qui passent minuit (ignorer celle avant minuit)
         sessions = filter_midnight_sessions(sessions)
+        
+        # Corriger les incohérences dans les données (today vs total)
+        correct_session_data_consistency(sessions)
         
         # Trier par date (plus récent en premier)
         sessions.sort(key=lambda x: x['date'], reverse=True)
@@ -222,6 +261,89 @@ def should_ignore_player(player_name):
     player_upper = player_name.upper().replace(' ', '')
     # Ignorer AIJIMMY, P1, P2
     return 'AIJIMMY' in player_upper or player_upper in ['P1', 'P2']
+
+def calculate_session_id_from_players(session):
+    """Calcule l'ID d'une session à partir des joueurs présents.
+    
+    Extrait les joueurs de la session, les filtre, les trie par ordre alphabétique
+    et les concatène avec des tirets pour créer l'ID.
+    
+    Args:
+        session: Dictionnaire de session avec 'data' contenant les données JSON
+    
+    Returns:
+        str: ID de la session calculé (ex: 'DAVID-ERIC-LOUIS')
+    """
+    players = parse_session_data(session)
+    if not players:
+        return ''
+    
+    # Filtrer les joueurs à ignorer et récupérer leurs noms
+    player_names = [name for name in players.keys() if not should_ignore_player(name)]
+    
+    # Trier par ordre alphabétique
+    player_names.sort()
+    
+    # Concaténer avec des tirets
+    return '-'.join(player_names)
+
+def correct_session_data_consistency(sessions):
+    """Corrige les incohérences dans les données des sessions.
+    
+    Pour chaque session de chaque groupe, compare le total de chaque joueur
+    avec le total de la session précédente. Si la différence ne correspond pas
+    au nombre de victoires dans la session, corrige le nombre de victoires.
+    
+    Args:
+        sessions: Liste de sessions à corriger (modifiée en place)
+    """
+    # Grouper les sessions par ID (groupe)
+    sessions_by_group = defaultdict(list)
+    for session in sessions:
+        if session.get('id'):
+            sessions_by_group[session['id']].append(session)
+    
+    # Pour chaque groupe, corriger les sessions
+    for group_id, group_sessions in sessions_by_group.items():
+        # Trier les sessions par date (croissante, de la plus ancienne à la plus récente)
+        group_sessions.sort(key=lambda x: x['date'])
+        
+        # Dictionnaire pour stocker le total précédent de chaque joueur
+        previous_totals = {}
+        
+        # Parcourir les sessions dans l'ordre chronologique
+        for session in group_sessions:
+            players = parse_session_data(session)
+            data = session['data']
+            
+            # Pour chaque joueur de la session
+            for player, stats in players.items():
+                current_total = stats['total']
+                current_today = stats['today']
+                
+                # Si on a un total précédent pour ce joueur
+                if player in previous_totals:
+                    previous_total = previous_totals[player]
+                    # Calculer la différence attendue
+                    expected_today = current_total - previous_total
+                    
+                    # Si la différence ne correspond pas au today actuel
+                    if expected_today != current_today and expected_today >= 0:
+                        # Corriger le today dans les données
+                        if 'version' in data and data['version'] == 'v1':
+                            # Format v1 : trouver la couleur du joueur
+                            color = PLAYER_TO_COLOR_KEY.get(player)
+                            if color:
+                                today_key = f'{color}TodayWins'
+                                if today_key in data:
+                                    data[today_key] = expected_today
+                        elif 'todayWin' in data:
+                            # Format v2 : corriger directement
+                            if player in data['todayWin']:
+                                data['todayWin'][player] = expected_today
+                
+                # Mettre à jour le total précédent
+                previous_totals[player] = current_total
 
 def parse_session_data(session):
     """Parse les données d'une session selon le format (v1 ou v2)."""
@@ -254,17 +376,25 @@ def parse_session_data(session):
     return {}
 
 def get_unique_groups(sessions):
-    """Récupère tous les groupes de joueurs uniques (basés sur l'ID de session)."""
+    """Récupère tous les groupes de joueurs uniques (basés sur l'ID de session).
+    
+    Les IDs sont déjà recalculés et ne contiennent que des joueurs valides,
+    donc on peut simplement collecter tous les IDs uniques.
+    """
     groups = set()
     for session in sessions:
-        # Ignorer les sessions avec uniquement des joueurs à ignorer
-        players_in_id = [p.strip() for p in session['id'].split('-')]
-        if not all(should_ignore_player(p) for p in players_in_id):
+        # Les IDs sont déjà calculés et ne contiennent que des joueurs valides
+        # (voir calculate_session_id_from_players)
+        if session.get('id'):
             groups.add(session['id'])
     return sorted(list(groups))
 
 def get_global_ranking(sessions, group_id=None):
-    """Calcule le classement global pour un groupe spécifique."""
+    """Calcule le classement global pour un groupe spécifique.
+    
+    Utilise stats['total'] (le maximum parmi toutes les sessions du groupe)
+    pour obtenir le meilleur score dans ce groupe spécifique.
+    """
     player_totals = defaultdict(int)
     
     for session in sessions:
@@ -274,7 +404,7 @@ def get_global_ranking(sessions, group_id=None):
         
         players = parse_session_data(session)
         for player, stats in players.items():
-            # Prendre le total le plus récent pour chaque joueur
+            # Prendre le total le plus élevé (stats['total']) pour chaque joueur
             if stats['total'] > player_totals[player]:
                 player_totals[player] = stats['total']
     
@@ -310,6 +440,12 @@ def format_date(date_str, format_short=False):
 def get_win_percentage_ranking(sessions):
     """Calcule le classement par pourcentage de victoires.
     
+    Le nombre total de Victoires est le cumul de stats['today'] pour chaque session
+    où le joueur a participé (depuis le début).
+    
+    Le nombre total de Parties est le cumul du total de parties (stats['today'] de tous
+    les joueurs) pour chaque session de chaque groupe auquel le joueur a participé.
+    
     Returns:
         list: Liste de tuples (joueur, victoires, parties_jouees, pourcentage) triée par pourcentage décroissant
     """
@@ -322,13 +458,15 @@ def get_win_percentage_ranking(sessions):
             continue
         
         # Calculer le nombre total de parties dans cette session
+        # (somme des victoires de tous les joueurs dans cette session)
         total_games_in_session = sum(stats['today'] for stats in players.values())
         
         # Pour chaque joueur de la session
         for player, stats in players.items():
-            # Ajouter les victoires
+            # Cumuler les victoires (stats['today']) pour chaque session
             player_victories[player] += stats['today']
-            # Ajouter le nombre de parties jouées (total de la session)
+            
+            # Cumuler les parties jouées (total de la session pour chaque session où le joueur était présent)
             player_games_played[player] += total_games_in_session
     
     # Calculer les pourcentages
