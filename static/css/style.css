@@ -115,6 +115,44 @@ h1 {
     }
 }
 
+@media (max-width: 375px) {
+    header {
+        gap: 1px;
+        padding: 8px 2px;
+        min-height: 45px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    header::-webkit-scrollbar {
+        height: 4px;
+    }
+
+    header::-webkit-scrollbar-thumb {
+        background: #8b4513;
+        border-radius: 2px;
+    }
+
+    .header-character {
+        width: 18px;
+        height: 28px;
+        min-width: 18px;
+    }
+
+    h1 {
+        font-size: 7px;
+        margin: 0 1px;
+        height: 28px;
+        padding: 0 1px;
+        white-space: nowrap;
+    }
+
+    .header-characters {
+        gap: 1px;
+        min-width: fit-content;
+    }
+}
+
 .header-image-placeholder {
     width: 200px;
     height: 100px;
@@ -180,6 +218,8 @@ nav ul li a {
     line-height: 1.4;
     margin-top: 20px;
     text-align: center;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 nav a {
@@ -238,6 +278,8 @@ section h2 {
     text-shadow: 2px 2px 0px #8b4513;
     position: relative;
     z-index: 1;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .ranking-table {
@@ -246,6 +288,9 @@ section h2 {
     margin: 15px 0;
     position: relative;
     z-index: 1;
+    table-layout: auto;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .ranking-table th {
@@ -255,6 +300,8 @@ section h2 {
     text-align: left;
     border: 2px solid #654321;
     font-size: 10px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .ranking-table td {
@@ -262,6 +309,9 @@ section h2 {
     border: 2px solid #654321;
     background: rgba(26, 26, 46, 0.5);
     font-size: 9px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 0;
 }
 
 .ranking-table tr:nth-child(even) td {
@@ -316,6 +366,8 @@ section h2 {
 
 .player-name {
     font-weight: bold;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
     /* La couleur sera définie inline pour chaque joueur */
 }
 
@@ -457,5 +509,118 @@ section h2 {
         width: 100%;
         padding: 8px 5px;
         font-size: 7px;
+    }
+}
+
+@media (max-width: 375px) {
+    body {
+        font-size: 7px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    section {
+        padding: 10px;
+        margin-bottom: 15px;
+    }
+
+    section h2 {
+        font-size: 9px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .ranking-table {
+        font-size: 6px;
+        width: 100%;
+        display: table;
+        table-layout: fixed;
+    }
+
+    section {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .ranking-table th,
+    .ranking-table td {
+        padding: 6px 4px;
+        font-size: 6px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .ranking-table th:first-child,
+    .ranking-table td:first-child {
+        position: sticky;
+        left: 0;
+        background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
+        z-index: 2;
+    }
+
+    .ranking-table td:first-child {
+        background: rgba(26, 26, 46, 0.5);
+    }
+
+    .ranking-table tr:nth-child(even) td:first-child {
+        background: rgba(26, 26, 46, 0.7);
+    }
+
+    .stat-card {
+        padding: 10px;
+    }
+
+    .stat-value {
+        font-size: 14px;
+    }
+
+    .stat-label {
+        font-size: 6px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    nav ul {
+        gap: 5px;
+    }
+
+    nav ul li a {
+        padding: 6px 3px;
+        font-size: 6px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .group-select {
+        font-size: 6px;
+        padding: 8px 10px;
+    }
+
+    .toggle-button {
+        font-size: 7px;
+        padding: 10px 15px;
+    }
+
+    .pagination-button {
+        font-size: 6px;
+        padding: 6px 12px;
+    }
+
+    .session-card {
+        padding: 10px;
+    }
+
+    .session-date {
+        font-size: 8px;
+    }
+
+    .player-stat {
+        font-size: 6px;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
     }
 }
