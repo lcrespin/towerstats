@@ -1,38 +1,67 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TowerStats - Statistiques TowerFall Ascension</title>
     <style>
-{CSS_CONTENT}
+        {CSS_CONTENT}
     </style>
 </head>
+
 <body>
     <header>
+        <div class="header-characters">
+            <img src="/images/pink-portrait-selected.png" alt="Pink Character" class="header-character left">
+            <img src="/images/green-portrait-selected.png" alt="Green Character" class="header-character left">
+            <img src="/images/altOrange-portrait-selected.png" alt="Orange Character" class="header-character left">
+        </div>
         <h1>🏹 TOWERSTATS 🏹</h1>
+        <div class="header-characters">
+            <img src="/images/purple-portrait-selected.png" alt="Purple Character" class="header-character right">
+            <img src="/images/white-portrait-selected.png" alt="White Character" class="header-character right">
+            <img src="/images/altCyan-portrait-selected.png" alt="Cyan Character" class="header-character right">
+        </div>
     </header>
-    
+
     <nav>
         <ul>
             <li><a href="#statistiques">Statistiques</a></li>
-            <li><a href="#classement">Classement par Groupe</a></li>
-            <li><a href="#derniere-soiree">Dernière Soirée</a></li>
+            <li><a href="#pourcentage-victoires">% Victoires</a></li>
+            <li><a href="#classement">Groupes</a></li>
+            <li><a href="#derniere-soiree">Sessions</a></li>
         </ul>
     </nav>
-    
+
     <div class="container">
         <section id="statistiques">
             <h2>📊 Statistiques Générales</h2>
             <div class="stats-grid">
-{STATS_CARDS}
+                {STATS_CARDS}
             </div>
             <div class="stats-dates">
                 <div>Depuis le {DATE_DEBUT}</div>
                 <div>Dernière soirée jouée le {DATE_FIN}</div>
             </div>
         </section>
-        
+
+        <section id="pourcentage-victoires">
+            <h2>🏆 Classement par Pourcentage de Victoires</h2>
+            <table class="ranking-table">
+                <thead>
+                    <tr>
+                        <th>Joueur</th>
+                        <th>Victoires / Parties</th>
+                        <th>% Victoires</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {WIN_PERCENTAGE_ROWS}
+                </tbody>
+            </table>
+        </section>
+
         <section id="classement">
             <h2>🏆 Classement par Groupe</h2>
             <div style="margin-bottom: 20px; position: relative; z-index: 1;">
@@ -40,26 +69,25 @@
                     Sélectionner un groupe de joueurs:
                 </label>
                 <select id="group-select" class="group-select">
-{GROUP_OPTIONS}
+                    {GROUP_OPTIONS}
                 </select>
             </div>
             <table class="ranking-table" id="ranking-table">
                 <thead>
                     <tr>
-                        <th>#</th>
                         <th>Joueur</th>
                         <th>Victoires</th>
                     </tr>
                 </thead>
                 <tbody id="ranking-tbody">
-{RANKING_ROWS}
+                    {RANKING_ROWS}
                 </tbody>
             </table>
         </section>
-        
+
         <section id="derniere-soiree">
-            <h2>📅 Dernière Soirée de Jeu</h2>
-{LATEST_SESSIONS}
+            <h2>📅 Dernière Session de Jeu</h2>
+            {LATEST_SESSIONS}
             <button id="toggle-all-sessions" class="toggle-button">
                 ▼ Voir toutes les sessions
             </button>
@@ -73,7 +101,7 @@
             </div>
         </section>
     </div>
-    
+
     <!-- Injection des données JSON pour JavaScript -->
     <script>
         // Données globales pour JavaScript
@@ -84,11 +112,11 @@
         const sessionsPerPage = 10;
         const totalPages = Math.ceil(allSessions.length / sessionsPerPage);
     </script>
-    
+
     <!-- Chargement du JavaScript externe -->
     <script>
 {JS_CONTENT}
     </script>
 </body>
-</html>
 
+</html>

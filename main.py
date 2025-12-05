@@ -1,4 +1,5 @@
-import functions_framework
+import functions_framework  # type: ignore
+from flask import Flask, send_from_directory, request as flask_request  # type: ignore
 import urllib.request
 import csv
 import io
@@ -6,6 +7,9 @@ import json
 import os
 from datetime import datetime
 from collections import defaultdict
+
+# Créer l'application Flask
+app = Flask(__name__)
 
 # URL publique de la Google Sheet en CSV
 CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQE3KfSAHXOp3hNFuR5oq_lgtEdEUzJ6YiRcov5gDSdgVSvuJDuy6sFslSC76qIa3CPjYSl9sTwQUrO/pub?output=csv'
@@ -170,6 +174,56 @@ def format_date(date_str, format_short=False):
         pass
     return date_str
 
+def get_win_percentage_ranking(sessions):
+    """Calcule le classement par pourcentage de victoires.
+    
+    Returns:
+        list: Liste de tuples (joueur, victoires, parties_jouees, pourcentage) triée par pourcentage décroissant
+    """
+    player_victories = defaultdict(int)
+    player_games_played = defaultdict(int)
+    
+    for session in sessions:
+        players = parse_session_data(session)
+        if not players:
+            continue
+        
+        # Calculer le nombre total de parties dans cette session
+        total_games_in_session = sum(stats['today'] for stats in players.values())
+        
+        # Pour chaque joueur de la session
+        for player, stats in players.items():
+            # Ajouter les victoires
+            player_victories[player] += stats['today']
+            # Ajouter le nombre de parties jouées (total de la session)
+            player_games_played[player] += total_games_in_session
+    
+    # Calculer les pourcentages
+    player_stats = []
+    for player in player_victories.keys():
+        victories = player_victories[player]
+        games_played = player_games_played[player]
+        
+        if games_played > 0:
+            win_percentage = (victories / games_played) * 100
+        else:
+            win_percentage = 0.0
+        
+        player_stats.append((player, victories, games_played, win_percentage))
+    
+    # Trier par pourcentage décroissant
+    return sorted(player_stats, key=lambda x: x[3], reverse=True)
+
+def get_medal(rank):
+    """Retourne la médaille correspondant au rang."""
+    if rank == 1:
+        return '🥇'
+    elif rank == 2:
+        return '🥈'
+    elif rank == 3:
+        return '🥉'
+    return ''
+
 def load_static_file(filepath, required=False):
     """Charge un fichier statique (CSS, JS ou HTML) et retourne son contenu.
     
@@ -326,6 +380,17 @@ def generate_html(sessions):
                     <div class="stat-label">{best_player_name}</div>
                 </div>''')
     
+    # Meilleur pourcentage de victoires - en deuxième position
+    win_percentage_ranking = get_win_percentage_ranking(sessions)
+    if win_percentage_ranking:
+        best_percentage_player, victories, games_played, win_percentage = win_percentage_ranking[0]
+        stats_cards.append(f'''
+                <div class="stat-card">
+                    <div class="stat-label">Meilleur % Victoires</div>
+                    <div class="stat-value">{win_percentage:.1f}%</div>
+                    <div class="stat-label">{best_percentage_player}</div>
+                </div>''')
+    
     # Joueurs Uniques et Total Sessions
     stats_cards.append(f'''
                 <div class="stat-card">
@@ -347,20 +412,37 @@ def generate_html(sessions):
         group_options.append(f'                    <option value="{group_id}" {selected}>{group_id} (Meilleur: {best_score})</option>')
     group_options_html = '\n'.join(group_options)
     
+    # Calculer le classement par pourcentage de victoires
+    win_percentage_ranking = get_win_percentage_ranking(sessions)
+    
+    # Générer les lignes du tableau de pourcentage de victoires
+    win_percentage_rows = []
+    for rank, (player, victories, games_played, win_percentage) in enumerate(win_percentage_ranking, 1):
+        medal = get_medal(rank)
+        rank_class = f'rank-{rank}' if rank <= 3 else ''
+        player_color = get_player_color(player)
+        win_percentage_rows.append(f'''
+                    <tr>
+                        <td class="{rank_class}" style="color: {player_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{medal} {player}</td>
+                        <td class="{rank_class}">{victories}/{games_played}</td>
+                        <td class="{rank_class}">{win_percentage:.2f}%</td>
+                    </tr>''')
+    win_percentage_rows_html = ''.join(win_percentage_rows)
+    
     # Générer les lignes du classement
     ranking_rows = []
     for rank, (player, total) in enumerate(default_ranking, 1):
+        medal = get_medal(rank)
         rank_class = f'rank-{rank}' if rank <= 3 else ''
         player_color = get_player_color(player)
         ranking_rows.append(f'''
                     <tr>
-                        <td class="{rank_class}">#{rank}</td>
-                        <td class="{rank_class}" style="color: {player_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{player}</td>
+                        <td class="{rank_class}" style="color: {player_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{medal} {player}</td>
                         <td class="{rank_class}">{total}</td>
                     </tr>''')
     ranking_rows_html = ''.join(ranking_rows)
     
-    # Générer les sessions de la dernière soirée
+    # Générer les sessions de la dernière session
     latest_sessions_html = ''
     if latest_date and latest_sessions:
         latest_sessions_html += f'<div class="session-date">Date: {format_date(latest_date)}</div>'
@@ -371,12 +453,12 @@ def generate_html(sessions):
                 session_rows = []
                 sorted_players = sorted(players.items(), key=lambda x: x[1]['today'], reverse=True)
                 for rank, (player, stats) in enumerate(sorted_players, 1):
+                    medal = get_medal(rank)
                     player_color = get_player_color(player)
                     rank_class = f'rank-{rank}' if rank <= 3 else ''
                     session_rows.append(f'''
                         <tr>
-                            <td class="{rank_class}">#{rank}</td>
-                            <td class="{rank_class}" style="color: {player_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{player}</td>
+                            <td class="{rank_class}" style="color: {player_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{medal} {player}</td>
                             <td class="{rank_class}">{stats["today"]}</td>
                             <td class="{rank_class}">{stats["total"]}</td>
                         </tr>''')
@@ -389,7 +471,6 @@ def generate_html(sessions):
                 <table class="ranking-table">
                     <thead>
                         <tr>
-                            <th>#</th>
                             <th>Joueur</th>
                             <th>Session</th>
                             <th>Total</th>
@@ -428,6 +509,7 @@ def generate_html(sessions):
     html = html.replace('{DATE_FIN}', date_fin_formatted)
     html = html.replace('{GROUP_OPTIONS}', group_options_html)
     html = html.replace('{RANKING_ROWS}', ranking_rows_html)
+    html = html.replace('{WIN_PERCENTAGE_ROWS}', win_percentage_rows_html)
     html = html.replace('{LATEST_SESSIONS}', latest_sessions_html)
     html = html.replace('{RANKINGS_JSON}', rankings_json)
     html = html.replace('{PLAYER_COLORS_JSON}', player_colors_json)
@@ -435,9 +517,17 @@ def generate_html(sessions):
     
     return html
 
-@functions_framework.http
-def display_stats(request):
-    """HTTP Cloud Function qui affiche les statistiques depuis Google Sheets."""
+@app.route('/images/<filename>')
+def serve_image(filename):
+    """Route pour servir les images statiques."""
+    base_path = os.path.dirname(os.path.abspath(__file__))
+    images_dir = os.path.join(base_path, 'images')
+    return send_from_directory(images_dir, filename)
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def flask_display_stats(path):
+    """Route principale qui affiche les statistiques depuis Google Sheets."""
     # Récupère les données de la sheet
     sheet_data = get_sheet_data()
     
@@ -454,67 +544,36 @@ def display_stats(request):
     html_response = generate_html(sheet_data)
     return html_response
 
-# Créer un objet app WSGI compatible avec Gunicorn
-# Cela permet à Cloud Run d'utiliser Gunicorn si un buildpack est détecté
-class WSGIRequest:
-    """Wrapper pour convertir une requête WSGI en objet request compatible avec functions-framework"""
-    def __init__(self, environ):
-        self.method = environ.get('REQUEST_METHOD', 'GET')
-        self.path = environ.get('PATH_INFO', '/')
-        self.headers = {}
-        for key, value in environ.items():
-            if key.startswith('HTTP_'):
-                header_name = key[5:].replace('_', '-').title()
-                self.headers[header_name] = value
-        # Lire le body si présent
-        try:
-            content_length = int(environ.get('CONTENT_LENGTH', 0))
-            if content_length > 0:
-                self.data = environ['wsgi.input'].read(content_length)
-            else:
-                self.data = b''
-        except (ValueError, KeyError):
-            self.data = b''
-
-def wsgi_app(environ, start_response):
-    """Application WSGI qui appelle display_stats"""
-    # Créer un objet request compatible avec functions-framework
-    request = WSGIRequest(environ)
+# Wrapper pour functions-framework
+@functions_framework.http
+def display_stats(request):
+    """Handler pour functions-framework qui délègue à Flask."""
+    # functions-framework passe un objet Flask Request
+    # On utilise directement Flask en créant un contexte WSGI
+    # Construire l'environ WSGI depuis l'objet request Flask
+    environ = {
+        'REQUEST_METHOD': request.method,
+        'PATH_INFO': request.path,
+        'QUERY_STRING': request.query_string.decode() if request.query_string else '',
+        'wsgi.input': io.BytesIO(request.get_data()),
+        'CONTENT_LENGTH': str(len(request.get_data())),
+        'CONTENT_TYPE': request.content_type or '',
+        'SERVER_NAME': request.host.split(':')[0] if request.host else 'localhost',
+        'SERVER_PORT': request.host.split(':')[1] if ':' in request.host else '80',
+        'wsgi.version': (1, 0),
+        'wsgi.url_scheme': request.scheme,
+        'wsgi.errors': None,
+        'wsgi.multithread': False,
+        'wsgi.multiprocess': True,
+        'wsgi.run_once': False,
+    }
+    # Ajouter les headers HTTP
+    for key, value in request.headers:
+        environ[f'HTTP_{key.upper().replace("-", "_")}'] = value
     
-    # Appeler la fonction display_stats
-    try:
-        result = display_stats(request)
-        
-        # Gérer la réponse (peut être un tuple (html, status) ou juste html)
-        if isinstance(result, tuple):
-            html, status_code = result
-            status = f"{status_code} OK" if status_code == 200 else f"{status_code} Error"
-        else:
-            html = result
-            status = "200 OK"
-        
-        # Convertir en bytes si nécessaire
-        if isinstance(html, str):
-            html = html.encode('utf-8')
-        
-        # Headers de réponse
-        headers = [
-            ('Content-Type', 'text/html; charset=utf-8'),
-            ('Content-Length', str(len(html)))
-        ]
-        
-        start_response(status, headers)
-        return [html]
-    except Exception as e:
-        # Gérer les erreurs
-        error_msg = f"<html><body><h1>Erreur</h1><pre>{str(e)}</pre></body></html>"
-        error_bytes = error_msg.encode('utf-8')
-        headers = [
-            ('Content-Type', 'text/html; charset=utf-8'),
-            ('Content-Length', str(len(error_bytes)))
-        ]
-        start_response("500 Internal Server Error", headers)
-        return [error_bytes]
+    # Utiliser Flask avec le contexte WSGI
+    with app.request_context(environ):
+        return app.full_dispatch_request()
 
-# Objet app que Gunicorn cherche
-app = wsgi_app
+# L'objet app Flask est déjà WSGI-compatible
+# Gunicorn peut l'utiliser directement via main:app

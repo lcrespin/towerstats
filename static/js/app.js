@@ -22,10 +22,10 @@ function updateRanking(groupId) {
         const rankClass = rank <= 3 ? `rank-${rank}` : '';
         const playerName = playerData[0];
         const playerColor = getPlayerColor(playerName);
+        const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td class="${rankClass}">#${rank}</td>
-            <td class="${rankClass}" style="color: ${playerColor}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${playerName}</td>
+            <td class="${rankClass}" style="color: ${playerColor}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${medal} ${playerName}</td>
             <td class="${rankClass}">${playerData[1]}</td>
         `;
         tbody.appendChild(row);
@@ -65,9 +65,10 @@ function renderSessions() {
             var rank = index + 1;
             var rankClass = rank <= 3 ? 'rank-' + rank : '';
             var color = getPlayerColor(p.name);
-            tableRows += '<tr><td class="' + rankClass + '">#' + rank + '</td><td class="' + rankClass + '" style="color: ' + color + '; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">' + p.name + '</td><td class="' + rankClass + '">' + p.today + '</td><td class="' + rankClass + '">' + p.total + '</td></tr>';
+            var medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
+            tableRows += '<tr><td class="' + rankClass + '" style="color: ' + color + '; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">' + medal + ' ' + p.name + '</td><td class="' + rankClass + '">' + p.today + '</td><td class="' + rankClass + '">' + p.total + '</td></tr>';
         });
-        sessionCard.innerHTML = '<div style="color: #ffd700; margin-bottom: 15px; font-size: 10px;">Session: ' + session.id + ' - ' + session.date + '</div><table class="ranking-table"><thead><tr><th>#</th><th>Joueur</th><th>Session</th><th>Total</th></tr></thead><tbody>' + tableRows + '</tbody></table>';
+        sessionCard.innerHTML = '<div style="color: #ffd700; margin-bottom: 15px; font-size: 10px;">Session: ' + session.id + ' - ' + session.date + '</div><table class="ranking-table"><thead><tr><th>Joueur</th><th>Session</th><th>Total</th></tr></thead><tbody>' + tableRows + '</tbody></table>';
         container.appendChild(sessionCard);
     });
     
