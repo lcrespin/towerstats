@@ -99,9 +99,14 @@ function initSessionsPagination() {
             const container = document.getElementById('all-sessions-container');
             if (!container) return;
             
-            const isVisible = container.style.display !== 'none';
-            container.style.display = isVisible ? 'none' : 'block';
-            this.textContent = isVisible ? '▼ Voir toutes les sessions' : '▲ Masquer toutes les sessions';
+            const isVisible = !container.classList.contains('hidden');
+            if (isVisible) {
+                container.classList.add('hidden');
+                this.textContent = '▼ Voir toutes les sessions';
+            } else {
+                container.classList.remove('hidden');
+                this.textContent = '▲ Masquer toutes les sessions';
+            }
             
             if (!isVisible && currentPage === 1) {
                 renderSessions();

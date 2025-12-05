@@ -6,6 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TowerStats - Statistiques TowerFall Ascension</title>
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'pixel': ['Press Start 2P', 'cursive'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
 {CSS_CONTENT}
     </style>
@@ -26,19 +38,19 @@
         </div>
     </header>
 
-    <nav>
-        <ul>
-            <li><a href="#statistiques">Statistiques</a></li>
-            <li><a href="#pourcentage-victoires">% Victoires</a></li>
-            <li><a href="#classement">Groupes</a></li>
-            <li><a href="#derniere-soiree">Sessions</a></li>
+    <nav class="sticky top-0 z-50">
+        <ul class="flex flex-wrap justify-center gap-4 sm:gap-5 w-full">
+            <li class="flex-1 min-w-0"><a href="#statistiques" class="block text-center">Statistiques</a></li>
+            <li class="flex-1 min-w-0"><a href="#pourcentage-victoires" class="block text-center">% Victoires</a></li>
+            <li class="flex-1 min-w-0"><a href="#classement" class="block text-center">Groupes</a></li>
+            <li class="flex-1 min-w-0"><a href="#derniere-soiree" class="block text-center">Sessions</a></li>
         </ul>
     </nav>
 
-    <div class="container">
-        <section id="statistiques">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+        <section id="statistiques" class="mb-6 sm:mb-8">
             <h2>📊 Statistiques Générales</h2>
-            <div class="stats-grid">
+            <div class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {STATS_CARDS}
             </div>
             <div class="stats-dates">
@@ -47,9 +59,10 @@
             </div>
         </section>
 
-        <section id="pourcentage-victoires">
+        <section id="pourcentage-victoires" class="mb-6 sm:mb-8">
             <h2>🏆 Classement par Pourcentage de Victoires</h2>
-            <table class="ranking-table">
+            <div class="overflow-x-auto">
+                <table class="ranking-table w-full">
                 <thead>
                     <tr>
                         <th>Joueur</th>
@@ -61,19 +74,21 @@
                     {WIN_PERCENTAGE_ROWS}
                 </tbody>
             </table>
+            </div>
         </section>
 
-        <section id="classement">
+        <section id="classement" class="mb-6 sm:mb-8">
             <h2>🏆 Classement par Groupe</h2>
-            <div style="margin-bottom: 20px; position: relative; z-index: 1;">
-                <label for="group-select" style="color: #ffd700; font-size: 10px; display: block; margin-bottom: 10px;">
+            <div class="mb-5 relative z-10">
+                <label for="group-select" class="block mb-2.5" style="color: #ffd700; font-size: 10px;">
                     Sélectionner un groupe de joueurs:
                 </label>
-                <select id="group-select" class="group-select">
+                <select id="group-select" class="group-select w-full max-w-md">
                     {GROUP_OPTIONS}
                 </select>
             </div>
-            <table class="ranking-table" id="ranking-table">
+            <div class="overflow-x-auto">
+                <table class="ranking-table w-full" id="ranking-table">
                 <thead>
                     <tr>
                         <th>Joueur</th>
@@ -84,17 +99,18 @@
                     {RANKING_ROWS}
                 </tbody>
             </table>
+            </div>
         </section>
 
-        <section id="derniere-soiree">
+        <section id="derniere-soiree" class="mb-6 sm:mb-8">
             <h2>📅 Dernière Session de Jeu</h2>
             {LATEST_SESSIONS}
-            <button id="toggle-all-sessions" class="toggle-button">
+            <button id="toggle-all-sessions" class="toggle-button w-full sm:w-auto">
                 ▼ Voir toutes les sessions
             </button>
-            <div id="all-sessions-container" style="display: none;">
+            <div id="all-sessions-container" class="hidden">
                 <div id="all-sessions-list"></div>
-                <div class="pagination-controls">
+                <div class="pagination-controls flex justify-center items-center gap-5 my-5">
                     <button id="prev-page" class="pagination-button">◄ Précédent</button>
                     <span id="page-info" class="page-info">1</span>
                     <button id="next-page" class="pagination-button">Suivant ►</button>

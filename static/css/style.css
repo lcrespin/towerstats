@@ -239,24 +239,18 @@ nav {
 }
 
 nav ul {
+    /* Tailwind classes handle this: flex flex-wrap justify-center gap-4 sm:gap-5 w-full */
     list-style: none;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 20px;
     margin: 0;
     padding: 0;
-    width: 100%;
 }
 
 nav ul li {
-    flex: 1;
-    min-width: 0;
+    /* Tailwind classes handle this: flex-1 min-w-0 */
 }
 
 nav ul li a {
-    width: 100%;
-    text-align: center;
+    /* Tailwind classes handle this: block text-center */
     box-sizing: border-box;
 }
 
@@ -291,9 +285,7 @@ nav a:hover {
 
 /* Main Content */
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+    /* Tailwind classes handle this: mx-auto px-4 sm:px-6 lg:px-8 */
 }
 
 section {
@@ -450,9 +442,7 @@ section h2 {
 }
 
 .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 15px;
+    /* Tailwind classes handle this: grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 */
     margin-top: 15px;
 }
 
@@ -497,11 +487,7 @@ section h2 {
 }
 
 .pagination-controls {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    margin: 20px 0;
+    /* Tailwind classes handle this: flex justify-center items-center gap-5 my-5 */
     position: relative;
     z-index: 1;
 }
