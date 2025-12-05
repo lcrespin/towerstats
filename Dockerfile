@@ -20,6 +20,10 @@ RUN chmod +x entrypoint.sh
 # Exposer le port 8080 (port par défaut de Cloud Run)
 EXPOSE 8080
 
-# Utiliser le script d'entrée
-CMD ["./entrypoint.sh"]
+# Définir la variable d'environnement pour éviter l'auto-détection
+ENV PORT=8080
+
+# Utiliser le script d'entrée explicitement
+# Utiliser ENTRYPOINT pour éviter que Cloud Run n'utilise un buildpack
+ENTRYPOINT ["./entrypoint.sh"]
 

@@ -1,0 +1,20 @@
+# Ignorer les fichiers qui pourraient déclencher l'auto-détection de buildpack
+.gcloudignore
+.git
+.gitignore
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+.venv
+*.swp
+*.swo
+*~
+.DS_Store
+README.md
+run_local.sh
+
