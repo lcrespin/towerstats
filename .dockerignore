@@ -1,0 +1,35 @@
+# Fichiers Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Environnements virtuels
+venv/
+env/
+ENV/
+
+# Fichiers de développement
+.git/
+.gitignore
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Documentation
+README.md
+*.md
+
+# Scripts locaux
+run_local.sh
+
+# Fichiers de données locaux (si présents)
+data.csv
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+

@@ -43,12 +43,32 @@ curl http://localhost:8080
 
 ## Déploiement sur Cloud Run
 
+Le projet inclut un `Dockerfile` pour le déploiement sur Cloud Run.
+
+### Déploiement direct
+
 ```bash
 gcloud run deploy towerstats \
   --source . \
   --region europe-west1 \
   --allow-unauthenticated
 ```
+
+Cloud Run détectera automatiquement le `Dockerfile` et construira l'image.
+
+### Tester le build Docker en local (optionnel)
+
+Pour tester le conteneur Docker localement avant le déploiement :
+
+```bash
+# Construire l'image
+docker build -t towerstats .
+
+# Lancer le conteneur
+docker run -p 8080:8080 towerstats
+```
+
+Le service sera accessible sur http://localhost:8080
 
 ## Configuration
 
