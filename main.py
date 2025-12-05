@@ -5,7 +5,7 @@ import csv
 import io
 import json
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import defaultdict
 
 # Créer l'application Flask
@@ -42,6 +42,136 @@ def get_player_color(player_name):
     """Retourne la couleur d'un joueur pour l'affichage."""
     return PLAYER_TO_COLOR.get(player_name.upper(), '#FFD700')  # Par défaut: or
 
+def parse_date_with_hour(date_str):
+    """Parse une date au format 'YYYY-MM-DD-HH' et retourne (date, heure).
+    
+    Args:
+        date_str: Date au format 'YYYY-MM-DD-HH' (ex: '2025-11-27-23')
+    
+    Returns:
+        tuple: (date_obj, heure) où date_obj est un objet datetime et heure est un int (0-23)
+        Retourne (None, None) si le format est invalide
+    """
+    try:
+        # Format attendu: 'YYYY-MM-DD-HH'
+        parts = date_str.split('-')
+        if len(parts) >= 4:
+            year = int(parts[0])
+            month = int(parts[1])
+            day = int(parts[2])
+            hour = int(parts[3])
+            date_obj = datetime(year, month, day)
+            return date_obj, hour
+    except (ValueError, IndexError):
+        pass
+    return None, None
+
+def filter_midnight_sessions(sessions):
+    """Filtre les sessions qui passent minuit en ignorant celle avant minuit.
+    
+    Si une session se termine à 23h et est suivie d'une session à 00h le jour suivant
+    avec le même groupe de joueurs, on ignore la session à 23h.
+    
+    Les dates peuvent être au format 'YYYY-MM-DD' ou 'YYYY-MM-DD-HH'.
+    Si l'heure n'est pas dans la date, on détecte les sessions consécutives avec le même ID.
+    
+    Args:
+        sessions: Liste de sessions triées par date (plus récent en premier)
+    
+    Returns:
+        list: Liste de sessions filtrée
+    """
+    if not sessions:
+        return sessions
+    
+    # Trier par date décroissante (plus récent en premier)
+    sessions_sorted = sorted(sessions, key=lambda x: x['date'], reverse=True)
+    
+    sessions_to_keep = []
+    sessions_to_skip = set()
+    
+    # Parcourir les sessions et détecter les paires qui passent minuit
+    for i, session in enumerate(sessions_sorted):
+        if i in sessions_to_skip:
+            continue
+        
+        date_obj, hour = parse_date_with_hour(session['date'])
+        
+        # Si le format de date contient l'heure (format YYYY-MM-DD-HH)
+        if date_obj is not None and hour is not None:
+            # Si cette session est à 23h, vérifier s'il y a une session à 00h le jour suivant
+            if hour == 23:
+                # Calculer la date du jour suivant
+                next_day = date_obj + timedelta(days=1)
+                
+                # Chercher une session à 00h le jour suivant avec le même groupe
+                # Les sessions sont triées par date décroissante, donc la session à 00h du jour suivant
+                # sera avant celle à 23h (indice plus petit)
+                found_next_day_session = False
+                for j, other_session in enumerate(sessions_sorted):
+                    if j >= i:  # On ne regarde que les sessions plus récentes (indices plus petits)
+                        continue
+                    
+                    other_date_obj, other_hour = parse_date_with_hour(other_session['date'])
+                    if other_date_obj is None or other_hour is None:
+                        continue
+                    
+                    # Vérifier si c'est le jour suivant à 00h avec le même groupe
+                    if (other_date_obj.date() == next_day.date() and 
+                        other_hour == 0 and 
+                        other_session['id'] == session['id']):
+                        # On a trouvé une session à 00h le jour suivant avec le même groupe
+                        # On ignore la session à 23h
+                        found_next_day_session = True
+                        break
+                
+                if found_next_day_session:
+                    # Ignorer cette session (23h)
+                    continue
+        
+        # Si le format de date ne contient pas l'heure (format YYYY-MM-DD)
+        # On doit détecter les sessions consécutives avec le même ID
+        else:
+            try:
+                # Parser la date au format YYYY-MM-DD
+                current_date = datetime.strptime(session['date'], '%Y-%m-%d')
+                previous_day_date = current_date - timedelta(days=1)
+                
+                # Chercher une session le jour précédent avec le même ID
+                # Les sessions sont triées par date décroissante, donc la session du jour précédent
+                # sera après celle d'aujourd'hui (indice plus grand)
+                # Si on trouve une session le jour précédent avec le même ID, cela signifie que
+                # la session actuelle (jour N) est celle après minuit, et la session du jour précédent
+                # (jour N-1) est celle avant minuit qu'on doit ignorer
+                found_previous_day_session = False
+                for j, other_session in enumerate(sessions_sorted):
+                    if j <= i or j in sessions_to_skip:  # On ne regarde que les sessions moins récentes (indices plus grands)
+                        continue
+                    
+                    try:
+                        other_date = datetime.strptime(other_session['date'], '%Y-%m-%d')
+                        # Vérifier si c'est le jour précédent avec le même groupe
+                        if (other_date.date() == previous_day_date.date() and 
+                            other_session['id'] == session['id']):
+                            # On a trouvé une session le jour précédent avec le même groupe
+                            # La session du jour précédent (j) est celle avant minuit, on doit l'ignorer
+                            found_previous_day_session = True
+                            sessions_to_skip.add(j)  # Marquer la session du jour précédent pour qu'elle soit ignorée
+                            break
+                    except (ValueError, KeyError):
+                        continue
+                
+                # Si on a trouvé une session le jour précédent, on continue (on garde la session actuelle)
+                # car c'est la session après minuit qu'on veut garder
+            except (ValueError, KeyError):
+                # Format de date non reconnu, on garde la session
+                pass
+        
+        # Garder la session
+        sessions_to_keep.append(session)
+    
+    return sessions_to_keep
+
 def get_sheet_data():
     """Récupère et parse les données depuis l'URL CSV publique."""
     try:
@@ -75,6 +205,9 @@ def get_sheet_data():
                 sessions.append(session)
             except json.JSONDecodeError:
                 continue
+        
+        # Filtrer les sessions qui passent minuit (ignorer celle avant minuit)
+        sessions = filter_midnight_sessions(sessions)
         
         # Trier par date (plus récent en premier)
         sessions.sort(key=lambda x: x['date'], reverse=True)
