@@ -32,7 +32,7 @@ header {
     gap: 10px;
     min-height: 80px;
     flex-wrap: nowrap;
-    overflow-x: auto;
+    overflow-x: hidden;
 }
 
 header::before {
@@ -51,7 +51,7 @@ header::before {
 }
 
 h1 {
-    font-size: 24px;
+    font-size: clamp(12px, calc(100vw / 20), 24px);
     color: #ffd700;
     text-shadow:
         3px 3px 0px #8b4513,
@@ -65,7 +65,12 @@ h1 {
     justify-content: center;
     line-height: 1;
     white-space: nowrap;
-    flex-shrink: 0;
+    flex-shrink: 1;
+}
+
+.title-emoji {
+    font-size: 0.8em;
+    display: inline-block;
 }
 
 .header-characters {
@@ -86,7 +91,8 @@ h1 {
     image-rendering: crisp-edges;
     filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
     transition: transform 0.3s ease;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    max-width: 90px;
 }
 
 .header-character:hover {
@@ -97,59 +103,104 @@ h1 {
     header {
         gap: 5px;
         padding: 15px 10px;
+        flex-wrap: nowrap;
+        overflow-x: hidden;
     }
 
     .header-character {
         width: 30px;
         height: 40px;
+        max-width: 30px;
+        flex-shrink: 1;
     }
 
     h1 {
-        font-size: 12px;
+        font-size: clamp(8px, calc(100vw / 30), 12px);
         margin: 0 5px;
         height: 40px;
+        flex-shrink: 1;
     }
 
     .header-characters {
         gap: 3px;
+        flex-shrink: 1;
     }
 }
 
 @media (max-width: 375px) {
     header {
-        gap: 1px;
-        padding: 8px 2px;
-        min-height: 45px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    header::-webkit-scrollbar {
-        height: 4px;
-    }
-
-    header::-webkit-scrollbar-thumb {
-        background: #8b4513;
-        border-radius: 2px;
+        gap: 0.5px;
+        padding: 6px 1px;
+        min-height: 40px;
+        flex-wrap: nowrap;
+        overflow-x: hidden;
     }
 
     .header-character {
-        width: 18px;
-        height: 28px;
-        min-width: 18px;
+        width: calc((100vw - 50px) / 7);
+        max-width: 16px;
+        height: auto;
+        aspect-ratio: 3/4;
+        flex-shrink: 1;
     }
 
     h1 {
-        font-size: 7px;
-        margin: 0 1px;
-        height: 28px;
-        padding: 0 1px;
+        font-size: clamp(5px, calc(100vw / 60), 6px);
+        margin: 0 0.5px;
+        height: auto;
+        min-height: 28px;
+        padding: 0 0.5px;
         white-space: nowrap;
+        flex-shrink: 1;
+    }
+
+    .title-emoji {
+        font-size: 0.5em;
     }
 
     .header-characters {
-        gap: 1px;
-        min-width: fit-content;
+        gap: 0.5px;
+        flex-shrink: 1;
+        display: flex;
+        flex-wrap: nowrap;
+    }
+}
+
+@media (max-width: 300px) {
+    header {
+        gap: 0.3px;
+        padding: 4px 0.5px;
+        min-height: 35px;
+        flex-wrap: nowrap;
+        overflow-x: hidden;
+    }
+
+    .header-character {
+        width: calc((100vw - 30px) / 7);
+        max-width: 12px;
+        height: auto;
+        aspect-ratio: 3/4;
+        flex-shrink: 1;
+    }
+
+    h1 {
+        font-size: clamp(4px, calc(100vw / 75), 5px);
+        margin: 0 0.3px;
+        height: auto;
+        min-height: 20px;
+        padding: 0 0.3px;
+        flex-shrink: 1;
+    }
+
+    .title-emoji {
+        display: none;
+    }
+
+    .header-characters {
+        gap: 0.3px;
+        flex-shrink: 1;
+        display: flex;
+        flex-wrap: nowrap;
     }
 }
 
@@ -526,6 +577,8 @@ section h2 {
     section {
         padding: 10px;
         margin-bottom: 15px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     section h2 {
@@ -539,11 +592,6 @@ section h2 {
         width: 100%;
         display: table;
         table-layout: fixed;
-    }
-
-    section {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
     }
 
     .ranking-table th,
@@ -622,5 +670,82 @@ section h2 {
         font-size: 6px;
         word-wrap: break-word;
         overflow-wrap: break-word;
+    }
+}
+
+@media (max-width: 300px) {
+    body {
+        font-size: 6px;
+    }
+
+    .container {
+        padding: 8px;
+    }
+
+    section {
+        padding: 8px;
+        margin-bottom: 12px;
+    }
+
+    section h2 {
+        font-size: 8px;
+    }
+
+    .ranking-table {
+        font-size: 5px;
+    }
+
+    .ranking-table th,
+    .ranking-table td {
+        padding: 4px 2px;
+        font-size: 5px;
+    }
+
+    .stat-card {
+        padding: 8px;
+    }
+
+    .stat-value {
+        font-size: 12px;
+    }
+
+    .stat-label {
+        font-size: 5px;
+    }
+
+    nav ul {
+        gap: 3px;
+    }
+
+    nav ul li a {
+        padding: 5px 2px;
+        font-size: 5px;
+    }
+
+    .group-select {
+        font-size: 5px;
+        padding: 6px 8px;
+    }
+
+    .toggle-button {
+        font-size: 6px;
+        padding: 8px 12px;
+    }
+
+    .pagination-button {
+        font-size: 5px;
+        padding: 5px 10px;
+    }
+
+    .session-card {
+        padding: 8px;
+    }
+
+    .session-date {
+        font-size: 7px;
+    }
+
+    .player-stat {
+        font-size: 5px;
     }
 }

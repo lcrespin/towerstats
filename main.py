@@ -373,22 +373,24 @@ def generate_html(sessions):
     if all_player_totals:
         best_player = max(all_player_totals.items(), key=lambda x: x[1])
         best_player_name, best_score = best_player
+        best_player_color = get_player_color(best_player_name)
         stats_cards.append(f'''
                 <div class="stat-card">
-                    <div class="stat-label">Meilleur Score Global</div>
+                    <div class="stat-label">Meilleur Score dans un groupe</div>
                     <div class="stat-value">{best_score}</div>
-                    <div class="stat-label">{best_player_name}</div>
+                    <div class="stat-label" style="color: {best_player_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{best_player_name}</div>
                 </div>''')
     
     # Meilleur pourcentage de victoires - en deuxième position
     win_percentage_ranking = get_win_percentage_ranking(sessions)
     if win_percentage_ranking:
         best_percentage_player, victories, games_played, win_percentage = win_percentage_ranking[0]
+        best_percentage_color = get_player_color(best_percentage_player)
         stats_cards.append(f'''
                 <div class="stat-card">
                     <div class="stat-label">Meilleur % Victoires</div>
                     <div class="stat-value">{win_percentage:.1f}%</div>
-                    <div class="stat-label">{best_percentage_player}</div>
+                    <div class="stat-label" style="color: {best_percentage_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{best_percentage_player}</div>
                 </div>''')
     
     # Joueurs Uniques et Total Sessions
@@ -408,8 +410,7 @@ def generate_html(sessions):
     group_options = []
     for group_id in sorted_groups:
         selected = 'selected' if group_id == default_group else ''
-        best_score = get_best_score(group_id)
-        group_options.append(f'                    <option value="{group_id}" {selected}>{group_id} (Meilleur: {best_score})</option>')
+        group_options.append(f'                    <option value="{group_id}" {selected}>{group_id}</option>')
     group_options_html = '\n'.join(group_options)
     
     # Calculer le classement par pourcentage de victoires
