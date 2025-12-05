@@ -3,6 +3,7 @@ import urllib.request
 import csv
 import io
 import json
+import os
 from datetime import datetime
 from collections import defaultdict
 
@@ -169,6 +170,48 @@ def format_date(date_str, format_short=False):
         pass
     return date_str
 
+def load_static_file(filepath, required=False):
+    """Charge un fichier statique (CSS, JS ou HTML) et retourne son contenu.
+    
+    Args:
+        filepath: Chemin vers le fichier à charger
+        required: Si True, lève une exception si le fichier ne peut pas être chargé.
+                 Si False, retourne une chaîne vide en cas d'erreur.
+    
+    Returns:
+        Contenu du fichier ou chaîne vide si non requis et erreur.
+    
+    Raises:
+        FileNotFoundError: Si required=True et le fichier n'existe pas.
+        IOError: Si required=True et une erreur de lecture survient.
+    """
+    try:
+        # Essayer d'abord depuis le répertoire courant
+        base_path = os.path.dirname(os.path.abspath(__file__))
+        full_path = os.path.join(base_path, filepath)
+        if os.path.exists(full_path):
+            with open(full_path, 'r', encoding='utf-8') as f:
+                return f.read()
+        # Si pas trouvé, essayer directement
+        if os.path.exists(filepath):
+            with open(filepath, 'r', encoding='utf-8') as f:
+                return f.read()
+        # Fichier non trouvé
+        if required:
+            raise FileNotFoundError(f"Required file not found: {filepath}")
+        print(f"Warning: Could not load {filepath}: File not found")
+        return ''
+    except (FileNotFoundError, IOError) as e:
+        if required:
+            raise
+        print(f"Warning: Could not load {filepath}: {e}")
+        return ''
+    except Exception as e:
+        if required:
+            raise IOError(f"Error loading {filepath}: {e}") from e
+        print(f"Warning: Could not load {filepath}: {e}")
+        return ''
+
 def generate_html(sessions):
     """Génère la page HTML complète avec style pixelart."""
     
@@ -219,395 +262,52 @@ def generate_html(sessions):
         filtered_players = {p: v for p, v in players.items() if not should_ignore_player(p)}
         unique_players.update(filtered_players.keys())
     
-    html = '''<!DOCTYPE html>
+    # Charger le template HTML (requis - lève une exception si échec)
+    try:
+        html_template = load_static_file('templates/index.html', required=True)
+    except (FileNotFoundError, IOError) as e:
+        # Retourner une page d'erreur HTML si le template ne peut pas être chargé
+        error_html = '''<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TowerStats - Statistiques TowerFall Ascension</title>
+    <title>Erreur - TowerStats</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: 'Press Start 2P', cursive;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
             color: #e8e8e8;
-            line-height: 1.6;
-            font-size: 10px;
-            min-height: 100vh;
-            background-image: 
-                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px),
-                repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px);
-        }
-        
-        /* Header */
-        header {
-            background: linear-gradient(135deg, #2d1b3d 0%, #1a0d2e 100%);
-            border-bottom: 4px solid #8b4513;
-            padding: 25px 20px;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 80px;
-        }
-        
-        header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                rgba(139, 69, 19, 0.1) 10px,
-                rgba(139, 69, 19, 0.1) 20px
-            );
-            pointer-events: none;
-        }
-        
-        h1 {
-            font-size: 24px;
-            color: #ffd700;
-            text-shadow: 
-                3px 3px 0px #8b4513,
-                0 0 10px rgba(255, 215, 0, 0.5);
-            margin-bottom: 10px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .header-image-placeholder {
-            width: 200px;
-            height: 100px;
-            margin: 10px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .header-image-placeholder img {
-            max-width: 100%;
-            max-height: 100%;
-            width: auto;
-            height: auto;
-            object-fit: contain;
-        }
-        
-        /* Sticky Menu */
-        nav {
-            background: linear-gradient(135deg, #3d2817 0%, #2d1b0d 100%);
-            border-bottom: 3px solid #8b4513;
-            padding: 15px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        nav ul {
-            list-style: none;
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin: 0;
-            padding: 0;
-        }
-        
-        .stats-dates {
-            color: #ffd700;
-            font-size: 8px;
-            text-shadow: 1px 1px 0px #8b4513;
-            display: flex;
-            flex-direction: column;
-            line-height: 1.4;
-            margin-top: 20px;
+            padding: 40px;
             text-align: center;
         }
-        
-        nav a {
-            color: #ffd700;
-            text-decoration: none;
-            padding: 8px 16px;
+        h1 { color: #ff4444; }
+        pre {
+            background: #2d1b3d;
+            padding: 20px;
+            border-radius: 5px;
             border: 2px solid #8b4513;
-            background: rgba(139, 69, 19, 0.3);
-            transition: all 0.3s;
-            display: inline-block;
-        }
-        
-        nav a:hover {
-            background: rgba(139, 69, 19, 0.6);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-        }
-        
-        /* Main Content */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        section {
-            background: rgba(45, 27, 61, 0.8);
-            border: 3px solid #8b4513;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 
-                inset 0 0 20px rgba(0,0,0,0.5),
-                0 4px 8px rgba(0,0,0,0.5);
-            position: relative;
-        }
-        
-        section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: repeating-linear-gradient(
-                0deg,
-                transparent,
-                transparent 20px,
-                rgba(139, 69, 19, 0.05) 20px,
-                rgba(139, 69, 19, 0.05) 22px
-            );
-            pointer-events: none;
-        }
-        
-        section h2 {
-            color: #ffd700;
-            font-size: 16px;
-            margin-bottom: 15px;
-            text-shadow: 2px 2px 0px #8b4513;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .ranking-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .ranking-table th {
-            background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
-            color: #ffd700;
-            padding: 12px;
             text-align: left;
-            border: 2px solid #654321;
-            font-size: 10px;
-        }
-        
-        .ranking-table td {
-            padding: 10px 12px;
-            border: 2px solid #654321;
-            background: rgba(26, 26, 46, 0.5);
-            font-size: 9px;
-        }
-        
-        .ranking-table tr:nth-child(even) td {
-            background: rgba(26, 26, 46, 0.7);
-        }
-        
-        .ranking-table tr:hover td {
-            background: rgba(139, 69, 19, 0.3);
-        }
-        
-        .rank-1 { color: #ffd700; font-weight: bold; }
-        .rank-2 { color: #c0c0c0; }
-        .rank-3 { color: #cd7f32; }
-        
-        .session-card {
-            background: rgba(26, 26, 46, 0.6);
-            border: 2px solid #8b4513;
-            padding: 15px;
-            margin-bottom: 15px;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .session-date {
-            color: #ffd700;
-            font-size: 12px;
-            margin-bottom: 10px;
-        }
-        
-        .session-players {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .player-stat {
-            background: rgba(139, 69, 19, 0.2);
-            padding: 8px;
-            border: 1px solid #8b4513;
-            font-size: 8px;
-        }
-        
-        .player-name {
-            font-weight: bold;
-            /* La couleur sera définie inline pour chaque joueur */
-        }
-        
-        .group-select {
-            background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
-            color: #ffd700;
-            border: 2px solid #654321;
-            padding: 10px 15px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 8px;
-            cursor: pointer;
-            width: 100%;
-            max-width: 500px;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffd700' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            padding-right: 35px;
-        }
-        
-        .group-select:hover {
-            background: linear-gradient(135deg, #654321 0%, #8b4513 100%);
-        }
-        
-        .group-select:focus {
-            outline: none;
-            border-color: #ffd700;
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-        }
-        
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
-        }
-        
-        .stat-card {
-            background: rgba(26, 26, 46, 0.6);
-            border: 2px solid #8b4513;
-            padding: 15px;
-            text-align: center;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .stat-value {
-            font-size: 20px;
-            color: #ffd700;
-            margin: 10px 0;
-        }
-        
-        .stat-label {
-            font-size: 8px;
-            color: #c0c0c0;
-        }
-        
-        .toggle-button {
-            background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
-            color: #ffd700;
-            border: 2px solid #654321;
-            padding: 12px 20px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 9px;
-            cursor: pointer;
-            margin: 20px 0;
-            transition: all 0.3s;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .toggle-button:hover {
-            background: linear-gradient(135deg, #654321 0%, #8b4513 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-        }
-        
-        .pagination-controls {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 20px;
-            margin: 20px 0;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .pagination-button {
-            background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
-            color: #ffd700;
-            border: 2px solid #654321;
-            padding: 8px 16px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 8px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .pagination-button:hover:not(:disabled) {
-            background: linear-gradient(135deg, #654321 0%, #8b4513 100%);
-            transform: translateY(-2px);
-        }
-        
-        .pagination-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .page-info {
-            color: #ffd700;
-            font-size: 9px;
-        }
-        
-        @media (max-width: 768px) {
-            body { font-size: 8px; }
-            h1 { font-size: 18px; }
-            section h2 { font-size: 12px; }
-            nav ul { flex-direction: column; gap: 10px; }
+            max-width: 800px;
+            margin: 20px auto;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>🏹 TOWERSTATS 🏹</h1>
-    </header>
+    <h1>❌ Erreur de Configuration</h1>
+    <p>Le template HTML n'a pas pu être chargé.</p>
+    <pre>''' + str(e) + '''</pre>
+    <p>Vérifiez que le fichier <code>templates/index.html</code> existe et est accessible.</p>
+</body>
+</html>'''
+        return error_html
     
-    <nav>
-        <ul>
-            <li><a href="#statistiques">Statistiques</a></li>
-            <li><a href="#classement">Classement par Groupe</a></li>
-            <li><a href="#derniere-soiree">Dernière Soirée</a></li>
-        </ul>
-    </nav>
+    # Charger les fichiers statiques (optionnels - chaîne vide si échec)
+    css_content = load_static_file('static/css/style.css', required=False)
+    js_content = load_static_file('static/js/app.js', required=False)
     
-    <div class="container">
-        <section id="statistiques">
-            <h2>📊 Statistiques Générales</h2>
-            <div class="stats-grid">'''
+    # Générer les cartes de statistiques
+    stats_cards = []
     
     # Meilleur joueur (parmi tous les groupes) - en premier
     all_player_totals = defaultdict(int)
@@ -619,15 +319,15 @@ def generate_html(sessions):
     if all_player_totals:
         best_player = max(all_player_totals.items(), key=lambda x: x[1])
         best_player_name, best_score = best_player
-        html += f'''
+        stats_cards.append(f'''
                 <div class="stat-card">
                     <div class="stat-label">Meilleur Score Global</div>
                     <div class="stat-value">{best_score}</div>
                     <div class="stat-label">{best_player_name}</div>
-                </div>'''
+                </div>''')
     
-    # Joueurs Uniques - en deuxième
-    html += f'''
+    # Joueurs Uniques et Total Sessions
+    stats_cards.append(f'''
                 <div class="stat-card">
                     <div class="stat-label">Joueurs Uniques</div>
                     <div class="stat-value">{len(unique_players)}</div>
@@ -635,108 +335,53 @@ def generate_html(sessions):
                 <div class="stat-card">
                     <div class="stat-label">Total Sessions</div>
                     <div class="stat-value">{total_sessions}</div>
-                </div>'''
+                </div>''')
     
-    html += f'''
-            </div>
-            <div class="stats-dates">
-                <div>Depuis le {date_debut_formatted}</div>
-                <div>Dernière soirée jouée le {date_fin_formatted}</div>
-            </div>
-        </section>
-        
-        <section id="classement">
-            <h2>🏆 Classement par Groupe</h2>
-            <div style="margin-bottom: 20px; position: relative; z-index: 1;">
-                <label for="group-select" style="color: #ffd700; font-size: 10px; display: block; margin-bottom: 10px;">
-                    Sélectionner un groupe de joueurs:
-                </label>
-                <select id="group-select" class="group-select">
-'''
+    stats_cards_html = ''.join(stats_cards)
     
-    # Générer les options du menu déroulant (triées par meilleur score)
+    # Générer les options du menu déroulant
+    group_options = []
     for group_id in sorted_groups:
         selected = 'selected' if group_id == default_group else ''
         best_score = get_best_score(group_id)
-        html += f'                    <option value="{group_id}" {selected}>{group_id} (Meilleur: {best_score})</option>\n'
+        group_options.append(f'                    <option value="{group_id}" {selected}>{group_id} (Meilleur: {best_score})</option>')
+    group_options_html = '\n'.join(group_options)
     
-    html += '''                </select>
-            </div>
-            <table class="ranking-table" id="ranking-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Joueur</th>
-                        <th>Victoires</th>
-                    </tr>
-                </thead>
-                <tbody id="ranking-tbody">'''
-    
-    # Classement par défaut
+    # Générer les lignes du classement
+    ranking_rows = []
     for rank, (player, total) in enumerate(default_ranking, 1):
         rank_class = f'rank-{rank}' if rank <= 3 else ''
         player_color = get_player_color(player)
-        html += f'''
+        ranking_rows.append(f'''
                     <tr>
                         <td class="{rank_class}">#{rank}</td>
                         <td class="{rank_class}" style="color: {player_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{player}</td>
                         <td class="{rank_class}">{total}</td>
-                    </tr>'''
+                    </tr>''')
+    ranking_rows_html = ''.join(ranking_rows)
     
-    # Convertir les classements en JSON pour JavaScript
-    rankings_json = json.dumps(rankings_by_group).replace('</', '<\\/')
-    player_colors_json = json.dumps(PLAYER_TO_COLOR).replace('</', '<\\/')
-    
-    html += f'''
-                </tbody>
-            </table>
-            <script>
-                const rankingsByGroup = {rankings_json};
-                if (typeof playerColors === 'undefined') {{
-                    var playerColors = {player_colors_json};
-                }}
-                
-                function getPlayerColor(playerName) {{
-                    return playerColors[playerName.toUpperCase()] || '#FFD700';
-                }}
-                
-                function updateRanking(groupId) {{
-                    const ranking = rankingsByGroup[groupId] || [];
-                    const tbody = document.getElementById('ranking-tbody');
-                    tbody.innerHTML = '';
-                    
-                    ranking.forEach((playerData, index) => {{
-                        const rank = index + 1;
-                        const rankClass = rank <= 3 ? `rank-${{rank}}` : '';
-                        const playerName = playerData[0];
-                        const playerColor = getPlayerColor(playerName);
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td class="${{rankClass}}">#${{rank}}</td>
-                            <td class="${{rankClass}}" style="color: ${{playerColor}}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${{playerName}}</td>
-                            <td class="${{rankClass}}">${{playerData[1]}}</td>
-                        `;
-                        tbody.appendChild(row);
-                    }});
-                }}
-                
-                document.getElementById('group-select').addEventListener('change', function() {{
-                    updateRanking(this.value);
-                }});
-            </script>
-        </section>
-        
-        <section id="derniere-soiree">
-            <h2>📅 Dernière Soirée de Jeu</h2>'''
-    
-    # Dernière soirée
+    # Générer les sessions de la dernière soirée
+    latest_sessions_html = ''
     if latest_date and latest_sessions:
-        html += f'<div class="session-date">Date: {format_date(latest_date)}</div>'
+        latest_sessions_html += f'<div class="session-date">Date: {format_date(latest_date)}</div>'
         
         for session in latest_sessions:
             players = parse_session_data(session)
             if players:
-                html += f'''
+                session_rows = []
+                sorted_players = sorted(players.items(), key=lambda x: x[1]['today'], reverse=True)
+                for rank, (player, stats) in enumerate(sorted_players, 1):
+                    player_color = get_player_color(player)
+                    rank_class = f'rank-{rank}' if rank <= 3 else ''
+                    session_rows.append(f'''
+                        <tr>
+                            <td class="{rank_class}">#{rank}</td>
+                            <td class="{rank_class}" style="color: {player_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{player}</td>
+                            <td class="{rank_class}">{stats["today"]}</td>
+                            <td class="{rank_class}">{stats["total"]}</td>
+                        </tr>''')
+                
+                latest_sessions_html += f'''
             <div class="session-card">
                 <div style="color: #ffd700; margin-bottom: 15px; font-size: 10px;">
                     Session: {session["id"]} - {session["date"]}
@@ -750,22 +395,8 @@ def generate_html(sessions):
                             <th>Total</th>
                         </tr>
                     </thead>
-                    <tbody>'''
-                
-                # Trier les joueurs par victoires du jour
-                sorted_players = sorted(players.items(), key=lambda x: x[1]['today'], reverse=True)
-                for rank, (player, stats) in enumerate(sorted_players, 1):
-                    player_color = get_player_color(player)
-                    rank_class = f'rank-{rank}' if rank <= 3 else ''
-                    html += f'''
-                        <tr>
-                            <td class="{rank_class}">#{rank}</td>
-                            <td class="{rank_class}" style="color: {player_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{player}</td>
-                            <td class="{rank_class}">{stats["today"]}</td>
-                            <td class="{rank_class}">{stats["total"]}</td>
-                        </tr>'''
-                
-                html += '''
+                    <tbody>
+{''.join(session_rows)}
                     </tbody>
                 </table>
             </div>'''
@@ -785,110 +416,22 @@ def generate_html(sessions):
                 })
     
     # Convertir en JSON pour JavaScript
+    rankings_json = json.dumps(rankings_by_group).replace('</', '<\\/')
+    player_colors_json = json.dumps(PLAYER_TO_COLOR).replace('</', '<\\/')
     sessions_json = json.dumps(all_sessions_data).replace('</', '<\\/')
     
-    # Convertir les couleurs en JSON pour JavaScript
-    player_colors_json = json.dumps(PLAYER_TO_COLOR).replace('</', '<\\/')
-    
-    # Bouton pour afficher toutes les sessions
-    html += f'''
-            <button id="toggle-all-sessions" class="toggle-button">
-                ▼ Voir toutes les sessions
-            </button>
-            <div id="all-sessions-container" style="display: none;">
-                <div id="all-sessions-list"></div>
-                <div class="pagination-controls">
-                    <button id="prev-page" class="pagination-button">◄ Précédent</button>
-                    <span id="page-info" class="page-info">1</span>
-                    <button id="next-page" class="pagination-button">Suivant ►</button>
-                </div>
-            </div>
-            <script>
-                const allSessions = {sessions_json};
-                if (typeof playerColors === 'undefined') {{
-                    var playerColors = {player_colors_json};
-                }}
-                let currentPage = 1;
-                const sessionsPerPage = 10;
-                const totalPages = Math.ceil(allSessions.length / sessionsPerPage);
-                
-                function getPlayerColor(playerName) {{
-                    return playerColors[playerName.toUpperCase()] || '#FFD700';
-                }}
-                
-                function renderSessions() {{
-                    const container = document.getElementById('all-sessions-list');
-                    container.innerHTML = '';
-                    
-                    const start = (currentPage - 1) * sessionsPerPage;
-                    const end = start + sessionsPerPage;
-                    const pageSessions = allSessions.slice(start, end);
-                    
-                    pageSessions.forEach(function(session) {{
-                        const sessionCard = document.createElement('div');
-                        sessionCard.className = 'session-card';
-                        var tableRows = '';
-                        session.players.forEach(function(p, index) {{
-                            var rank = index + 1;
-                            var rankClass = rank <= 3 ? 'rank-' + rank : '';
-                            var color = getPlayerColor(p.name);
-                            tableRows += '<tr><td class="' + rankClass + '">#' + rank + '</td><td class="' + rankClass + '" style="color: ' + color + '; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">' + p.name + '</td><td class="' + rankClass + '">' + p.today + '</td><td class="' + rankClass + '">' + p.total + '</td></tr>';
-                        }});
-                        sessionCard.innerHTML = '<div style="color: #ffd700; margin-bottom: 15px; font-size: 10px;">Session: ' + session.id + ' - ' + session.date + '</div><table class="ranking-table"><thead><tr><th>#</th><th>Joueur</th><th>Session</th><th>Total</th></tr></thead><tbody>' + tableRows + '</tbody></table>';
-                        container.appendChild(sessionCard);
-                    }});
-                    
-                    document.getElementById('page-info').textContent = `${{currentPage}} / ${{totalPages}}`;
-                    document.getElementById('prev-page').disabled = currentPage === 1;
-                    document.getElementById('next-page').disabled = currentPage === totalPages;
-                }}
-                
-                // Attacher l'événement au bouton
-                var toggleBtn = document.getElementById('toggle-all-sessions');
-                if (toggleBtn) {{
-                    toggleBtn.addEventListener('click', function() {{
-                        var container = document.getElementById('all-sessions-container');
-                        var isVisible = container.style.display !== 'none';
-                        container.style.display = isVisible ? 'none' : 'block';
-                        this.textContent = isVisible ? '▼ Voir toutes les sessions' : '▲ Masquer toutes les sessions';
-                        
-                        if (!isVisible && currentPage === 1) {{
-                            renderSessions();
-                        }}
-                    }});
-                }}
-                
-                document.getElementById('prev-page').addEventListener('click', function() {{
-                    if (currentPage > 1) {{
-                        currentPage--;
-                        renderSessions();
-                    }}
-                }});
-                
-                document.getElementById('next-page').addEventListener('click', function() {{
-                    if (currentPage < totalPages) {{
-                        currentPage++;
-                        renderSessions();
-                    }}
-                }});
-            </script>
-        </section>
-    </div>
-    
-    <script>
-        // Smooth scroll pour le menu
-        document.querySelectorAll('nav a').forEach(function(anchor) {{
-            anchor.addEventListener('click', function (e) {{
-                e.preventDefault();
-                var target = document.querySelector(this.getAttribute('href'));
-                if (target) {{
-                    target.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
-                }}
-            }});
-        }});
-    </script>
-</body>
-</html>'''
+    # Remplacer les placeholders dans le template
+    html = html_template.replace('{CSS_CONTENT}', css_content)
+    html = html.replace('{JS_CONTENT}', js_content)
+    html = html.replace('{STATS_CARDS}', stats_cards_html)
+    html = html.replace('{DATE_DEBUT}', date_debut_formatted)
+    html = html.replace('{DATE_FIN}', date_fin_formatted)
+    html = html.replace('{GROUP_OPTIONS}', group_options_html)
+    html = html.replace('{RANKING_ROWS}', ranking_rows_html)
+    html = html.replace('{LATEST_SESSIONS}', latest_sessions_html)
+    html = html.replace('{RANKINGS_JSON}', rankings_json)
+    html = html.replace('{PLAYER_COLORS_JSON}', player_colors_json)
+    html = html.replace('{SESSIONS_JSON}', sessions_json)
     
     return html
 
