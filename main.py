@@ -375,10 +375,10 @@ def generate_html(sessions):
         best_player_name, best_score = best_player
         best_player_color = get_player_color(best_player_name)
         stats_cards.append(f'''
-                <div class="stat-card">
-                    <div class="stat-label">Meilleur Score dans un groupe</div>
-                    <div class="stat-value">{best_score}</div>
-                    <div class="stat-label" style="color: {best_player_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{best_player_name}</div>
+                <div class="stat-card p-2 sm:p-4 md:p-[15px]">
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]">Meilleur Score dans un groupe</div>
+                    <div class="stat-value text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px]">{best_score}</div>
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]" style="color: {best_player_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{best_player_name}</div>
                 </div>''')
     
     # Meilleur pourcentage de victoires - en deuxième position
@@ -387,21 +387,21 @@ def generate_html(sessions):
         best_percentage_player, victories, games_played, win_percentage = win_percentage_ranking[0]
         best_percentage_color = get_player_color(best_percentage_player)
         stats_cards.append(f'''
-                <div class="stat-card">
-                    <div class="stat-label">Meilleur % Victoires</div>
-                    <div class="stat-value">{win_percentage:.1f}%</div>
-                    <div class="stat-label" style="color: {best_percentage_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{best_percentage_player}</div>
+                <div class="stat-card p-2 sm:p-4 md:p-[15px]">
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]">Meilleur % Victoires</div>
+                    <div class="stat-value text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px]">{win_percentage:.1f}%</div>
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]" style="color: {best_percentage_color}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{best_percentage_player}</div>
                 </div>''')
     
     # Joueurs Uniques et Total Sessions
     stats_cards.append(f'''
-                <div class="stat-card">
-                    <div class="stat-label">Joueurs Uniques</div>
-                    <div class="stat-value">{len(unique_players)}</div>
+                <div class="stat-card p-2 sm:p-4 md:p-[15px]">
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]">Joueurs Uniques</div>
+                    <div class="stat-value text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px]">{len(unique_players)}</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Total Sessions</div>
-                    <div class="stat-value">{total_sessions}</div>
+                <div class="stat-card p-2 sm:p-4 md:p-[15px]">
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]">Total Sessions</div>
+                    <div class="stat-value text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px]">{total_sessions}</div>
                 </div>''')
     
     stats_cards_html = ''.join(stats_cards)
@@ -465,11 +465,12 @@ def generate_html(sessions):
                         </tr>''')
                 
                 latest_sessions_html += f'''
-            <div class="session-card">
-                <div style="color: #ffd700; margin-bottom: 15px; font-size: 10px;">
+            <div class="session-card p-2 sm:p-4 md:p-[15px]">
+                <div class="text-[7px] sm:text-[8px] md:text-[10px] mb-3 sm:mb-4" style="color: #ffd700;">
                     Session: {session["id"]} - {session["date"]}
                 </div>
-                <table class="ranking-table">
+                <div class="overflow-x-auto">
+                <table class="ranking-table w-full text-[5px] sm:text-[6px] md:text-[9px]">
                     <thead>
                         <tr>
                             <th>Joueur</th>
@@ -481,6 +482,7 @@ def generate_html(sessions):
 {''.join(session_rows)}
                     </tbody>
                 </table>
+                </div>
             </div>'''
     
     # Préparer toutes les sessions pour JavaScript

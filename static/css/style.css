@@ -7,12 +7,14 @@
 }
 
 body {
+    /* Tailwind classes handle responsive font size: text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] */
     font-family: 'Press Start 2P', cursive;
     background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
     color: #e8e8e8;
     line-height: 1.6;
-    font-size: 10px;
     min-height: 100vh;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
     background-image:
         repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0, 0, 0, 0.1) 2px, rgba(0, 0, 0, 0.1) 4px),
         repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 0, 0, 0.1) 2px, rgba(0, 0, 0, 0.1) 4px);
@@ -51,15 +53,13 @@ header::before {
 }
 
 h1 {
-    font-size: clamp(12px, calc(100vw / 20), 24px);
+    /* Tailwind classes handle responsive sizing: text-[6px] sm:text-[8px] md:text-[14px] lg:text-[20px] xl:text-[32px] */
     color: #ffd700;
     text-shadow:
         3px 3px 0px #8b4513,
         0 0 10px rgba(255, 215, 0, 0.5);
-    margin: 0 10px;
     position: relative;
     z-index: 1;
-    height: 120px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -83,8 +83,7 @@ h1 {
 }
 
 .header-character {
-    width: 90px;
-    height: 120px;
+    /* Tailwind classes handle responsive sizing: w-[12px] sm:w-[16px] md:w-[30px] lg:w-[90px] */
     object-fit: contain;
     image-rendering: pixelated;
     image-rendering: -moz-crisp-edges;
@@ -92,117 +91,13 @@ h1 {
     filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
     transition: transform 0.3s ease;
     flex-shrink: 1;
-    max-width: 90px;
 }
 
 .header-character:hover {
     transform: scale(1.1);
 }
 
-@media (max-width: 768px) {
-    header {
-        gap: 5px;
-        padding: 15px 10px;
-        flex-wrap: nowrap;
-        overflow-x: hidden;
-    }
 
-    .header-character {
-        width: 30px;
-        height: 40px;
-        max-width: 30px;
-        flex-shrink: 1;
-    }
-
-    h1 {
-        font-size: clamp(8px, calc(100vw / 30), 12px);
-        margin: 0 5px;
-        height: 40px;
-        flex-shrink: 1;
-    }
-
-    .header-characters {
-        gap: 3px;
-        flex-shrink: 1;
-    }
-}
-
-@media (max-width: 375px) {
-    header {
-        gap: 0.5px;
-        padding: 6px 1px;
-        min-height: 40px;
-        flex-wrap: nowrap;
-        overflow-x: hidden;
-    }
-
-    .header-character {
-        width: calc((100vw - 50px) / 7);
-        max-width: 16px;
-        height: auto;
-        aspect-ratio: 3/4;
-        flex-shrink: 1;
-    }
-
-    h1 {
-        font-size: clamp(5px, calc(100vw / 60), 6px);
-        margin: 0 0.5px;
-        height: auto;
-        min-height: 28px;
-        padding: 0 0.5px;
-        white-space: nowrap;
-        flex-shrink: 1;
-    }
-
-    .title-emoji {
-        font-size: 0.5em;
-    }
-
-    .header-characters {
-        gap: 0.5px;
-        flex-shrink: 1;
-        display: flex;
-        flex-wrap: nowrap;
-    }
-}
-
-@media (max-width: 300px) {
-    header {
-        gap: 0.3px;
-        padding: 4px 0.5px;
-        min-height: 35px;
-        flex-wrap: nowrap;
-        overflow-x: hidden;
-    }
-
-    .header-character {
-        width: calc((100vw - 30px) / 7);
-        max-width: 12px;
-        height: auto;
-        aspect-ratio: 3/4;
-        flex-shrink: 1;
-    }
-
-    h1 {
-        font-size: clamp(4px, calc(100vw / 75), 5px);
-        margin: 0 0.3px;
-        height: auto;
-        min-height: 20px;
-        padding: 0 0.3px;
-        flex-shrink: 1;
-    }
-
-    .title-emoji {
-        display: none;
-    }
-
-    .header-characters {
-        gap: 0.3px;
-        flex-shrink: 1;
-        display: flex;
-        flex-wrap: nowrap;
-    }
-}
 
 .header-image-placeholder {
     width: 200px;
@@ -245,10 +140,6 @@ nav ul {
     padding: 0;
 }
 
-nav ul li {
-    /* Tailwind classes handle this: flex-1 min-w-0 */
-}
-
 nav ul li a {
     /* Tailwind classes handle this: block text-center */
     box-sizing: border-box;
@@ -284,10 +175,6 @@ nav a:hover {
 }
 
 /* Main Content */
-.container {
-    /* Tailwind classes handle this: mx-auto px-4 sm:px-6 lg:px-8 */
-}
-
 section {
     background: rgba(45, 27, 61, 0.8);
     border: 3px solid #8b4513;
@@ -315,8 +202,8 @@ section::before {
 }
 
 section h2 {
+    /* Tailwind classes handle responsive sizing: text-[8px] sm:text-[9px] md:text-[12px] lg:text-[16px] */
     color: #ffd700;
-    font-size: 16px;
     margin-bottom: 15px;
     text-shadow: 2px 2px 0px #8b4513;
     position: relative;
@@ -337,21 +224,21 @@ section h2 {
 }
 
 .ranking-table th {
+    /* Tailwind classes handle responsive sizing: text-[5px] sm:text-[6px] md:text-[9px] */
     background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
     color: #ffd700;
     padding: 12px;
     text-align: left;
     border: 2px solid #654321;
-    font-size: 10px;
     word-wrap: break-word;
     overflow-wrap: break-word;
 }
 
 .ranking-table td {
+    /* Tailwind classes handle responsive sizing: text-[5px] sm:text-[6px] md:text-[9px] */
     padding: 10px 12px;
     border: 2px solid #654321;
     background: rgba(26, 26, 46, 0.5);
-    font-size: 9px;
     word-wrap: break-word;
     overflow-wrap: break-word;
     max-width: 0;
@@ -415,15 +302,12 @@ section h2 {
 }
 
 .group-select {
+    /* Tailwind classes handle responsive sizing: text-[5px] sm:text-[6px] md:text-[8px] p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px] */
     background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
     color: #ffd700;
     border: 2px solid #654321;
-    padding: 10px 15px;
     font-family: 'Press Start 2P', cursive;
-    font-size: 8px;
     cursor: pointer;
-    width: 100%;
-    max-width: 500px;
     appearance: none;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffd700' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
@@ -447,32 +331,33 @@ section h2 {
 }
 
 .stat-card {
+    /* Tailwind classes handle responsive padding: p-2 sm:p-4 md:p-[15px] */
     background: rgba(26, 26, 46, 0.6);
     border: 2px solid #8b4513;
-    padding: 15px;
     text-align: center;
     position: relative;
     z-index: 1;
 }
 
 .stat-value {
-    font-size: 20px;
+    /* Tailwind classes handle responsive sizing: text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px] */
     color: #ffd700;
     margin: 10px 0;
 }
 
 .stat-label {
-    font-size: 8px;
+    /* Tailwind classes handle responsive sizing: text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px] */
     color: #c0c0c0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .toggle-button {
+    /* Tailwind classes handle responsive sizing: text-[6px] sm:text-[7px] md:text-[9px] p-2 sm:p-2.5 md:p-3 lg:p-[12px] lg:px-5 */
     background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
     color: #ffd700;
     border: 2px solid #654321;
-    padding: 12px 20px;
     font-family: 'Press Start 2P', cursive;
-    font-size: 9px;
     cursor: pointer;
     margin: 20px 0;
     transition: all 0.3s;
@@ -493,12 +378,11 @@ section h2 {
 }
 
 .pagination-button {
+    /* Tailwind classes handle responsive sizing: text-[5px] sm:text-[6px] md:text-[8px] p-1 sm:p-1.5 md:p-2 lg:p-2 lg:px-4 */
     background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
     color: #ffd700;
     border: 2px solid #654321;
-    padding: 8px 16px;
     font-family: 'Press Start 2P', cursive;
-    font-size: 8px;
     cursor: pointer;
     transition: all 0.3s;
 }
@@ -518,220 +402,3 @@ section h2 {
     font-size: 9px;
 }
 
-@media (max-width: 768px) {
-    body {
-        font-size: 8px;
-    }
-
-    h1 {
-        font-size: 18px;
-    }
-
-    section h2 {
-        font-size: 12px;
-    }
-
-    nav ul {
-        flex-direction: row;
-        gap: 10px;
-        width: 100%;
-    }
-
-    nav ul li {
-        flex: 1;
-        min-width: 0;
-    }
-
-    nav ul li a {
-        width: 100%;
-        padding: 8px 5px;
-        font-size: 7px;
-    }
-}
-
-@media (max-width: 375px) {
-    body {
-        font-size: 7px;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
-
-    .container {
-        padding: 10px;
-    }
-
-    section {
-        padding: 10px;
-        margin-bottom: 15px;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    section h2 {
-        font-size: 9px;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
-
-    .ranking-table {
-        font-size: 6px;
-        width: 100%;
-        display: table;
-        table-layout: fixed;
-    }
-
-    .ranking-table th,
-    .ranking-table td {
-        padding: 6px 4px;
-        font-size: 6px;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
-
-    .ranking-table th:first-child,
-    .ranking-table td:first-child {
-        position: sticky;
-        left: 0;
-        background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
-        z-index: 2;
-    }
-
-    .ranking-table td:first-child {
-        background: rgba(26, 26, 46, 0.5);
-    }
-
-    .ranking-table tr:nth-child(even) td:first-child {
-        background: rgba(26, 26, 46, 0.7);
-    }
-
-    .stat-card {
-        padding: 10px;
-    }
-
-    .stat-value {
-        font-size: 14px;
-    }
-
-    .stat-label {
-        font-size: 6px;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
-
-    nav ul {
-        gap: 5px;
-    }
-
-    nav ul li a {
-        padding: 6px 3px;
-        font-size: 6px;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
-
-    .group-select {
-        font-size: 6px;
-        padding: 8px 10px;
-    }
-
-    .toggle-button {
-        font-size: 7px;
-        padding: 10px 15px;
-    }
-
-    .pagination-button {
-        font-size: 6px;
-        padding: 6px 12px;
-    }
-
-    .session-card {
-        padding: 10px;
-    }
-
-    .session-date {
-        font-size: 8px;
-    }
-
-    .player-stat {
-        font-size: 6px;
-        word-wrap: break-word;
-        overflow-wrap: break-word;
-    }
-}
-
-@media (max-width: 300px) {
-    body {
-        font-size: 6px;
-    }
-
-    .container {
-        padding: 8px;
-    }
-
-    section {
-        padding: 8px;
-        margin-bottom: 12px;
-    }
-
-    section h2 {
-        font-size: 8px;
-    }
-
-    .ranking-table {
-        font-size: 5px;
-    }
-
-    .ranking-table th,
-    .ranking-table td {
-        padding: 4px 2px;
-        font-size: 5px;
-    }
-
-    .stat-card {
-        padding: 8px;
-    }
-
-    .stat-value {
-        font-size: 12px;
-    }
-
-    .stat-label {
-        font-size: 5px;
-    }
-
-    nav ul {
-        gap: 3px;
-    }
-
-    nav ul li a {
-        padding: 5px 2px;
-        font-size: 5px;
-    }
-
-    .group-select {
-        font-size: 5px;
-        padding: 6px 8px;
-    }
-
-    .toggle-button {
-        font-size: 6px;
-        padding: 8px 12px;
-    }
-
-    .pagination-button {
-        font-size: 5px;
-        padding: 5px 10px;
-    }
-
-    .session-card {
-        padding: 8px;
-    }
-
-    .session-date {
-        font-size: 7px;
-    }
-
-    .player-stat {
-        font-size: 5px;
-    }
-}
