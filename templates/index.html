@@ -19,7 +19,7 @@
         }
     </script>
     <style>
-{CSS_CONTENT}
+{{ css_content|safe }}
     </style>
 </head>
 
@@ -51,11 +51,32 @@
         <section id="statistiques" class="mb-3 sm:mb-4 md:mb-6 lg:mb-8 p-2 sm:p-4 md:p-5 overflow-x-auto">
             <h2 class="text-[8px] sm:text-[9px] md:text-[12px] lg:text-[16px] break-words">📊 Statistiques Générales</h2>
             <div class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
-                {STATS_CARDS}
+                {% if best_player %}
+                <div class="stat-card p-2 sm:p-4 md:p-[15px]">
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]">Meilleur Score dans un groupe</div>
+                    <div class="stat-value text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px]">{{ best_score }}</div>
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]" style="color: {{ get_player_color(best_player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ best_player }}</div>
+                </div>
+                {% endif %}
+                {% if best_percentage_player %}
+                <div class="stat-card p-2 sm:p-4 md:p-[15px]">
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]">Meilleur % Victoires</div>
+                    <div class="stat-value text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px]">{{ "%.1f"|format(best_percentage) }}%</div>
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]" style="color: {{ get_player_color(best_percentage_player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ best_percentage_player }}</div>
+                </div>
+                {% endif %}
+                <div class="stat-card p-2 sm:p-4 md:p-[15px]">
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]">Joueurs Uniques</div>
+                    <div class="stat-value text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px]">{{ unique_players_count }}</div>
+                </div>
+                <div class="stat-card p-2 sm:p-4 md:p-[15px]">
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]">Total Sessions</div>
+                    <div class="stat-value text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px]">{{ total_sessions }}</div>
+                </div>
             </div>
             <div class="stats-dates">
-                <div>Depuis le {DATE_DEBUT}</div>
-                <div>Dernière soirée jouée le {DATE_FIN}</div>
+                <div>Depuis le {{ date_debut }}</div>
+                <div>Dernière soirée jouée le {{ date_fin }}</div>
             </div>
         </section>
 
@@ -71,7 +92,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {WIN_PERCENTAGE_ROWS}
+                    {% for rank, item in win_percentage_ranking|enumerate(1) %}
+                    {% set player, victories, games_played, win_percentage = item %}
+                    <tr>
+                        <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
+                        <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ victories }}/{{ games_played }}</td>
+                        <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f"|format(win_percentage) }}%</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
             </div>
@@ -84,7 +112,9 @@
                     Sélectionner un groupe de joueurs:
                 </label>
                 <select id="group-select" class="group-select w-full max-w-md text-[5px] sm:text-[6px] md:text-[8px] p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
-                    {GROUP_OPTIONS}
+                    {% for group_id in sorted_groups %}
+                    <option value="{{ group_id }}" {% if group_id == default_group %}selected{% endif %}>{{ group_id }}</option>
+                    {% endfor %}
                 </select>
             </div>
             <div class="overflow-x-auto">
@@ -96,7 +126,13 @@
                     </tr>
                 </thead>
                 <tbody id="ranking-tbody">
-                    {RANKING_ROWS}
+                    {% for rank, item in default_ranking|enumerate(1) %}
+                    {% set player, total = item %}
+                    <tr>
+                        <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
+                        <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ total }}</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
             </div>
@@ -104,7 +140,39 @@
 
         <section id="derniere-soiree" class="mb-3 sm:mb-4 md:mb-6 lg:mb-8 p-2 sm:p-4 md:p-5">
             <h2 class="text-[8px] sm:text-[9px] md:text-[12px] lg:text-[16px] break-words">📅 Dernière Session de Jeu</h2>
-            {LATEST_SESSIONS}
+            {% if latest_date and latest_sessions_parsed %}
+            <div class="session-date">Date: {{ stats_manager.format_date(latest_date) }}</div>
+            {% for session_data in latest_sessions_parsed %}
+                {% set session = session_data.session %}
+                {% set players = session_data.players %}
+                <div class="session-card p-2 sm:p-4 md:p-[15px]">
+                    <div class="text-[7px] sm:text-[8px] md:text-[10px] mb-3 sm:mb-4" style="color: #ffd700;">
+                        Session: {{ session.id }} - {{ session.date }}
+                    </div>
+                    <div class="overflow-x-auto">
+                    <table class="ranking-table w-full text-[5px] sm:text-[6px] md:text-[9px]">
+                        <thead>
+                            <tr>
+                                <th>Joueur</th>
+                                <th>Session</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for rank in range(1, players|length + 1) %}
+                            {% set player, stats = players[rank - 1] %}
+                            <tr>
+                                <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
+                                <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ stats.today }}</td>
+                                <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ stats.total }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            {% endfor %}
+            {% endif %}
             <button id="toggle-all-sessions" class="toggle-button w-full sm:w-auto text-[6px] sm:text-[7px] md:text-[9px] p-2 sm:p-2.5 md:p-3 lg:p-[12px] lg:px-5">
                 ▼ Voir toutes les sessions
             </button>
@@ -140,9 +208,9 @@
     <!-- Injection des données JSON pour JavaScript -->
     <script>
         // Données globales pour JavaScript
-        const rankingsByGroup = {RANKINGS_JSON};
-        const playerColors = {PLAYER_COLORS_JSON};
-        const allSessions = {SESSIONS_JSON};
+        const rankingsByGroup = {{ rankings_by_group|tojson }};
+        const playerColors = {{ player_colors|tojson }};
+        const allSessions = {{ all_sessions_data|tojson }};
         let currentPage = 1;
         const sessionsPerPage = 10;
         // Initialiser filteredSessions avec toutes les sessions au chargement
@@ -152,7 +220,7 @@
 
     <!-- Chargement du JavaScript externe -->
     <script>
-{JS_CONTENT}
+{{ js_content|safe }}
     </script>
 </body>
 

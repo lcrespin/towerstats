@@ -56,9 +56,24 @@ Cloud Run détectera automatiquement Python, installera les dépendances depuis 
 
 **Note :** L'objet `app` dans `main.py` est un wrapper WSGI qui permet la compatibilité avec Gunicorn tout en utilisant `functions-framework` en arrière-plan.
 
+## Structure du projet
+
+```
+towerstats/
+├── src/                    # Code source Python
+│   ├── config.py          # Configuration (URL CSV, couleurs, etc.)
+│   ├── data_manager.py    # Gestion des données (fetch, filter, correct)
+│   ├── stats_manager.py   # Calculs de statistiques
+│   └── main.py            # Application Flask
+├── main.py                 # Point d'entrée (réexport pour Gunicorn/Cloud Run)
+├── templates/             # Templates HTML Jinja2
+├── static/                 # Fichiers statiques (CSS, JS)
+└── images/                 # Images
+```
+
 ## Configuration
 
-L'URL CSV est définie dans `main.py` :
+L'URL CSV est définie dans `src/config.py` :
 ```python
 CSV_URL = 'https://docs.google.com/spreadsheets/d/e/.../pub?output=csv'
 ```
