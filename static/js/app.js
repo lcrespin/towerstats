@@ -404,10 +404,231 @@ function initSmoothScroll() {
     });
 }
 
+// Graphique d'évolution des scores
+let evolutionChart = null;
+
+// Initialiser le graphique d'évolution
+function initEvolutionChart() {
+    if (typeof allSessions === 'undefined' || allSessions.length === 0) {
+        return;
+    }
+
+    // Récupérer tous les groupes uniques
+    const allGroups = new Set();
+    allSessions.forEach(function(session) {
+        const group = session.group || session.id;
+        if (group) {
+            allGroups.add(group);
+        }
+    });
+
+    // Trier les groupes par le meilleur score du groupe (décroissant)
+    const sortedGroups = Array.from(allGroups).sort(function(a, b) {
+        const rankingA = rankingsByGroup[a] || [];
+        const rankingB = rankingsByGroup[b] || [];
+        const bestScoreA = rankingA.length > 0 ? rankingA[0][1] : 0;
+        const bestScoreB = rankingB.length > 0 ? rankingB[0][1] : 0;
+        return bestScoreB - bestScoreA; // Décroissant
+    });
+
+    // Remplir le sélecteur de groupe
+    const groupSelect = document.getElementById('evolution-group-select');
+    if (groupSelect) {
+        sortedGroups.forEach(function(group) {
+            const option = document.createElement('option');
+            option.value = group;
+            option.textContent = group;
+            groupSelect.appendChild(option);
+        });
+
+        // Écouter les changements
+        groupSelect.addEventListener('change', function() {
+            updateEvolutionChart(this.value);
+        });
+
+        // Initialiser avec le premier groupe si disponible
+        if (sortedGroups.length > 0) {
+            groupSelect.value = sortedGroups[0];
+            updateEvolutionChart(sortedGroups[0]);
+        }
+    }
+}
+
+// Mettre à jour le graphique d'évolution
+function updateEvolutionChart(groupId) {
+    if (typeof allSessions === 'undefined' || !groupId) {
+        return;
+    }
+
+    // Filtrer les sessions du groupe sélectionné
+    const groupSessions = allSessions.filter(function(session) {
+        const sessionGroup = session.group || session.id;
+        return sessionGroup === groupId;
+    });
+
+    if (groupSessions.length === 0) {
+        return;
+    }
+
+    // Organiser les données par date
+    const dataByDate = {};
+    const dateMapping = {}; // Mapping date originale -> date formatée
+    const allPlayers = new Set();
+
+    groupSessions.forEach(function(session) {
+        const originalDate = session.date; // Format YYYY-MM-DD pour le tri
+        const formattedDate = session.formatted_date || session.date;
+        
+        // Utiliser la date originale comme clé pour le tri
+        if (!dataByDate[originalDate]) {
+            dataByDate[originalDate] = {};
+            dateMapping[originalDate] = formattedDate;
+        }
+        
+        if (session.players) {
+            session.players.forEach(function(player) {
+                allPlayers.add(player.name);
+                // Utiliser le total de points (total) pour cette session
+                if (!dataByDate[originalDate][player.name]) {
+                    dataByDate[originalDate][player.name] = 0;
+                }
+                dataByDate[originalDate][player.name] = player.total;
+            });
+        }
+    });
+
+    // Trier les dates par date originale (format YYYY-MM-DD)
+    // pour avoir la plus ancienne à gauche, la plus récente à droite
+    const sortedOriginalDates = Object.keys(dataByDate).sort();
+    const sortedDates = sortedOriginalDates.map(function(originalDate) {
+        return dateMapping[originalDate];
+    });
+    const sortedPlayers = Array.from(allPlayers).sort();
+
+    // Préparer les données pour Chart.js
+    const datasets = sortedPlayers.map(function(player) {
+        const data = sortedOriginalDates.map(function(originalDate) {
+            return dataByDate[originalDate][player] || 0;
+        });
+        return {
+            label: player,
+            data: data,
+            backgroundColor: getPlayerColor(player),
+            borderColor: getPlayerColor(player),
+            borderWidth: 1
+        };
+    });
+
+    // Obtenir le canvas
+    const canvas = document.getElementById('evolution-chart');
+    if (!canvas) {
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+
+    // Détruire le graphique existant s'il existe
+    if (evolutionChart) {
+        evolutionChart.destroy();
+    }
+
+    // Créer le nouveau graphique
+    evolutionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: sortedDates,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Points totaux',
+                        color: '#ffd700',
+                        font: {
+                            family: 'Press Start 2P',
+                            size: 8
+                        }
+                    },
+                    ticks: {
+                        color: '#ffd700',
+                        font: {
+                            family: 'Press Start 2P',
+                            size: 6
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(139, 69, 19, 0.3)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Dates',
+                        color: '#ffd700',
+                        font: {
+                            family: 'Press Start 2P',
+                            size: 8
+                        }
+                    },
+                    ticks: {
+                        color: '#ffd700',
+                        font: {
+                            family: 'Press Start 2P',
+                            size: 6
+                        },
+                        maxRotation: 45,
+                        minRotation: 45
+                    },
+                    grid: {
+                        color: 'rgba(139, 69, 19, 0.3)'
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: '#ffd700',
+                        font: {
+                            family: 'Press Start 2P',
+                            size: 6
+                        },
+                        usePointStyle: true,
+                        padding: 10
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(45, 27, 61, 0.9)',
+                    titleColor: '#ffd700',
+                    bodyColor: '#ffd700',
+                    borderColor: '#8b4513',
+                    borderWidth: 2,
+                    titleFont: {
+                        family: 'Press Start 2P',
+                        size: 8
+                    },
+                    bodyFont: {
+                        family: 'Press Start 2P',
+                        size: 7
+                    },
+                    padding: 10
+                }
+            }
+        }
+    });
+}
+
 // Initialisation globale quand le DOM est prêt
 document.addEventListener('DOMContentLoaded', function() {
     initGroupSelector();
     initSessionsPagination();
     initSmoothScroll();
+    initEvolutionChart();
 });
 

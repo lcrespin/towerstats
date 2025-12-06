@@ -7,6 +7,7 @@
     <title>TowerStats - Statistiques TowerFall Ascension</title>
     <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -44,6 +45,7 @@
             <li class="flex-1 min-w-0"><a href="#pourcentage-victoires" class="block text-center txt-xs  break-words">% Victoires</a></li>
             <li class="flex-1 min-w-0"><a href="#classement" class="block text-center txt-xs  break-words">Groupes</a></li>
             <li class="flex-1 min-w-0"><a href="#derniere-soiree" class="block text-center txt-xs  break-words">Sessions</a></li>
+            <li class="flex-1 min-w-0"><a href="#evolution-scores" class="block text-center txt-xs  break-words">Évolution</a></li>
         </ul>
     </nav>
 
@@ -242,6 +244,24 @@
                     <span id="page-info" class="page-info text-[5px] sm:text-[6px] md:text-[9px]">1</span>
                     <button id="next-page" class="pagination-button text-[5px] sm:text-[6px] md:text-[8px] p-1 sm:p-1.5 md:p-2 lg:p-2 lg:px-4">Suivant ►</button>
                 </div>
+            </div>
+        </section>
+
+        <section id="evolution-scores" class="margin-bottom-section pad-section overflow-x-auto">
+            <h2 class="txt-heading break-words">📈 Évolution des Scores par Groupe</h2>
+            <div class="mb-3 sm:mb-4 md:mb-5 relative z-10">
+                <label for="evolution-group-select" class="block mb-1.5 sm:mb-2 md:mb-2.5 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
+                    Sélectionner un groupe de joueurs:
+                </label>
+                <div class="select-wrapper relative w-full max-w-md">
+                    <select id="evolution-group-select" class="group-select w-full p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
+                        <option value="">Sélectionner un groupe</option>
+                    </select>
+                    <span class="select-arrow">▼</span>
+                </div>
+            </div>
+            <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
+                <canvas id="evolution-chart"></canvas>
             </div>
         </section>
     </div>
