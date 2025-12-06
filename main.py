@@ -99,7 +99,8 @@ def filter_midnight_sessions(sessions):
         '2025-06-04',
         '2025-09-11',
         '2025-09-16',
-        '2025-10-01'
+        '2025-10-01',
+        '2025-10-15',
     }
     
     # Trier par date décroissante (plus récent en premier)
