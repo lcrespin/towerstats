@@ -136,6 +136,9 @@ nav > div {
     align-items: flex-start;
     justify-content: space-between;
     gap: 10px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .global-info-button {
@@ -168,6 +171,11 @@ nav ul {
 nav ul li a {
     /* Tailwind classes handle this: block text-center */
     box-sizing: border-box;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding: 8px 4px;
 }
 
 .stats-dates {
@@ -191,6 +199,13 @@ nav a {
     background: rgba(139, 69, 19, 0.3);
     transition: all 0.3s;
     display: inline-block;
+    max-width: none;
+    width: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    box-sizing: border-box;
+    font-size: 8px;
 }
 
 nav a:hover {
@@ -200,6 +215,43 @@ nav a:hover {
 }
 
 /* Main Content */
+.container,
+div.container {
+    max-width: 1000px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    width: 100%;
+}
+
+/* Override Tailwind container at all breakpoints */
+@media (min-width: 640px) {
+    .container,
+    div.container {
+        max-width: 1000px !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .container,
+    div.container {
+        max-width: 1000px !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .container,
+    div.container {
+        max-width: 1000px !important;
+    }
+}
+
+@media (min-width: 1280px) {
+    .container,
+    div.container {
+        max-width: 1000px !important;
+    }
+}
+
 section {
     background: rgba(45, 27, 61, 0.8);
     border: 3px solid #8b4513;
@@ -209,6 +261,9 @@ section {
         inset 0 0 20px rgba(0, 0, 0, 0.5),
         0 4px 8px rgba(0, 0, 0, 0.5);
     position: relative;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 section::before {
@@ -407,9 +462,9 @@ section h2 {
 
 /* .txt-title-h1 uses clamp() for responsive sizing - see .txt-title-h1, h1.txt-title-h1 above */
 
-.gap-grid { gap: 8px; }
-@media (min-width: 640px) { .gap-grid { gap: 12px; } }
-@media (min-width: 768px) { .gap-grid { gap: 16px; } }
+.gap-grid { gap: 4px; }
+@media (min-width: 640px) { .gap-grid { gap: 6px; } }
+@media (min-width: 768px) { .gap-grid { gap: 8px; } }
 
 .pad-section { padding: 8px; }
 @media (min-width: 640px) { .pad-section { padding: 16px; } }
@@ -539,7 +594,7 @@ section h2 {
   .txt-base { font-size: 11px; }
   .txt-heading { font-size: 9px; }
   /* .txt-title-h1 uses clamp() for responsive sizing */
-  .gap-grid { gap: 12px; }
+  .gap-grid { gap: 6px; }
   .pad-section { padding: 16px; }
   .pad-card { padding: 16px; }
   .margin-bottom-section { margin-bottom: 16px; }
@@ -553,7 +608,7 @@ section h2 {
   .txt-base { font-size: 12px; }
   .txt-heading { font-size: 12px; }
   /* .txt-title-h1 uses clamp() for responsive sizing */
-  .gap-grid { gap: 16px; }
+  .gap-grid { gap: 8px; }
   .pad-section { padding: 20px; }
   .pad-card { padding: 15px; }
   .margin-bottom-section { margin-bottom: 24px; }

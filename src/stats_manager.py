@@ -306,6 +306,12 @@ class SessionStatsManager:
             # En cas d'erreur, retourner une liste vide
             elo_ranking = []
         
+        # Meilleur ELO
+        best_elo_player = None
+        best_elo = 0.0
+        if elo_ranking:
+            best_elo_player, best_elo = elo_ranking[0]
+        
         # Préparer les sessions latest avec leurs joueurs parsés
         latest_sessions_parsed = []
         for session in latest_sessions:
@@ -348,6 +354,8 @@ class SessionStatsManager:
             'best_percentage': best_percentage,
             'win_percentage_ranking': win_percentage_ranking,
             'elo_ranking': elo_ranking,
+            'best_elo_player': best_elo_player,
+            'best_elo': best_elo,
             'latest_date': latest_date,
             'latest_sessions_parsed': latest_sessions_parsed,
             'sessions_by_date': sessions_by_date,
