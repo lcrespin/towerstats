@@ -15,4 +15,3 @@ ENV/
 *~
 .DS_Store
 data.csv
-sandbox.py

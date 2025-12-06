@@ -39,8 +39,12 @@ fi
 
 echo ""
 echo "✅ Démarrage du serveur sur http://localhost:$PORT"
+echo "   Mode développement avec rechargement automatique activé"
 echo "   Appuyez sur Ctrl+C pour arrêter"
 echo ""
 
-# Lancer avec les logs visibles
-PYTHONUNBUFFERED=1 functions-framework --target=display_stats --port=$PORT --debug
+# Lancer Flask directement en mode développement avec rechargement automatique
+export FLASK_APP=main:app
+export FLASK_ENV=development
+export FLASK_DEBUG=1
+PYTHONUNBUFFERED=1 flask run --host=0.0.0.0 --port=$PORT --reload

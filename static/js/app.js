@@ -51,6 +51,11 @@ if (typeof filteredSessions === 'undefined') {
 let currentPlayerFilter = '';
 let currentGroupFilter = '';
 
+// Handlers pour les filtres (stockés pour pouvoir les supprimer)
+let playerFilterHandler = null;
+let groupFilterHandler = null;
+let filtersListenersAttached = false;
+
 // Filtrer les sessions selon les critères sélectionnés
 function filterSessions() {
     if (typeof allSessions === 'undefined') {
@@ -82,6 +87,7 @@ function filterSessions() {
     // Réinitialiser à la page 1 après filtrage
     currentPage = 1;
     updatePagination();
+    updateSessionsCount();
     renderSessions();
 }
 
@@ -93,6 +99,15 @@ function updatePagination() {
     }
     if (currentPage > totalPages) {
         currentPage = totalPages;
+    }
+}
+
+// Mettre à jour le compteur de sessions
+function updateSessionsCount() {
+    const countElement = document.getElementById('sessions-count-value');
+    if (countElement) {
+        const total = filteredSessions ? filteredSessions.length : 0;
+        countElement.textContent = total;
     }
 }
 
@@ -111,11 +126,13 @@ function renderSessions() {
     if (filteredSessions.length === 0 && allSessions.length > 0) {
         filteredSessions = allSessions.slice();
         updatePagination();
+        updateSessionsCount();
     }
     
     if (filteredSessions.length === 0) {
         container.innerHTML = '<div class="session-card p-2 sm:p-4 md:p-[15px] text-center" style="color: #ffd700;">Aucune session trouvée avec ces filtres.</div>';
         updatePaginationControls();
+        updateSessionsCount();
         return;
     }
     
@@ -172,11 +189,32 @@ function initFilters() {
     // Toujours initialiser filteredSessions, même si les filtres sont déjà initialisés
     if (filteredSessions.length === 0 && !currentPlayerFilter && !currentGroupFilter) {
         filteredSessions = allSessions.slice();
+        updateSessionsCount();
     }
     
-    // Ne pas réinitialiser les listes déroulantes si déjà fait
+    // Si les filtres sont déjà initialisés, synchroniser seulement les valeurs des selects
+    // IMPORTANT: Ne pas réinitialiser les selects à vide, seulement synchroniser si la variable a une valeur
     if (filtersInitialized) {
+        const playerSelect = document.getElementById('filter-player');
+        if (playerSelect) {
+            // Synchroniser la valeur du select avec la variable seulement si la variable a une valeur
+            // Ne pas réinitialiser à vide pour préserver la sélection de l'utilisateur
+            if (currentPlayerFilter && playerSelect.value !== currentPlayerFilter) {
+                playerSelect.value = currentPlayerFilter;
+            }
+        }
+        
+        const groupSelect = document.getElementById('filter-group');
+        if (groupSelect) {
+            // Synchroniser la valeur du select avec la variable seulement si la variable a une valeur
+            // Ne pas réinitialiser à vide pour préserver la sélection de l'utilisateur
+            if (currentGroupFilter && groupSelect.value !== currentGroupFilter) {
+                groupSelect.value = currentGroupFilter;
+            }
+        }
+        
         updatePagination();
+        updateSessionsCount();
         return;
     }
     
@@ -203,34 +241,87 @@ function initFilters() {
     
     // Remplir la liste déroulante des joueurs
     const playerSelect = document.getElementById('filter-player');
-    if (playerSelect && playerSelect.children.length === 1) { // Seulement si pas déjà rempli
-        sortedPlayers.forEach(function(player) {
-            const option = document.createElement('option');
-            option.value = player;
-            option.textContent = player;
-            playerSelect.appendChild(option);
-        });
+    if (playerSelect) {
+        // Remplir seulement si pas déjà rempli
+        if (playerSelect.children.length === 1) {
+            sortedPlayers.forEach(function(player) {
+                const option = document.createElement('option');
+                option.value = player;
+                option.textContent = player;
+                playerSelect.appendChild(option);
+            });
+        }
         
-        playerSelect.addEventListener('change', function() {
-            currentPlayerFilter = this.value;
-            filterSessions();
-        });
+        // Synchroniser la valeur du select avec la variable (sans déclencher l'event)
+        // IMPORTANT: Lire la valeur actuelle du select et la mettre dans la variable si elle n'est pas vide
+        // Cela préserve la sélection de l'utilisateur même si la variable était vide
+        if (playerSelect.value && !currentPlayerFilter) {
+            currentPlayerFilter = playerSelect.value;
+        }
+        // Sinon, synchroniser le select avec la variable si la variable a une valeur
+        else if (currentPlayerFilter && playerSelect.value !== currentPlayerFilter) {
+            playerSelect.value = currentPlayerFilter;
+        }
+        
+        // Attacher le listener seulement s'il n'est pas déjà attaché
+        if (!filtersListenersAttached) {
+            playerFilterHandler = function() {
+                currentPlayerFilter = this.value;
+                // Si un joueur est sélectionné, réinitialiser le filtre groupe
+                if (currentPlayerFilter) {
+                    currentGroupFilter = '';
+                    const groupSelect = document.getElementById('filter-group');
+                    if (groupSelect) {
+                        groupSelect.value = '';
+                    }
+                }
+                filterSessions();
+            };
+            playerSelect.addEventListener('change', playerFilterHandler);
+        }
     }
     
     // Remplir la liste déroulante des groupes
     const groupSelect = document.getElementById('filter-group');
-    if (groupSelect && groupSelect.children.length === 1) { // Seulement si pas déjà rempli
-        sortedGroups.forEach(function(group) {
-            const option = document.createElement('option');
-            option.value = group;
-            option.textContent = group;
-            groupSelect.appendChild(option);
-        });
+    if (groupSelect) {
+        // Remplir seulement si pas déjà rempli
+        if (groupSelect.children.length === 1) {
+            sortedGroups.forEach(function(group) {
+                const option = document.createElement('option');
+                option.value = group;
+                option.textContent = group;
+                groupSelect.appendChild(option);
+            });
+        }
         
-        groupSelect.addEventListener('change', function() {
-            currentGroupFilter = this.value;
-            filterSessions();
-        });
+        // Synchroniser la valeur du select avec la variable (sans déclencher l'event)
+        // IMPORTANT: Lire la valeur actuelle du select et la mettre dans la variable si elle n'est pas vide
+        // Cela préserve la sélection de l'utilisateur même si la variable était vide
+        if (groupSelect.value && !currentGroupFilter) {
+            currentGroupFilter = groupSelect.value;
+        }
+        // Sinon, synchroniser le select avec la variable si la variable a une valeur
+        else if (currentGroupFilter && groupSelect.value !== currentGroupFilter) {
+            groupSelect.value = currentGroupFilter;
+        }
+        
+        // Attacher le listener seulement s'il n'est pas déjà attaché
+        if (!filtersListenersAttached) {
+            groupFilterHandler = function() {
+                currentGroupFilter = this.value;
+                // Si un groupe est sélectionné, réinitialiser le filtre joueur
+                if (currentGroupFilter) {
+                    currentPlayerFilter = '';
+                    const playerSelect = document.getElementById('filter-player');
+                    if (playerSelect) {
+                        playerSelect.value = '';
+                    }
+                }
+                filterSessions();
+            };
+            groupSelect.addEventListener('change', groupFilterHandler);
+            filtersListenersAttached = true;
+        }
     }
     
     // Initialiser les sessions filtrées avec toutes les sessions si pas déjà fait
@@ -238,6 +329,7 @@ function initFilters() {
         filteredSessions = allSessions.slice();
     }
     updatePagination();
+    updateSessionsCount();
     filtersInitialized = true;
 }
 
@@ -268,6 +360,7 @@ function initSessionsPagination() {
                 if (filteredSessions.length === 0 && typeof allSessions !== 'undefined' && allSessions.length > 0) {
                     filteredSessions = allSessions.slice();
                     updatePagination();
+                    updateSessionsCount();
                 }
                 
                 // Rendre les sessions

@@ -51,18 +51,18 @@
         <section id="statistiques" class="mb-3 sm:mb-4 md:mb-6 lg:mb-8 p-2 sm:p-4 md:p-5 overflow-x-auto">
             <h2 class="text-[8px] sm:text-[9px] md:text-[12px] lg:text-[16px] break-words">📊 Statistiques Générales</h2>
             <div class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+                {% if best_percentage_player %}
+                <div class="stat-card p-2 sm:p-4 md:p-[15px]">
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]">Meilleur % Victoires</div>
+                    <div class="stat-value text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px]">{{ "%.2f" % best_percentage }}%</div>
+                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]" style="color: {{ get_player_color(best_percentage_player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ best_percentage_player }}</div>
+                </div>
+                {% endif %}
                 {% if best_player %}
                 <div class="stat-card p-2 sm:p-4 md:p-[15px]">
                     <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]">Meilleur Score dans un groupe</div>
                     <div class="stat-value text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px]">{{ best_score }}</div>
                     <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]" style="color: {{ get_player_color(best_player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ best_player }}</div>
-                </div>
-                {% endif %}
-                {% if best_percentage_player %}
-                <div class="stat-card p-2 sm:p-4 md:p-[15px]">
-                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]">Meilleur % Victoires</div>
-                    <div class="stat-value text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px]">{{ "%.1f"|format(best_percentage) }}%</div>
-                    <div class="stat-label text-[5px] sm:text-[6px] md:text-[7px] lg:text-[8px]" style="color: {{ get_player_color(best_percentage_player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ best_percentage_player }}</div>
                 </div>
                 {% endif %}
                 <div class="stat-card p-2 sm:p-4 md:p-[15px]">
@@ -76,7 +76,7 @@
             </div>
             <div class="stats-dates">
                 <div>Depuis le {{ date_debut }}</div>
-                <div>Dernière soirée jouée le {{ date_fin }}</div>
+                <div>Dernière session jouée le {{ date_fin }}</div>
             </div>
         </section>
 
@@ -97,7 +97,7 @@
                     <tr>
                         <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
                         <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ victories }}/{{ games_played }}</td>
-                        <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f"|format(win_percentage) }}%</td>
+                        <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f" % win_percentage }}%</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -111,11 +111,14 @@
                 <label for="group-select" class="block mb-1.5 sm:mb-2 md:mb-2.5 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
                     Sélectionner un groupe de joueurs:
                 </label>
-                <select id="group-select" class="group-select w-full max-w-md text-[5px] sm:text-[6px] md:text-[8px] p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
-                    {% for group_id in sorted_groups %}
-                    <option value="{{ group_id }}" {% if group_id == default_group %}selected{% endif %}>{{ group_id }}</option>
-                    {% endfor %}
-                </select>
+                <div class="select-wrapper relative w-full max-w-md">
+                    <select id="group-select" class="group-select w-full p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
+                        {% for group_id in sorted_groups %}
+                        <option value="{{ group_id }}" {% if group_id == default_group %}selected{% endif %}>{{ group_id }}</option>
+                        {% endfor %}
+                    </select>
+                    <span class="select-arrow">▼</span>
+                </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="ranking-table w-full text-[5px] sm:text-[6px] md:text-[9px]" id="ranking-table">
@@ -182,18 +185,27 @@
                         <label for="filter-player" class="block mb-1.5 sm:mb-2 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
                             Filtrer par joueur:
                         </label>
-                        <select id="filter-player" class="group-select w-full text-[5px] sm:text-[6px] md:text-[8px] p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
-                            <option value="">Tous les joueurs</option>
-                        </select>
+                        <div class="select-wrapper relative w-full">
+                            <select id="filter-player" class="group-select w-full p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
+                                <option value="">Tous les joueurs</option>
+                            </select>
+                            <span class="select-arrow">▼</span>
+                        </div>
                     </div>
                     <div class="filter-group flex-1">
                         <label for="filter-group" class="block mb-1.5 sm:mb-2 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
                             Filtrer par groupe:
                         </label>
-                        <select id="filter-group" class="group-select w-full text-[5px] sm:text-[6px] md:text-[8px] p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
-                            <option value="">Tous les groupes</option>
-                        </select>
+                        <div class="select-wrapper relative w-full">
+                            <select id="filter-group" class="group-select w-full p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
+                                <option value="">Tous les groupes</option>
+                            </select>
+                            <span class="select-arrow">▼</span>
+                        </div>
                     </div>
+                </div>
+                <div id="sessions-count" class="mb-3 sm:mb-4 text-center" style="color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+                    <span class="text-[6px] sm:text-[7px] md:text-[9px]">Total: <span id="sessions-count-value">0</span> session(s)</span>
                 </div>
                 <div id="all-sessions-list"></div>
                 <div class="pagination-controls flex justify-center items-center gap-3 sm:gap-4 md:gap-5 my-3 sm:my-4 md:my-5">

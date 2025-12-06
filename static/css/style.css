@@ -301,28 +301,138 @@ section h2 {
     /* La couleur sera définie inline pour chaque joueur */
 }
 
+.select-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 100%;
+}
+
+.select-arrow {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ffd700 !important;
+    font-size: 10px;
+    font-weight: bold;
+    pointer-events: none;
+    z-index: 100;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    line-height: 1;
+    display: block;
+}
+
+@media (min-width: 640px) {
+    .select-arrow {
+        font-size: 11px;
+        right: 16px;
+    }
+}
+
+@media (min-width: 768px) {
+    .select-arrow {
+        font-size: 13px;
+        right: 18px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .select-arrow {
+        font-size: 14px;
+        right: 20px;
+    }
+}
+
 .group-select {
     /* Tailwind classes handle responsive sizing: text-[5px] sm:text-[6px] md:text-[8px] p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px] */
-    background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
-    color: #ffd700;
-    border: 2px solid #654321;
-    font-family: 'Press Start 2P', cursive;
+    background: linear-gradient(135deg, #8b4513 0%, #654321 100%) !important;
+    color: #ffd700 !important;
+    border: 2px solid #654321 !important;
+    font-family: 'Press Start 2P', cursive !important;
     cursor: pointer;
     appearance: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23ffd700' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 10px center;
-    padding-right: 35px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 40px;
+    /* Taille de police responsive pour correspondre au reste du site - augmentée pour meilleure visibilité */
+    font-size: 6px !important;
+    line-height: 1.5;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+}
+
+@media (min-width: 640px) {
+    .group-select {
+        font-size: 7px !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .group-select {
+        font-size: 9px !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .group-select {
+        font-size: 10px !important;
+    }
 }
 
 .group-select:hover {
-    background: linear-gradient(135deg, #654321 0%, #8b4513 100%);
+    background: linear-gradient(135deg, #654321 0%, #8b4513 100%) !important;
 }
 
 .group-select:focus {
     outline: none;
     border-color: #ffd700;
     box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.group-select option {
+    background: rgba(26, 26, 46, 0.9) !important;
+    color: #ffd700 !important;
+    padding: 10px 12px !important;
+    font-family: 'Press Start 2P', cursive !important;
+    /* Taille de police responsive pour correspondre au reste du site - augmentée pour meilleure visibilité */
+    font-size: 6px !important;
+    line-height: 1.6;
+    border: 1px solid #654321 !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+@media (min-width: 640px) {
+    .group-select option {
+        font-size: 7px !important;
+    }
+}
+
+@media (min-width: 768px) {
+    .group-select option {
+        font-size: 9px !important;
+    }
+}
+
+@media (min-width: 1024px) {
+    .group-select option {
+        font-size: 10px !important;
+    }
+}
+
+.group-select option:hover,
+.group-select option:focus {
+    background: rgba(139, 69, 19, 0.6) !important;
+    color: #ffd700 !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+.group-select option:checked,
+.group-select option[selected] {
+    background: linear-gradient(135deg, #8b4513 0%, #654321 100%) !important;
+    color: #ffd700 !important;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8) !important;
+    font-weight: bold !important;
 }
 
 .stats-grid {
