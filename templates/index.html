@@ -105,6 +105,35 @@
             </div>
         </section>
 
+        <section id="elo-ranking" class="mb-3 sm:mb-4 md:mb-6 lg:mb-8 p-2 sm:p-4 md:p-5 overflow-x-auto">
+            <h2 class="text-[8px] sm:text-[9px] md:text-[12px] lg:text-[16px] break-words">🏆 Classement ELO</h2>
+            <div class="overflow-x-auto">
+            <table class="ranking-table w-full text-[5px] sm:text-[6px] md:text-[9px]">
+                <thead>
+                    <tr>
+                        <th>Joueur</th>
+                        <th>ELO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if elo_ranking %}
+                    {% for rank, item in elo_ranking|enumerate(1) %}
+                    {% set player, elo = item %}
+                    <tr>
+                        <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
+                        <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.0f" % elo }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="2" class="text-center" style="color: #ffd700; padding: 20px;">Aucun classement ELO disponible</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            </div>
+        </section>
+
         <section id="classement" class="mb-3 sm:mb-4 md:mb-6 lg:mb-8 p-2 sm:p-4 md:p-5 overflow-x-auto">
             <h2 class="text-[8px] sm:text-[9px] md:text-[12px] lg:text-[16px] break-words">🏆 Classement par Groupe</h2>
             <div class="mb-3 sm:mb-4 md:mb-5 relative z-10">

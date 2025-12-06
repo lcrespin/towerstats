@@ -133,6 +133,104 @@ class SessionStatsManager:
             return '🥉'
         return ''
 
+    def calculate_elo_ratings(self, initial_elo=1500, k_factor=32):
+        """Calcule les ratings ELO pour chaque joueur basés sur toutes les sessions.
+        
+        Le système ELO calcule un score pour chaque joueur basé sur leurs performances
+        dans les sessions. Chaque session est traitée comme une série de matchups entre
+        tous les joueurs présents, où le classement est déterminé par le score 'today'.
+        
+        Args:
+            initial_elo: Score ELO initial pour les nouveaux joueurs (défaut: 1500)
+            k_factor: Facteur K qui détermine la vitesse de changement (défaut: 32)
+                     Plus K est élevé, plus les changements sont rapides.
+        
+        Returns:
+            dict: Dictionnaire {joueur: rating_elo} trié par rating décroissant
+        """
+        # Initialiser les ratings ELO pour tous les joueurs
+        elo_ratings = defaultdict(lambda: initial_elo)
+        
+        # Trier les sessions par date (plus ancien en premier pour calculer chronologiquement)
+        sorted_sessions = sorted(self.sessions, key=lambda x: x.get('date', ''))
+        
+        for session in sorted_sessions:
+            players = SessionDataManager.parse_session_data(session)
+            if not players or len(players) < 2:
+                continue
+            
+            # Filtrer les joueurs valides et obtenir leurs scores
+            valid_players = {
+                name: stats for name, stats in players.items()
+                if not SessionDataManager.should_ignore_player(name)
+            }
+            
+            if len(valid_players) < 2:
+                continue
+            
+            # Trier les joueurs par score 'today' (décroissant)
+            # Le meilleur score = gagnant de la session
+            sorted_players = sorted(
+                valid_players.items(),
+                key=lambda x: x[1]['today'],
+                reverse=True
+            )
+            
+            # Créer un classement pour chaque joueur dans cette session
+            # (1 = premier, 2 = deuxième, etc.)
+            player_ranks = {}
+            for rank, (player, stats) in enumerate(sorted_players, start=1):
+                player_ranks[player] = rank
+            
+            # Calculer les matchups entre tous les joueurs de la session
+            # Pour chaque paire de joueurs, calculer le résultat du matchup
+            player_names = list(valid_players.keys())
+            
+            for i, player_a in enumerate(player_names):
+                for player_b in player_names[i + 1:]:
+                    rank_a = player_ranks[player_a]
+                    rank_b = player_ranks[player_b]
+                    
+                    # Calculer le score attendu pour le joueur A
+                    elo_a = elo_ratings[player_a]
+                    elo_b = elo_ratings[player_b]
+                    
+                    # Score attendu (probabilité de gagner)
+                    expected_score_a = 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
+                    
+                    # Score réel basé sur le classement
+                    # Si A est mieux classé que B, A gagne (score = 1)
+                    # Si égalité, score = 0.5
+                    # Sinon, A perd (score = 0)
+                    if rank_a < rank_b:
+                        actual_score_a = 1.0  # A gagne
+                    elif rank_a == rank_b:
+                        actual_score_a = 0.5  # Égalité
+                    else:
+                        actual_score_a = 0.0  # A perd
+                    
+                    # Mettre à jour les ratings ELO
+                    elo_change = k_factor * (actual_score_a - expected_score_a)
+                    elo_ratings[player_a] += elo_change
+                    elo_ratings[player_b] -= elo_change  # Changement opposé pour B
+        
+        # Trier par rating décroissant
+        sorted_elo = sorted(elo_ratings.items(), key=lambda x: x[1], reverse=True)
+        return dict(sorted_elo)
+
+    def get_elo_ranking(self, initial_elo=1500, k_factor=32):
+        """Retourne le classement ELO des joueurs.
+        
+        Args:
+            initial_elo: Score ELO initial (défaut: 1500)
+            k_factor: Facteur K (défaut: 32)
+        
+        Returns:
+            list: Liste de tuples (joueur, rating_elo) triée par rating décroissant
+        """
+        elo_ratings = self.calculate_elo_ratings(initial_elo, k_factor)
+        return list(elo_ratings.items())
+
     def prepare_template_data(self):
         """Prépare toutes les données nécessaires pour le template HTML."""
         # Calculer les données
@@ -198,6 +296,16 @@ class SessionStatsManager:
         if win_percentage_ranking:
             best_percentage_player, _, _, best_percentage = win_percentage_ranking[0]
         
+        # Classement ELO
+        try:
+            elo_ranking = self.get_elo_ranking()
+            # S'assurer que elo_ranking est une liste
+            if not isinstance(elo_ranking, list):
+                elo_ranking = list(elo_ranking) if elo_ranking else []
+        except Exception as e:
+            # En cas d'erreur, retourner une liste vide
+            elo_ranking = []
+        
         # Préparer les sessions latest avec leurs joueurs parsés
         latest_sessions_parsed = []
         for session in latest_sessions:
@@ -239,6 +347,7 @@ class SessionStatsManager:
             'best_percentage_player': best_percentage_player,
             'best_percentage': best_percentage,
             'win_percentage_ranking': win_percentage_ranking,
+            'elo_ranking': elo_ranking,
             'latest_date': latest_date,
             'latest_sessions_parsed': latest_sessions_parsed,
             'sessions_by_date': sessions_by_date,
