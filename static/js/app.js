@@ -624,11 +624,101 @@ function updateEvolutionChart(groupId) {
     });
 }
 
+// Initialisation des info-bulles
+function initInfoBubbles() {
+    const infoButtons = document.querySelectorAll('.info-button');
+    
+    infoButtons.forEach(function(button) {
+        button.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const infoId = this.getAttribute('data-info');
+            const infoBubble = document.getElementById(infoId);
+            
+            if (infoBubble) {
+                // Fermer toutes les autres info-bulles
+                document.querySelectorAll('.info-bubble').forEach(function(bubble) {
+                    if (bubble.id !== infoId) {
+                        bubble.classList.remove('active');
+                    }
+                });
+                
+                // Calculer la position de l'info-bulle par rapport au bouton
+                const buttonRect = this.getBoundingClientRect();
+                const bubbleWidth = Math.min(400, window.innerWidth - 40);
+                const maxHeight = Math.min(window.innerHeight * 0.8, 600);
+                
+                // Toggle l'info-bulle actuelle d'abord pour calculer sa taille
+                const isActive = infoBubble.classList.contains('active');
+                infoBubble.classList.toggle('active');
+                
+                // Positionner l'info-bulle sous le bouton (vers le bas)
+                setTimeout(function() {
+                    const spaceBelow = window.innerHeight - buttonRect.bottom;
+                    const spaceAbove = buttonRect.top;
+                    const availableHeight = Math.min(maxHeight, Math.max(spaceBelow - 20, spaceAbove - 20));
+                    
+                    // Définir la hauteur maximale pour éviter de dépasser
+                    infoBubble.style.maxHeight = availableHeight + 'px';
+                    
+                    // Si pas assez d'espace en bas, afficher au-dessus
+                    if (spaceBelow < 200 && spaceAbove > spaceBelow) {
+                        const topPosition = Math.max(10, buttonRect.top - availableHeight - 10);
+                        infoBubble.style.top = topPosition + 'px';
+                        infoBubble.style.bottom = 'auto';
+                    } else {
+                        // Afficher en bas par défaut
+                        infoBubble.style.top = (buttonRect.bottom + 10) + 'px';
+                        infoBubble.style.bottom = 'auto';
+                    }
+                    
+                    // Position horizontale
+                    infoBubble.style.right = (window.innerWidth - buttonRect.right) + 'px';
+                    infoBubble.style.maxWidth = bubbleWidth + 'px';
+                    
+                    // Ajuster si l'info-bulle dépasse à droite
+                    const finalRect = infoBubble.getBoundingClientRect();
+                    if (finalRect.right > window.innerWidth - 10) {
+                        infoBubble.style.right = '10px';
+                    }
+                    
+                    // S'assurer que l'info-bulle ne dépasse pas en bas
+                    if (finalRect.bottom > window.innerHeight - 10) {
+                        const newTop = Math.max(10, window.innerHeight - availableHeight - 10);
+                        infoBubble.style.top = newTop + 'px';
+                    }
+                }, 10);
+            }
+        });
+    });
+    
+    // Fermer les info-bulles quand on clique ailleurs
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.info-button') && !e.target.closest('.info-bubble')) {
+            document.querySelectorAll('.info-bubble').forEach(function(bubble) {
+                bubble.classList.remove('active');
+            });
+        }
+    });
+    
+    // Ajuster la position lors du scroll
+    window.addEventListener('scroll', function() {
+        document.querySelectorAll('.info-bubble.active').forEach(function(bubble) {
+            const button = document.querySelector('[data-info="' + bubble.id + '"]');
+            if (button) {
+                const buttonRect = button.getBoundingClientRect();
+                bubble.style.top = (buttonRect.bottom + 10) + 'px';
+                bubble.style.right = (window.innerWidth - buttonRect.right) + 'px';
+            }
+        });
+    });
+}
+
 // Initialisation globale quand le DOM est prêt
 document.addEventListener('DOMContentLoaded', function() {
     initGroupSelector();
     initSessionsPagination();
     initSmoothScroll();
     initEvolutionChart();
+    initInfoBubbles();
 });
 
