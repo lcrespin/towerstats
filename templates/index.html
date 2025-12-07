@@ -402,14 +402,22 @@
                 </div>
             </div>
             <div class="mb-3 sm:mb-4 md:mb-5 relative z-10">
-                <label for="evolution-group-select" class="block mb-1.5 sm:mb-2 md:mb-2.5 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
-                    Sélectionner un groupe de joueurs:
-                </label>
-                <div class="select-wrapper relative w-full max-w-md">
-                    <select id="evolution-group-select" class="group-select w-full p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
-                        <option value="">Sélectionner un groupe</option>
-                    </select>
-                    <span class="select-arrow">▼</span>
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 md:gap-5">
+                    <div class="flex-1 w-full sm:w-auto">
+                        <label for="evolution-group-select" class="block mb-1.5 sm:mb-2 md:mb-2.5 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
+                            Sélectionner un groupe de joueurs:
+                        </label>
+                        <div class="select-wrapper relative w-full max-w-md">
+                            <select id="evolution-group-select" class="group-select w-full p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
+                                <option value="">Sélectionner un groupe</option>
+                            </select>
+                            <span class="select-arrow">▼</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 mt-4 sm:mt-0">
+                        <input type="checkbox" id="evolution-cumul-checkbox" checked class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: #8b4513;">
+                        <label for="evolution-cumul-checkbox" class="text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px] cursor-pointer" style="color: #ffd700;">Cumulé</label>
+                    </div>
                 </div>
             </div>
             <div class="chart-container" style="position: relative; height: 400px; width: 100%;">

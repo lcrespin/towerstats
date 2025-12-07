@@ -815,3 +815,22 @@ section h2 {
     background: rgba(139, 69, 19, 1);
 }
 
+/* Checkbox styling for evolution chart */
+#evolution-cumul-checkbox {
+    accent-color: #8b4513;
+    cursor: pointer;
+    width: 16px;
+    height: 16px;
+}
+
+@media (min-width: 640px) {
+    #evolution-cumul-checkbox {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+#evolution-cumul-checkbox:checked {
+    accent-color: #ffd700;
+}
+

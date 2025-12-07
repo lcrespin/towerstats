@@ -433,6 +433,8 @@ function initEvolutionChart() {
 
     // Remplir le sélecteur de groupe
     const groupSelect = document.getElementById('evolution-group-select');
+    const cumulCheckbox = document.getElementById('evolution-cumul-checkbox');
+    
     if (groupSelect) {
         sortedGroups.forEach(function(group) {
             const option = document.createElement('option');
@@ -441,23 +443,41 @@ function initEvolutionChart() {
             groupSelect.appendChild(option);
         });
 
-        // Écouter les changements
+        // Écouter les changements du sélecteur
         groupSelect.addEventListener('change', function() {
-            updateEvolutionChart(this.value);
+            const isCumul = cumulCheckbox ? cumulCheckbox.checked : true;
+            updateEvolutionChart(this.value, isCumul);
         });
+        
+        // Écouter les changements de la case à cocher
+        if (cumulCheckbox) {
+            cumulCheckbox.addEventListener('change', function() {
+                const groupId = groupSelect.value;
+                if (groupId) {
+                    updateEvolutionChart(groupId, this.checked);
+                }
+            });
+        }
 
         // Initialiser avec le premier groupe si disponible
         if (sortedGroups.length > 0) {
             groupSelect.value = sortedGroups[0];
-            updateEvolutionChart(sortedGroups[0]);
+            const isCumul = cumulCheckbox ? cumulCheckbox.checked : true;
+            updateEvolutionChart(sortedGroups[0], isCumul);
         }
     }
 }
 
 // Mettre à jour le graphique d'évolution
-function updateEvolutionChart(groupId) {
+function updateEvolutionChart(groupId, isCumul) {
     if (typeof allSessions === 'undefined' || !groupId) {
         return;
+    }
+    
+    // Par défaut, utiliser le mode cumul si non spécifié
+    if (typeof isCumul === 'undefined') {
+        const cumulCheckbox = document.getElementById('evolution-cumul-checkbox');
+        isCumul = cumulCheckbox ? cumulCheckbox.checked : true;
     }
 
     // Filtrer les sessions du groupe sélectionné
@@ -488,11 +508,12 @@ function updateEvolutionChart(groupId) {
         if (session.players) {
             session.players.forEach(function(player) {
                 allPlayers.add(player.name);
-                // Utiliser le total de points (total) pour cette session
+                // Utiliser total pour cumul, today pour session
+                const value = isCumul ? (player.total || 0) : (player.today || 0);
                 if (!dataByDate[originalDate][player.name]) {
                     dataByDate[originalDate][player.name] = 0;
                 }
-                dataByDate[originalDate][player.name] = player.total;
+                dataByDate[originalDate][player.name] = value;
             });
         }
     });
@@ -547,7 +568,7 @@ function updateEvolutionChart(groupId) {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Points totaux',
+                        text: isCumul ? 'Points totaux' : 'Points par session',
                         color: '#ffd700',
                         font: {
                             family: 'Press Start 2P',
