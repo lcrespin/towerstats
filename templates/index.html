@@ -42,11 +42,11 @@
     <nav class="sticky top-0 z-50">
         <div class="flex items-center justify-between w-full">
             <ul class="flex flex-wrap justify-center gap-grid flex-1">
-                <li class="flex-1 min-w-0"><a href="#statistiques" class="block text-center txt-xs  break-words">Statistiques</a></li>
-                <li class="flex-1 min-w-0"><a href="#pourcentage-victoires" class="block text-center txt-xs  break-words">% Victoires</a></li>
-                <li class="flex-1 min-w-0"><a href="#classement" class="block text-center txt-xs  break-words">Groupes</a></li>
-                <li class="flex-1 min-w-0"><a href="#derniere-soiree" class="block text-center txt-xs  break-words">Sessions</a></li>
-                <li class="flex-1 min-w-0"><a href="#evolution-scores" class="block text-center txt-xs  break-words">Évolution</a></li>
+                <li class="flex-1 min-w-0"><a href="#statistiques" class="block text-center">Statistiques</a></li>
+                <li class="flex-1 min-w-0"><a href="#pourcentage-victoires" class="block text-center">% Victoires</a></li>
+                <li class="flex-1 min-w-0"><a href="#classement" class="block text-center">Groupes</a></li>
+                <li class="flex-1 min-w-0"><a href="#derniere-soiree" class="block text-center">Sessions</a></li>
+                <li class="flex-1 min-w-0"><a href="#evolution-scores" class="block text-center">Évolution</a></li>
             </ul>
             <button class="info-button global-info-button txt-xs" data-info="global-data-info">?</button>
         </div>
@@ -184,7 +184,7 @@
                 <table class="ranking-table w-full txt-xs">
                 <thead>
                     <tr>
-                        <th>Joueur</th>
+                        <th class="player-column">Joueur</th>
                         <th>Victoires / Parties</th>
                         <th>% Victoires</th>
                     </tr>
@@ -193,7 +193,7 @@
                     {% for rank, item in win_percentage_ranking|enumerate(1) %}
                     {% set player, victories, games_played, win_percentage = item %}
                     <tr>
-                        <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
+                        <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
                         <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ victories }}/{{ games_played }}</td>
                         <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f" % win_percentage }}%</td>
                     </tr>
@@ -232,7 +232,7 @@
             <table class="ranking-table w-full txt-xs">
                 <thead>
                     <tr>
-                        <th>Joueur</th>
+                        <th class="player-column">Joueur</th>
                         <th>ELO</th>
                     </tr>
                 </thead>
@@ -241,7 +241,7 @@
                     {% for rank, item in elo_ranking|enumerate(1) %}
                     {% set player, elo = item %}
                     <tr>
-                        <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
+                        <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
                         <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.0f" % elo }}</td>
                     </tr>
                     {% endfor %}
@@ -289,7 +289,7 @@
                 <table class="ranking-table w-full txt-xs" id="ranking-table">
                 <thead>
                     <tr>
-                        <th>Joueur</th>
+                        <th class="player-column">Joueur</th>
                         <th>Victoires</th>
                     </tr>
                 </thead>
@@ -297,7 +297,7 @@
                     {% for rank, item in default_ranking|enumerate(1) %}
                     {% set player, total = item %}
                     <tr>
-                        <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
+                        <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
                         <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ total }}</td>
                     </tr>
                     {% endfor %}
@@ -321,7 +321,7 @@
                     <table class="ranking-table w-full txt-xs">
                         <thead>
                             <tr>
-                                <th>Joueur</th>
+                                <th class="player-column">Joueur</th>
                                 <th>Session</th>
                                 <th>Total</th>
                             </tr>
@@ -330,7 +330,7 @@
                             {% for rank in range(1, players|length + 1) %}
                             {% set player, stats = players[rank - 1] %}
                             <tr>
-                                <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
+                                <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
                                 <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ stats.today }}</td>
                                 <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ stats.total }}</td>
                             </tr>

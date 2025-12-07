@@ -205,7 +205,25 @@ nav a {
     text-overflow: ellipsis;
     white-space: nowrap;
     box-sizing: border-box;
-    font-size: 8px;
+    font-size: 6px;
+}
+
+@media (min-width: 640px) {
+    nav a {
+        font-size: 9px;
+    }
+}
+
+@media (min-width: 768px) {
+    nav a {
+        font-size: 10px;
+    }
+}
+
+@media (min-width: 1024px) {
+    nav a {
+        font-size: 11px;
+    }
 }
 
 nav a:hover {
@@ -322,6 +340,28 @@ section h2 {
     word-wrap: break-word;
     overflow-wrap: break-word;
     max-width: 0;
+}
+
+.ranking-table .player-column {
+    width: 100px;
+}
+
+@media (min-width: 640px) {
+    .ranking-table .player-column {
+        min-width: 130px;
+    }
+}
+
+@media (min-width: 768px) {
+    .ranking-table .player-column {
+        min-width: 160px;
+    }
+}
+
+@media (min-width: 1024px) {
+    .ranking-table .player-column {
+        min-width: 180px;
+    }
 }
 
 .ranking-table tr:nth-child(even) td {
@@ -445,10 +485,10 @@ section h2 {
 }
 
 /* Util classes to factor common Tailwind repetitions (HTML factorisation) */
-.txt-xs { font-size: 5px; }
-@media (min-width: 640px) { .txt-xs { font-size: 6px; } }
-@media (min-width: 768px) { .txt-xs { font-size: 7px; } }
-@media (min-width: 1024px) { .txt-xs { font-size: 8px; } }
+.txt-xs { font-size: 8px; }
+@media (min-width: 640px) { .txt-xs { font-size: 9px; } }
+@media (min-width: 768px) { .txt-xs { font-size: 10px; } }
+@media (min-width: 1024px) { .txt-xs { font-size: 11px; } }
 
 .txt-base { font-size: 10px; }
 @media (min-width: 640px) { .txt-base { font-size: 11px; } }
@@ -587,50 +627,6 @@ section h2 {
     font-weight: bold !important;
 }
 
-/* === Responsive breakpoints regrouped === */
-
-@media (min-width: 640px) {
-  .txt-xs { font-size: 6px; }
-  .txt-base { font-size: 11px; }
-  .txt-heading { font-size: 9px; }
-  /* .txt-title-h1 uses clamp() for responsive sizing */
-  .gap-grid { gap: 6px; }
-  .pad-section { padding: 16px; }
-  .pad-card { padding: 16px; }
-  .margin-bottom-section { margin-bottom: 16px; }
-  .select-arrow { font-size: 11px; right: 16px; }
-  .group-select { font-size: 7px !important; }
-  .group-select option { font-size: 7px !important; }
-}
-
-@media (min-width: 768px) {
-  .txt-xs { font-size: 7px; }
-  .txt-base { font-size: 12px; }
-  .txt-heading { font-size: 12px; }
-  /* .txt-title-h1 uses clamp() for responsive sizing */
-  .gap-grid { gap: 8px; }
-  .pad-section { padding: 20px; }
-  .pad-card { padding: 15px; }
-  .margin-bottom-section { margin-bottom: 24px; }
-  .select-arrow { font-size: 13px; right: 18px; }
-  .group-select { font-size: 9px !important; }
-  .group-select option { font-size: 9px !important; }
-}
-
-@media (min-width: 1024px) {
-  .txt-xs { font-size: 8px; }
-  .txt-base { font-size: 13px; }
-  .txt-heading { font-size: 16px; }
-  /* .txt-title-h1 uses clamp() for responsive sizing */
-  .margin-bottom-section { margin-bottom: 32px; }
-  .select-arrow { font-size: 14px; right: 20px; }
-  .group-select { font-size: 10px !important; }
-  .group-select option { font-size: 10px !important; }
-}
-
-@media (min-width: 1280px) {
-  /* .txt-title-h1 uses clamp() for responsive sizing */
-}
 
 /* Info bubble styles */
 .section-header {
