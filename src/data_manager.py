@@ -227,6 +227,11 @@ class SessionDataManager:
         Returns:
             str: ID de la session calculé (ex: 'DAVID-ERIC-LOUIS')
         """
+        # Si la session contient un joueur à ignorer, on écarte toute la session
+        all_player_names = SessionDataManager.extract_player_names(session)
+        if any(SessionDataManager.should_ignore_player(name) for name in all_player_names):
+            return ''
+
         players = SessionDataManager.parse_session_data(session)
         if not players:
             return ''
@@ -241,13 +246,29 @@ class SessionDataManager:
         return '-'.join(player_names)
 
     @staticmethod
+    def extract_player_names(session) -> List[str]:
+        """Retourne tous les noms de joueurs présents, sans filtrage."""
+        data = session.get('data', {})
+        names = []
+
+        if 'version' in data and data['version'] == 'v1':
+            for color in COLOR_CONFIG.keys():
+                player_name = COLOR_TO_PLAYER.get(color)
+                if player_name:
+                    names.append(player_name)
+        elif 'todayWin' in data:
+            names.extend(list(data['todayWin'].keys()))
+
+        return names
+
+    @staticmethod
     def should_ignore_player(player_name: str) -> bool:
-        """Vérifie si un joueur doit être ignoré (AIJIMMY, P1, P2)."""
+        """Vérifie si un joueur doit être ignoré (AIJIMMY, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, etc.)."""
         if not player_name:
             return True
         player_upper = player_name.upper().replace(' ', '')
-        # Ignorer AIJIMMY, P1, P2
-        return 'AIJIMMY' in player_upper or player_upper in ['P1', 'P2']
+        # Ignorer AIJIMMY, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10
+        return 'AIJIMMY' in player_upper or player_upper in ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10']
 
     @staticmethod
     def parse_session_data(session: Dict[str, Any]) -> Dict[str, Any]:

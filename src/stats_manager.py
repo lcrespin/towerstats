@@ -282,19 +282,22 @@ class SessionStatsManager:
                 if total > all_player_totals[player]:
                     all_player_totals[player] = total
         
-        best_player = None
+        best_players = []
         best_score = 0
         if all_player_totals:
-            best_player_tuple = max(all_player_totals.items(), key=lambda x: x[1])
-            best_player = best_player_tuple[0]
-            best_score = best_player_tuple[1]
+            best_score = max(all_player_totals.values())
+            best_players = [p for p, total in all_player_totals.items() if total == best_score]
         
         # Meilleur pourcentage de victoires
         win_percentage_ranking = self.get_win_percentage_ranking()
-        best_percentage_player = None
+        best_percentage_players = []
         best_percentage = 0.0
         if win_percentage_ranking:
-            best_percentage_player, _, _, best_percentage = win_percentage_ranking[0]
+            _, _, _, top_percentage = win_percentage_ranking[0]
+            best_percentage = top_percentage
+            best_percentage_players = [
+                player for player, _, _, pct in win_percentage_ranking if pct == top_percentage
+            ]
         
         # Classement ELO
         try:
@@ -307,10 +310,11 @@ class SessionStatsManager:
             elo_ranking = []
         
         # Meilleur ELO
-        best_elo_player = None
+        best_elo_players = []
         best_elo = 0.0
         if elo_ranking:
-            best_elo_player, best_elo = elo_ranking[0]
+            best_elo = elo_ranking[0][1]
+            best_elo_players = [player for player, rating in elo_ranking if rating == best_elo]
         
         # Préparer les sessions latest avec leurs joueurs parsés
         latest_sessions_parsed = []
@@ -348,13 +352,13 @@ class SessionStatsManager:
             'date_fin': date_fin_formatted,
             'total_sessions': total_sessions,
             'unique_players_count': len(unique_players),
-            'best_player': best_player,
+            'best_players': best_players,
             'best_score': best_score,
-            'best_percentage_player': best_percentage_player,
+            'best_percentage_players': best_percentage_players,
             'best_percentage': best_percentage,
             'win_percentage_ranking': win_percentage_ranking,
             'elo_ranking': elo_ranking,
-            'best_elo_player': best_elo_player,
+            'best_elo_players': best_elo_players,
             'best_elo': best_elo,
             'latest_date': latest_date,
             'latest_sessions_parsed': latest_sessions_parsed,

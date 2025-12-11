@@ -125,25 +125,37 @@
                 </div>
             </div>
             <div class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-grid">
-                {% if best_percentage_player %}
+                {% if best_percentage_players %}
                 <div class="stat-card pad-card">
                     <div class="stat-label txt-xs">Meilleur % Victoires</div>
                     <div class="stat-value txt-title-h2">{{ "%.2f" % best_percentage }}%</div>
-                    <div class="stat-label txt-sm" style="color: {{ get_player_color(best_percentage_player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ best_percentage_player }}</div>
+                    <div class="flex flex-wrap justify-center gap-1.5 mt-1">
+                        {% for player in best_percentage_players %}
+                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                        {% endfor %}
+                    </div>
                 </div>
                 {% endif %}
-                {% if best_player %}
+                {% if best_players %}
                 <div class="stat-card pad-card">
                     <div class="stat-label txt-xs">Meilleur Score dans un groupe</div>
                     <div class="stat-value txt-title-h2">{{ best_score }}</div>
-                    <div class="stat-label txt-sm" style="color: {{ get_player_color(best_player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ best_player }}</div>
+                    <div class="flex flex-wrap justify-center gap-1.5 mt-1">
+                        {% for player in best_players %}
+                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                        {% endfor %}
+                    </div>
                 </div>
                 {% endif %}
-                {% if best_elo_player %}
+                {% if best_elo_players %}
                 <div class="stat-card pad-card">
                     <div class="stat-label txt-xs">Joueur avec le meilleur ELO</div>
                     <div class="stat-value txt-title-h2">{{ "%.0f" % best_elo }}</div>
-                    <div class="stat-label txt-sm" style="color: {{ get_player_color(best_elo_player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ best_elo_player }}</div>
+                    <div class="flex flex-wrap justify-center gap-1.5 mt-1">
+                        {% for player in best_elo_players %}
+                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                        {% endfor %}
+                    </div>
                 </div>
                 {% endif %}
                 <div class="stat-card pad-card">

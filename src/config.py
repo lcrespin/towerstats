@@ -1,7 +1,8 @@
 """Configuration et constantes pour TowerStats."""
 
 # URL publique de la Google Sheet en CSV
-CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQE3KfSAHXOp3hNFuR5oq_lgtEdEUzJ6YiRcov5gDSdgVSvuJDuy6sFslSC76qIa3CPjYSl9sTwQUrO/pub?output=csv'
+# CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQE3KfSAHXOp3hNFuR5oq_lgtEdEUzJ6YiRcov5gDSdgVSvuJDuy6sFslSC76qIa3CPjYSl9sTwQUrO/pub?output=csv'
+CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTTikaqWVWPY9RNMASh76zdipiwF5XwwAq-TNgUDSVs6uU10BRvaATt8GidTikAvL6E1Jh6drNG04wd/pub?gid=0&single=true&output=csv'
 
 # Source de vérité : configuration des couleurs
 # Format: couleur (nom) -> (joueur, code_hex)
