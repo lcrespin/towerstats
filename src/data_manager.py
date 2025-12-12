@@ -79,7 +79,10 @@ class SessionDataManager:
                 continue
             
             # Vérifier s'il y a une session le jour suivant avec le même ID
-            date_obj, hour = SessionDataManager.parse_date_with_hour(session['date'])
+            # L'heure peut être dans data['date'] ou dans session['date']
+            data = session.get('data', {})
+            date_with_hour = data.get('date', session['date'])
+            date_obj, hour = SessionDataManager.parse_date_with_hour(date_with_hour)
             
             if date_obj is not None and hour is not None:
                 # Format avec heure : chercher session entre 00h-05h le jour suivant
@@ -88,7 +91,9 @@ class SessionDataManager:
                 for j, other_session in enumerate(sessions_sorted):
                     if j >= i or other_session['id'] != session['id']:
                         continue
-                    other_date_obj, other_hour = SessionDataManager.parse_date_with_hour(other_session['date'])
+                    other_data = other_session.get('data', {})
+                    other_date_with_hour = other_data.get('date', other_session['date'])
+                    other_date_obj, other_hour = SessionDataManager.parse_date_with_hour(other_date_with_hour)
                     if (other_date_obj and other_hour is not None and
                         other_date_obj.date() == next_day.date() and 0 <= other_hour <= 5):
                         found_next = True
