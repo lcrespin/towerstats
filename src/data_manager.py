@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 from typing import List, Dict, Any
 
-from .config import CSV_URL, COLOR_TO_PLAYER, PLAYER_TO_COLOR_KEY, V1_DATES_TO_IGNORE, COLOR_CONFIG
+from .config import CSV_URL
 
 
 class SessionDataManager:
@@ -56,7 +56,7 @@ class SessionDataManager:
             raise Exception(f"Erreur lors de la récupération des données: {e}")
 
     def filter_sessions(self) -> None:
-        """Filtre les sessions (minuit, v1, etc)."""
+        """Filtre les sessions qui passent minuit."""
         if not self.sessions:
             return
         
@@ -67,17 +67,6 @@ class SessionDataManager:
         
         # Parcourir les sessions et détecter les paires qui passent minuit
         for i, session in enumerate(sessions_sorted):
-            # Vérifier si c'est une session v1
-            is_v1 = session.get('data', {}).get('version') == 'v1'
-            
-            # Pour les sessions v1, ignorer uniquement les dates spécifiques
-            if is_v1:
-                date_str = SessionDataManager.extract_date_str(session['date'])
-                if date_str in V1_DATES_TO_IGNORE:
-                    continue
-                sessions_to_keep.append(session)
-                continue
-            
             # Vérifier s'il y a une session le jour suivant avec le même ID
             # L'heure peut être dans data['date'] ou dans session['date']
             data = session.get('data', {})
@@ -161,17 +150,8 @@ class SessionDataManager:
                         # Si la différence ne correspond pas au today actuel
                         if expected_today != current_today and expected_today >= 0:
                             # Corriger le today dans les données
-                            if 'version' in data and data['version'] == 'v1':
-                                # Format v1 : trouver la couleur du joueur
-                                color = PLAYER_TO_COLOR_KEY.get(player)
-                                if color:
-                                    today_key = f'{color}TodayWins'
-                                    if today_key in data:
-                                        data[today_key] = expected_today
-                            elif 'todayWin' in data:
-                                # Format v2 : corriger directement
-                                if player in data['todayWin']:
-                                    data['todayWin'][player] = expected_today
+                            if 'todayWin' in data and player in data['todayWin']:
+                                data['todayWin'][player] = expected_today
                     
                     # Mettre à jour le total précédent
                     previous_totals[player] = current_total
@@ -254,17 +234,9 @@ class SessionDataManager:
     def extract_player_names(session) -> List[str]:
         """Retourne tous les noms de joueurs présents, sans filtrage."""
         data = session.get('data', {})
-        names = []
-
-        if 'version' in data and data['version'] == 'v1':
-            for color in COLOR_CONFIG.keys():
-                player_name = COLOR_TO_PLAYER.get(color)
-                if player_name:
-                    names.append(player_name)
-        elif 'todayWin' in data:
-            names.extend(list(data['todayWin'].keys()))
-
-        return names
+        if 'todayWin' in data:
+            return list(data['todayWin'].keys())
+        return []
 
     @staticmethod
     def should_ignore_player(player_name: str) -> bool:
@@ -277,32 +249,17 @@ class SessionDataManager:
 
     @staticmethod
     def parse_session_data(session: Dict[str, Any]) -> Dict[str, Any]:
-        """Parse les données d'une session selon le format (v1 ou v2)."""
+        """Parse les données d'une session."""
         data = session['data']
+        players = {}
         
-        if 'version' in data and data['version'] == 'v1':
-            # Format ancien avec couleurs
-            players = {}
-            for color in COLOR_CONFIG.keys():
-                today_key = f'{color}TodayWins'
-                total_key = f'{color}TotalWins'
-                if today_key in data and data[today_key] > 0:
-                    player_name = COLOR_TO_PLAYER.get(color, color.capitalize())
-                    if player_name and not SessionDataManager.should_ignore_player(player_name):
-                        players[player_name] = {
-                            'today': data[today_key],
-                            'total': data.get(total_key, 0)
-                        }
-            return players
-        elif 'todayWin' in data:
-            # Format nouveau avec noms de joueurs
-            players = {}
+        if 'todayWin' in data:
             for player, today_wins in data['todayWin'].items():
                 if not SessionDataManager.should_ignore_player(player):
                     players[player] = {
                         'today': today_wins,
                         'total': data.get('totalWin', {}).get(player, 0)
                     }
-            return players
-        return {}
+        
+        return players
 

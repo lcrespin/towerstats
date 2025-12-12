@@ -67,21 +67,8 @@
                 • On met à jour le TotalWins précédent pour la prochaine session<br>
                 • (Oui, on fait le travail qu'Eric aurait dû faire correctement dès le début, mais bon... 🤷)<br><br>
                 
-                <strong>Formats supportés :</strong><br>
-                • <strong>Format v1 :</strong> Utilise <code>{color}TodayWins</code> et <code>{color}TotalWins</code> (ex: pinkTodayWins, greenTotalWins)<br>
-                • <strong>Format v2 :</strong> Utilise <code>todayWin[player]</code> et <code>totalWin[player]</code><br>
-                • (Merci Eric pour cette belle cohérence entre les versions... pas.)<br><br>
-                
-                <strong>Mapping de couleur vers joueur :</strong><br>
-                Comme les noms de joueurs ont été rajoutés récemment dans la fiche de stats, un mapping manuel a été créé pour associer les couleurs du format v1 aux vrais noms :<br>
-                • <code>pink</code> → MEHDI<br>
-                • <code>green</code> → JULIEN<br>
-                • <code>orange</code> → LOUIS<br>
-                • <code>yellow</code> → ALEX<br>
-                • <code>purple</code> → ERIC<br>
-                • <code>blue2</code> → BENOIT<br>
-                • <code>white</code> → DAVID<br>
-                • (Parce que oui, Eric a préféré utiliser des codes couleur plutôt que des noms... génial.)<br><br>
+                <strong>Format des données :</strong><br>
+                Les données utilisent le format <code>todayWin[player]</code> et <code>totalWin[player]</code> pour stocker les statistiques de chaque joueur.<br><br>
                 
                 <strong>Exemple :</strong><br>
                 Session 1 : TotalWins = 50, TodayWins = 10<br>
@@ -91,9 +78,7 @@
                 
                 <strong>Filtrage :</strong><br>
                 • Sessions passant minuit : si une session se termine après minuit, seule la session du jour suivant (00h-05h) est conservée<br>
-                • Sessions v1 : certaines dates spécifiques sont ignorées manuellement car il n'y a pas l'heure dans les stats v1. Sans l'heure, impossible de savoir quand une session passe minuit ou pas... alors on les ignore, c'est plus simple ! 🎯<br>
-                • (Encore un choix de design brillant d'Eric : pas d'horodatage précis, mais on s'en sort comme on peut)<br>
-                • Joueurs invalides : AIJIMMY, P1, P2 sont ignorés<br>
+                • Joueurs invalides : AIJIMMY, P1, P2, etc. sont ignorés<br>
                 • (Parce qu'apparemment, Eric aime bien laisser des traces de debug dans les données de production...)
             </div>
         </div>
