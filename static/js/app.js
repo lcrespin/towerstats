@@ -32,6 +32,24 @@ function updateRanking(groupId) {
     });
 }
 
+// Initialisation du tableau de kills
+function initRankingTable() {
+    const toggleRankingTable = document.getElementById('toggle-ranking-table');
+    if (toggleRankingTable) {
+        toggleRankingTable.addEventListener('click', function() {
+            const rankingTable = document.getElementById('ranking-table');
+            if (rankingTable) {
+                rankingTable.classList.toggle('hidden');
+            }
+            if (rankingTable.classList.contains('hidden')) {
+                toggleRankingTable.textContent = '▼ Voir le détail des kills';
+            } else {
+                toggleRankingTable.textContent = '▲ Masquer le détail des kills';
+            }
+        });
+    }
+}
+
 // Initialisation du sélecteur de groupe
 function initGroupSelector() {
     const groupSelect = document.getElementById('group-select');
@@ -734,12 +752,247 @@ function initInfoBubbles() {
     });
 }
 
+// Graphiques pour les sources de kills
+let killSourcesGlobalChart = null;
+let killSourcesByPlayerChart = null;
+
+// Initialiser les graphiques de sources de kills
+function initKillSourcesCharts() {
+    if (!hasDetailedStats || !killSourcesAggregated) {
+        return;
+    }
+    
+    // Graphique global (camembert)
+    const globalCanvas = document.getElementById('kill-sources-global-chart');
+    if (globalCanvas) {
+        const globalSources = killSourcesAggregated.global || {};
+        const labels = Object.keys(globalSources);
+        const data = Object.values(globalSources);
+        
+        // Couleurs pour le graphique
+        const colors = [
+            'rgba(255, 99, 132, 0.8)',
+            'rgba(54, 162, 235, 0.8)',
+            'rgba(255, 206, 86, 0.8)',
+            'rgba(75, 192, 192, 0.8)',
+            'rgba(153, 102, 255, 0.8)',
+            'rgba(255, 159, 64, 0.8)',
+            'rgba(199, 199, 199, 0.8)',
+            'rgba(83, 102, 255, 0.8)',
+            'rgba(255, 99, 255, 0.8)',
+            'rgba(99, 255, 132, 0.8)'
+        ];
+        
+        const ctx = globalCanvas.getContext('2d');
+        
+        if (killSourcesGlobalChart) {
+            killSourcesGlobalChart.destroy();
+        }
+        
+        killSourcesGlobalChart = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors.slice(0, labels.length),
+                    borderColor: '#8b4513',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right',
+                        labels: {
+                            color: '#ffd700',
+                            font: {
+                                family: 'Press Start 2P',
+                                size: 8
+                            },
+                            padding: 15
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(45, 27, 61, 0.9)',
+                        titleColor: '#ffd700',
+                        bodyColor: '#ffd700',
+                        borderColor: '#8b4513',
+                        borderWidth: 2,
+                        titleFont: {
+                            family: 'Press Start 2P',
+                            size: 8
+                        },
+                        bodyFont: {
+                            family: 'Press Start 2P',
+                            size: 7
+                        },
+                        padding: 10
+                    }
+                }
+            }
+        });
+    }
+    
+    // Graphique par joueur (barres empilées)
+    const byPlayerCanvas = document.getElementById('kill-sources-by-player-chart');
+    if (byPlayerCanvas) {
+        const byPlayer = killSourcesAggregated.by_player || {};
+        const players = Object.keys(byPlayer);
+        const allSources = new Set();
+        
+        // Collecter toutes les sources uniques
+        players.forEach(function(player) {
+            Object.keys(byPlayer[player]).forEach(function(source) {
+                allSources.add(source);
+            });
+        });
+        
+        const sources = Array.from(allSources).sort();
+        
+        // Couleurs pour chaque source
+        const sourceColors = {
+            'Arrow': 'rgba(255, 99, 132, 0.8)',
+            'JumpedOn': 'rgba(54, 162, 235, 0.8)',
+            'Explosion': 'rgba(255, 206, 86, 0.8)',
+            'Lava': 'rgba(255, 99, 99, 0.8)',
+            'Brambles': 'rgba(75, 192, 192, 0.8)',
+            'FallingObject': 'rgba(153, 102, 255, 0.8)',
+            'Shock': 'rgba(255, 159, 64, 0.8)',
+            'Squish': 'rgba(199, 199, 199, 0.8)',
+            'SpikeBall': 'rgba(83, 102, 255, 0.8)',
+            'Miasma': 'rgba(255, 99, 255, 0.8)'
+        };
+        
+        // Créer les datasets pour chaque source
+        const datasets = sources.map(function(source) {
+            const data = players.map(function(player) {
+                return byPlayer[player][source] || 0;
+            });
+            return {
+                label: source,
+                data: data,
+                backgroundColor: sourceColors[source] || 'rgba(128, 128, 128, 0.8)',
+                borderColor: '#8b4513',
+                borderWidth: 1
+            };
+        });
+        
+        const ctx = byPlayerCanvas.getContext('2d');
+        
+        if (killSourcesByPlayerChart) {
+            killSourcesByPlayerChart.destroy();
+        }
+        
+        killSourcesByPlayerChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: players.map(function(p) {
+                    return p;
+                }),
+                datasets: datasets
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        stacked: true,
+                        title: {
+                            display: true,
+                            text: 'Joueurs',
+                            color: '#ffd700',
+                            font: {
+                                family: 'Press Start 2P',
+                                size: 8
+                            }
+                        },
+                        ticks: {
+                            color: '#ffd700',
+                            font: {
+                                family: 'Press Start 2P',
+                                size: 6
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(139, 69, 19, 0.3)'
+                        }
+                    },
+                    y: {
+                        stacked: true,
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Nombre de Kills',
+                            color: '#ffd700',
+                            font: {
+                                family: 'Press Start 2P',
+                                size: 8
+                            }
+                        },
+                        ticks: {
+                            color: '#ffd700',
+                            font: {
+                                family: 'Press Start 2P',
+                                size: 6
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(139, 69, 19, 0.3)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#ffd700',
+                            font: {
+                                family: 'Press Start 2P',
+                                size: 6
+                            },
+                            usePointStyle: true,
+                            padding: 10
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(45, 27, 61, 0.9)',
+                        titleColor: '#ffd700',
+                        bodyColor: '#ffd700',
+                        borderColor: '#8b4513',
+                        borderWidth: 2,
+                        titleFont: {
+                            family: 'Press Start 2P',
+                            size: 8
+                        },
+                        bodyFont: {
+                            family: 'Press Start 2P',
+                            size: 7
+                        },
+                        padding: 10,
+                        mode: 'index',
+                        intersect: false
+                    }
+                }
+            }
+        });
+    }
+}
+
 // Initialisation globale quand le DOM est prêt
 document.addEventListener('DOMContentLoaded', function() {
+    initRankingTable();
     initGroupSelector();
     initSessionsPagination();
     initSmoothScroll();
     initEvolutionChart();
     initInfoBubbles();
+    if (hasDetailedStats) {
+        initKillSourcesCharts();
+    }
 });
 

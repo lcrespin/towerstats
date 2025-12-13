@@ -248,18 +248,51 @@ class SessionDataManager:
         return 'AIJIMMY' in player_upper or player_upper in ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10']
 
     @staticmethod
+    def has_detailed_stats(session: Dict[str, Any]) -> bool:
+        """Vérifie si une session contient des statistiques détaillées.
+        
+        Args:
+            session: Dictionnaire de session avec 'data' contenant les données JSON
+        
+        Returns:
+            bool: True si la session contient des stats détaillées (today/total avec kill, death, etc.)
+        """
+        data = session.get('data', {})
+        return 'today' in data and 'total' in data
+    
+    @staticmethod
     def parse_session_data(session: Dict[str, Any]) -> Dict[str, Any]:
-        """Parse les données d'une session."""
+        """Parse les données d'une session.
+        
+        Retourne les données de base (today/total wins) et les stats détaillées si disponibles.
+        """
         data = session['data']
         players = {}
+        has_detailed = SessionDataManager.has_detailed_stats(session)
         
         if 'todayWin' in data:
             for player, today_wins in data['todayWin'].items():
                 if not SessionDataManager.should_ignore_player(player):
-                    players[player] = {
+                    player_data = {
                         'today': today_wins,
                         'total': data.get('totalWin', {}).get(player, 0)
                     }
+                    
+                    # Ajouter les stats détaillées si disponibles
+                    if has_detailed:
+                        today_stats = data.get('today', {}).get(player, {})
+                        total_stats = data.get('total', {}).get(player, {})
+                        
+                        if today_stats or total_stats:
+                            player_data['detailed'] = {
+                                'kill': total_stats.get('kill', 0),
+                                'death': total_stats.get('death', 0),
+                                'self': total_stats.get('self', 0),
+                                'killFrom': total_stats.get('killFrom', {}),
+                                'killBy': total_stats.get('killBy', {})
+                            }
+                    
+                    players[player] = player_data
         
         return players
 

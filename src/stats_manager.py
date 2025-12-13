@@ -230,6 +230,158 @@ class SessionStatsManager:
         """
         elo_ratings = self.calculate_elo_ratings(initial_elo, k_factor)
         return list(elo_ratings.items())
+    
+    def has_detailed_stats(self) -> bool:
+        """Vérifie si au moins une session contient des statistiques détaillées."""
+        for session in self.sessions:
+            if SessionDataManager.has_detailed_stats(session):
+                return True
+        return False
+    
+    def get_kill_death_stats(self):
+        """Calcule les statistiques de kills et deaths par joueur.
+        
+        Returns:
+            list: Liste de tuples (joueur, kills, deaths, self_kills, kd_ratio) triée par ratio K/D décroissant
+        """
+        player_kills = defaultdict(int)
+        player_deaths = defaultdict(int)
+        player_self_kills = defaultdict(int)
+        
+        for session in self.sessions:
+            players = SessionDataManager.parse_session_data(session)
+            for player, stats in players.items():
+                if 'detailed' in stats:
+                    detailed = stats['detailed']
+                    player_kills[player] = max(player_kills[player], detailed.get('kill', 0))
+                    player_deaths[player] = max(player_deaths[player], detailed.get('death', 0))
+                    player_self_kills[player] = max(player_self_kills[player], detailed.get('self', 0))
+        
+        # Calculer les ratios K/D
+        player_stats = []
+        for player in player_kills.keys():
+            kills = player_kills[player]
+            deaths = player_deaths[player]
+            self_kills = player_self_kills[player]
+            
+            if deaths > 0:
+                kd_ratio = kills / deaths
+            else:
+                kd_ratio = kills if kills > 0 else 0.0
+            
+            player_stats.append((player, kills, deaths, self_kills, kd_ratio))
+        
+        # Trier par ratio K/D décroissant
+        return sorted(player_stats, key=lambda x: x[4], reverse=True)
+    
+    def get_kill_sources_stats(self):
+        """Agrège les sources de kills (Arrow, Explosion, etc.) par joueur et globalement.
+        
+        Returns:
+            dict: {
+                'by_player': {player: {source: count}},
+                'global': {source: total_count}
+            }
+        """
+        by_player = defaultdict(lambda: defaultdict(int))
+        global_sources = defaultdict(int)
+        
+        for session in self.sessions:
+            players = SessionDataManager.parse_session_data(session)
+            for player, stats in players.items():
+                if 'detailed' in stats:
+                    kill_from = stats['detailed'].get('killFrom', {})
+                    for source, count in kill_from.items():
+                        by_player[player][source] = max(by_player[player][source], count)
+                        global_sources[source] = max(global_sources[source], count)
+        
+        return {
+            'by_player': dict(by_player),
+            'global': dict(global_sources)
+        }
+    
+    def get_kill_relationships(self):
+        """Crée une matrice montrant qui tue qui (killBy agrégé).
+        
+        Returns:
+            dict: {killer: {victim: count}} - Matrice des kills entre joueurs
+        """
+        relationships = defaultdict(lambda: defaultdict(int))
+        
+        for session in self.sessions:
+            players = SessionDataManager.parse_session_data(session)
+            for player, stats in players.items():
+                if 'detailed' in stats:
+                    kill_by = stats['detailed'].get('killBy', {})
+                    for killer, count in kill_by.items():
+                        if not SessionDataManager.should_ignore_player(killer):
+                            relationships[killer][player] = max(relationships[killer][player], count)
+        
+        return dict(relationships)
+    
+    def get_self_kill_stats(self):
+        """Calcule les statistiques sur les auto-éliminations.
+        
+        Returns:
+            list: Liste de tuples (joueur, self_kills) triée par nombre décroissant
+        """
+        player_self_kills = defaultdict(int)
+        
+        for session in self.sessions:
+            players = SessionDataManager.parse_session_data(session)
+            for player, stats in players.items():
+                if 'detailed' in stats:
+                    self_kills = stats['detailed'].get('self', 0)
+                    player_self_kills[player] = max(player_self_kills[player], self_kills)
+        
+        return sorted(player_self_kills.items(), key=lambda x: x[1], reverse=True)
+    
+    def get_detailed_player_stats(self, player_name: str):
+        """Retourne les statistiques complètes pour un joueur spécifique.
+        
+        Args:
+            player_name: Nom du joueur
+        
+        Returns:
+            dict: Statistiques détaillées du joueur ou None si non trouvé
+        """
+        player_kills = 0
+        player_deaths = 0
+        player_self_kills = 0
+        kill_from = defaultdict(int)
+        kill_by = defaultdict(int)
+        
+        for session in self.sessions:
+            players = SessionDataManager.parse_session_data(session)
+            if player_name in players:
+                stats = players[player_name]
+                if 'detailed' in stats:
+                    detailed = stats['detailed']
+                    player_kills = max(player_kills, detailed.get('kill', 0))
+                    player_deaths = max(player_deaths, detailed.get('death', 0))
+                    player_self_kills = max(player_self_kills, detailed.get('self', 0))
+                    
+                    for source, count in detailed.get('killFrom', {}).items():
+                        kill_from[source] = max(kill_from[source], count)
+                    
+                    for killer, count in detailed.get('killBy', {}).items():
+                        if not SessionDataManager.should_ignore_player(killer):
+                            kill_by[killer] = max(kill_by[killer], count)
+        
+        if player_kills == 0 and player_deaths == 0:
+            return None
+        
+        kd_ratio = player_kills / player_deaths if player_deaths > 0 else (player_kills if player_kills > 0 else 0.0)
+        
+        return {
+            'player': player_name,
+            'kills': player_kills,
+            'deaths': player_deaths,
+            'self_kills': player_self_kills,
+            'kd_ratio': kd_ratio,
+            'killFrom': dict(kill_from),
+            'killBy': dict(kill_by)
+        }
 
     def prepare_template_data(self):
         """Prépare toutes les données nécessaires pour le template HTML."""
@@ -342,6 +494,55 @@ class SessionStatsManager:
                         'players': [{'name': p, 'today': s['today'], 'total': s['total']} for p, s in sorted_players]
                     })
         
+        # Statistiques détaillées (si disponibles)
+        has_detailed = self.has_detailed_stats()
+        kill_death_ranking = []
+        kill_sources_aggregated = {'by_player': {}, 'global': {}}
+        kill_relationships = {}
+        all_players_for_matrix = []
+        top_killers = []
+        top_deaths = []
+        top_self_kills = []
+        best_kd_ratio = []
+        best_kd_value = 0.0
+        
+        if has_detailed:
+            kill_death_ranking = self.get_kill_death_stats()
+            kill_sources_aggregated = self.get_kill_sources_stats()
+            kill_relationships = self.get_kill_relationships()
+            self_kill_stats = self.get_self_kill_stats()
+            
+            # Collecter tous les joueurs uniques pour la matrice (tueurs + victimes)
+            all_players_set = set()
+            for player, _, _, _, _ in kill_death_ranking:
+                all_players_set.add(player)
+            for killer in kill_relationships.keys():
+                all_players_set.add(killer)
+                for victim in kill_relationships[killer].keys():
+                    all_players_set.add(victim)
+            all_players_for_matrix = sorted(list(all_players_set))
+            
+            # Calculer le maximum de kills pour la normalisation de la matrice
+            max_kills_in_matrix = 1  # Minimum 1 pour éviter division par zéro
+            for killer, victims in kill_relationships.items():
+                for victim, count in victims.items():
+                    if count > max_kills_in_matrix:
+                        max_kills_in_matrix = count
+            
+            # Top killers (par kills totaux)
+            if kill_death_ranking:
+                top_killers = sorted(kill_death_ranking, key=lambda x: x[1], reverse=True)[:5]
+                top_deaths = sorted(kill_death_ranking, key=lambda x: x[2], reverse=True)[:5]
+                top_self_kills = self_kill_stats[:5] if self_kill_stats else []
+                
+                # Meilleur ratio K/D
+                if kill_death_ranking:
+                    best_kd_value = kill_death_ranking[0][4]
+                    best_kd_ratio = [
+                        player for player, _, _, _, kd in kill_death_ranking 
+                        if kd == best_kd_value
+                    ]
+        
         return {
             'unique_groups': unique_groups,
             'sorted_groups': sorted_groups,
@@ -365,5 +566,16 @@ class SessionStatsManager:
             'sessions_by_date': sessions_by_date,
             'all_sessions_data': all_sessions_data,
             'player_colors': PLAYER_TO_COLOR,
+            'has_detailed_stats': has_detailed,
+            'kill_death_ranking': kill_death_ranking,
+            'kill_sources_aggregated': kill_sources_aggregated,
+            'kill_relationships': kill_relationships,
+            'all_players_for_matrix': all_players_for_matrix,
+            'max_kills_in_matrix': max_kills_in_matrix,
+            'top_killers': top_killers,
+            'top_deaths': top_deaths,
+            'top_self_kills': top_self_kills,
+            'best_kd_ratio': best_kd_ratio,
+            'best_kd_value': best_kd_value,
         }
 

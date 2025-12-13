@@ -43,6 +43,11 @@
         <div class="flex items-center justify-between w-full">
             <ul class="flex flex-wrap justify-center gap-grid flex-1">
                 <li class="flex-1 min-w-0"><a href="#statistiques" class="block text-center">Statistiques</a></li>
+                {% if has_detailed_stats %}
+                <li class="flex-1 min-w-0"><a href="#combat-stats" class="block text-center">Combat</a></li>
+                <li class="flex-1 min-w-0"><a href="#kill-analysis" class="block text-center">Kills</a></li>
+                <li class="flex-1 min-w-0"><a href="#kill-relationships" class="block text-center">Relations</a></li>
+                {% endif %}
                 <li class="flex-1 min-w-0"><a href="#pourcentage-victoires" class="block text-center">% Victoires</a></li>
                 <li class="flex-1 min-w-0"><a href="#classement" class="block text-center">Groupes</a></li>
                 <li class="flex-1 min-w-0"><a href="#derniere-soiree" class="block text-center">Sessions</a></li>
@@ -157,6 +162,115 @@
                 <div>Dernière session jouée le {{ date_fin }}</div>
             </div>
         </section>
+
+        {% if has_detailed_stats %}
+        <section id="combat-stats" class="margin-bottom-section pad-section overflow-x-auto">
+            <div class="section-header">
+                <h2 class="txt-heading break-words">⚔️ Statistiques de Combat</h2>
+                <button class="info-button" data-info="combat-stats-info">?</button>
+            </div>
+            <div id="combat-stats-info" class="info-bubble">
+                <div class="info-bubble-title">⚔️ Statistiques de Combat</div>
+                <div class="info-bubble-content">
+                    <strong>K/D Ratio :</strong> Ratio Kills/Deaths. Plus le ratio est élevé, meilleur est le joueur en combat.<br><br>
+                    <strong>Kills :</strong> Nombre total d'éliminations réalisées.<br><br>
+                    <strong>Deaths :</strong> Nombre total de morts subies.<br><br>
+                    <strong>Self Kills :</strong> Nombre d'auto-éliminations (mort par sa propre faute).
+                </div>
+            </div>
+            <div class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-grid">
+                {% if best_kd_ratio %}
+                <div class="stat-card pad-card">
+                    <div class="stat-label txt-xs">Meilleur Ratio K/D</div>
+                    <div class="stat-value txt-title-h2">{{ "%.2f" % best_kd_value }}</div>
+                    <div class="flex flex-wrap justify-center gap-1.5 mt-1">
+                        {% for player in best_kd_ratio %}
+                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if top_killers %}
+                <div class="stat-card pad-card">
+                    <div class="stat-label txt-xs">Plus de Kills</div>
+                    <div class="stat-value txt-title-h2">{{ top_killers[0][1] }}</div>
+                    <div class="flex flex-wrap justify-center gap-1.5 mt-1">
+                        {% for player, kills, _, _, _ in top_killers[:1] %}
+                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if top_deaths %}
+                {% set least_deaths = top_deaths[-1] %}
+                <div class="stat-card pad-card">
+                    <div class="stat-label txt-xs">Moins de Deaths</div>
+                    <div class="stat-value txt-title-h2">{{ least_deaths[2] }}</div>
+                    <div class="flex justify-center mt-1">
+                        <span class="stat-label txt-sm px-1 py-0.5 rounded"
+                              style="color: {{ get_player_color(least_deaths[0]) }};
+                                     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+                                     background: rgba(0,0,0,0.25);">
+                            {{ least_deaths[0] }}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+                {% if top_self_kills %}
+                {% set least_self_kills = top_self_kills[-1] %}
+                <div class="stat-card pad-card">
+                    <div class="stat-label txt-xs">Moins d'Auto-Kills</div>
+                    <!-- valeur -->
+                    <div class="stat-value txt-title-h2">
+                        {{ least_self_kills[1] }}
+                    </div>
+                
+                    <!-- joueur -->
+                    <div class="flex justify-center mt-1">
+                        <span class="stat-label txt-sm px-1 py-0.5 rounded"
+                              style="color: {{ get_player_color(least_self_kills[0]) }};
+                                     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+                                     background: rgba(0,0,0,0.25);">
+                            {{ least_self_kills[0] }}
+                        </span>
+                    </div>
+                </div>                
+                {% endif %}
+                
+            </div>
+            <button id="toggle-ranking-table" class="toggle-button w-full sm:w-auto text-[6px] sm:text-[7px] md:text-[9px] p-2 sm:p-2.5 md:p-3 lg:p-[12px] lg:px-5">
+                ▼ Voir le détail des kills
+            </button>            
+            <div id="ranking-table" class="hidden overflow-x-auto mt-4">
+                <table class="ranking-table w-full txt-xs">
+                    <thead>
+                        <tr>
+                            <th class="player-column">Joueur</th>
+                            <th>Kills</th>
+                            <th>Deaths</th>
+                            <th>Self</th>
+                            <th>Ratio K/D</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rank, item in kill_death_ranking|enumerate(1) %}
+                        {% set player, kills, deaths, self_kills, kd_ratio = item %}
+                        <tr>
+                            <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
+                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ kills }}</td>
+                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ deaths }}</td>
+                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ self_kills }}</td>
+                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f" % kd_ratio }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="stats-dates">
+                <div>Depuis le 08/12/2025</div>
+            </div>
+        </section>
+        {% endif %}
 
         <section id="pourcentage-victoires" class="margin-bottom-section pad-section overflow-x-auto">
             <div class="section-header">
@@ -421,7 +535,88 @@
                 <canvas id="evolution-chart"></canvas>
             </div>
         </section>
+
+        {% if has_detailed_stats %}
+        <section id="kill-relationships" class="margin-bottom-section pad-section overflow-x-auto">
+            <div class="section-header">
+                <h2 class="txt-heading break-words">🔗 Relations de Kills</h2>
+                <button class="info-button" data-info="kill-relationships-info">?</button>
+            </div>
+            <div id="kill-relationships-info" class="info-bubble">
+                <div class="info-bubble-title">🔗 Relations de Kills</div>
+                <div class="info-bubble-content">
+                    <strong>Matrice de Kills :</strong> Ce tableau montre qui tue qui. Les lignes représentent les tueurs, les colonnes les victimes.<br><br>
+                    <strong>Lecture :</strong> Plus la couleur est foncée/intense, plus le nombre de kills est élevé. Cela permet de voir quels joueurs sont les prédateurs de qui.
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="ranking-table w-full txt-xs" id="kill-relationships-table">
+                    <thead>
+                        <tr>
+                            <th class="player-column">Tueur → Victime</th>
+                            {% for player in all_players_for_matrix %}
+                            <th style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ player }}</th>
+                            {% endfor %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for killer in all_players_for_matrix %}
+                        {% set victims = kill_relationships.get(killer, {}) %}
+                        <tr>
+                            <td class="player-column" style="color: {{ get_player_color(killer) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ killer }}</td>
+                            {% for victim_player in all_players_for_matrix %}
+                            {% set kill_count = victims.get(victim_player, 0) %}
+                            {% set intensity = [kill_count / max_kills_in_matrix, 1.0]|min if max_kills_in_matrix > 0 else 0 %}
+                            <td class="kill-cell" data-count="{{ kill_count }}" style="background-color: rgba(139, 69, 19, {{ intensity }});">
+                                {% if kill_count > 0 %}{{ kill_count }}{% else %}-{% endif %}
+                            </td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="stats-dates">
+                <div>Depuis le 08/12/2025</div>
+            </div>
+        </section>
+        {% endif %}
+
+        {% if has_detailed_stats %}
+        <section id="kill-analysis" class="margin-bottom-section pad-section overflow-x-auto">
+            <div class="section-header">
+                <h2 class="txt-heading break-words">🎯 Analyse des Kills</h2>
+                <button class="info-button" data-info="kill-analysis-info">?</button>
+            </div>
+            <div id="kill-analysis-info" class="info-bubble">
+                <div class="info-bubble-title">🎯 Analyse des Kills</div>
+                <div class="info-bubble-content">
+                    <strong>Sources de Kills :</strong> Répartition des éliminations par type (Arrow, Explosion, JumpedOn, etc.).<br><br>
+                    <strong>Graphique global :</strong> Répartition de toutes les sources de kills, tous joueurs confondus.<br><br>
+                    <strong>Graphique par joueur :</strong> Répartition des sources de kills pour chaque joueur individuellement.
+                </div>
+            </div>
+            <div class="mb-3 sm:mb-4 md:mb-5">
+                <h3 class="txt-heading text-sm mb-2">Répartition Globale des Sources de Kills</h3>
+                <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+                    <canvas id="kill-sources-global-chart"></canvas>
+                </div>
+            </div>
+            <div class="mb-3 sm:mb-4 md:mb-5">
+                <h3 class="txt-heading text-sm mb-2">Top Sources de Kills par Joueur</h3>
+                <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
+                    <canvas id="kill-sources-by-player-chart"></canvas>
+                </div>
+            </div>
+            <div class="stats-dates">
+                <div>Depuis le 08/12/2025</div>
+            </div>
+        </section>
+        {% endif %}
+
     </div>
+
+    
 
     <!-- Injection des données JSON pour JavaScript -->
     <script>
@@ -429,6 +624,8 @@
         const rankingsByGroup = {{ rankings_by_group|tojson }};
         const playerColors = {{ player_colors|tojson }};
         const allSessions = {{ all_sessions_data|tojson }};
+        const hasDetailedStats = {{ has_detailed_stats|tojson }};
+        const killSourcesAggregated = {{ kill_sources_aggregated|tojson }};
         let currentPage = 1;
         const sessionsPerPage = 10;
         // Initialiser filteredSessions avec toutes les sessions au chargement
