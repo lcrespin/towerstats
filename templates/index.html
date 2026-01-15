@@ -72,6 +72,9 @@
                 • On met à jour le TotalWins précédent pour la prochaine session<br>
                 • (Oui, on fait le travail qu'Eric aurait dû faire correctement dès le début, mais bon... 🤷)<br><br>
                 
+                <strong>Normalisation des joueurs :</strong><br>
+                Tous les joueurs présents dans les statistiques détaillées (<code>today</code>/<code>total</code>) sont automatiquement inclus dans <code>todayWin</code> et <code>totalWin</code>, même s'ils ont 0 victoires. Cela garantit que tous les joueurs qui ont participé à une session sont correctement comptabilisés dans le groupe et l'ID de session, même s'ils n'ont gagné aucune partie.<br><br>
+                
                 <strong>Format des données :</strong><br>
                 Les données utilisent le format <code>todayWin[player]</code> et <code>totalWin[player]</code> pour stocker les statistiques de chaque joueur.<br><br>
                 
@@ -285,6 +288,8 @@
                     <strong>Victoires :</strong> On additionne toutes les victoires du joueur dans toutes ses sessions.<br><br>
                     
                     <strong>Parties :</strong> On compte toutes les parties jouées dans tous les groupes où le joueur a participé. Si une session a 4 joueurs qui ont gagné 10, 8, 6 et 4 parties chacun, cela fait 28 parties au total pour cette session.<br><br>
+                    
+                    <strong>Joueurs avec 0 victoires :</strong> Tous les joueurs présents dans une session sont comptabilisés, même ceux qui n'ont gagné aucune partie. Cela garantit que les statistiques reflètent fidèlement la participation de tous les joueurs.<br><br>
                     
                     <strong>Pourcentage :</strong> (Victoires ÷ Parties) × 100<br><br>
                     

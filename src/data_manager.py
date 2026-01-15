@@ -41,6 +41,8 @@ class SessionDataManager:
                         'date': row['date'],
                         'data': data
                     }
+                    # Normaliser les joueurs pour s'assurer que tous sont dans todayWin/totalWin
+                    SessionDataManager.normalize_session_players(session)
                     # Recalculer l'ID à partir des joueurs présents dans la session
                     calculated_id = SessionDataManager.calculate_session_id_from_players(session)
                     if not calculated_id:
@@ -133,6 +135,9 @@ class SessionDataManager:
             
             # Parcourir les sessions dans l'ordre chronologique
             for session in group_sessions:
+                # Normaliser les joueurs pour s'assurer que tous sont dans todayWin/totalWin
+                SessionDataManager.normalize_session_players(session)
+                
                 players = SessionDataManager.parse_session_data(session)
                 data = session['data']
                 
@@ -234,9 +239,14 @@ class SessionDataManager:
     def extract_player_names(session) -> List[str]:
         """Retourne tous les noms de joueurs présents, sans filtrage."""
         data = session.get('data', {})
+        player_names = set()
+        # Ajouter les joueurs de todayWin
         if 'todayWin' in data:
-            return list(data['todayWin'].keys())
-        return []
+            player_names.update(data['todayWin'].keys())
+        # Ajouter aussi les joueurs de today (même ceux avec 0 victoires)
+        if 'today' in data:
+            player_names.update(data['today'].keys())
+        return list(player_names)
 
     @staticmethod
     def should_ignore_player(player_name: str) -> bool:
@@ -246,6 +256,38 @@ class SessionDataManager:
         player_upper = player_name.upper().replace(' ', '')
         # Ignorer AIJIMMY, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10
         return 'AIJIMMY' in player_upper or player_upper in ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10']
+
+    @staticmethod
+    def normalize_session_players(session: Dict[str, Any]) -> None:
+        """Normalise les données d'une session pour s'assurer que tous les joueurs présents 
+        dans today/total sont aussi dans todayWin/totalWin, même s'ils ont 0 victoires.
+        
+        Args:
+            session: Dictionnaire de session avec 'data' contenant les données JSON
+        """
+        data = session.get('data', {})
+        if 'today' not in data:
+            return
+        
+        # Initialiser todayWin et totalWin si nécessaire
+        if 'todayWin' not in data:
+            data['todayWin'] = {}
+        if 'totalWin' not in data:
+            data['totalWin'] = {}
+        
+        # Pour chaque joueur présent dans today
+        for player in data['today'].keys():
+            if SessionDataManager.should_ignore_player(player):
+                continue
+            
+            # Si le joueur n'est pas dans todayWin, l'ajouter avec 0
+            if player not in data['todayWin']:
+                data['todayWin'][player] = 0
+            
+            # Si le joueur n'est pas dans totalWin, récupérer depuis total ou mettre 0
+            if player not in data['totalWin']:
+                total_win = data.get('total', {}).get(player, {}).get('win', 0)
+                data['totalWin'][player] = total_win
 
     @staticmethod
     def has_detailed_stats(session: Dict[str, Any]) -> bool:
@@ -270,29 +312,41 @@ class SessionDataManager:
         players = {}
         has_detailed = SessionDataManager.has_detailed_stats(session)
         
+        # Collecter tous les joueurs : ceux de todayWin et ceux de today (même avec 0 victoires)
+        all_players = set()
         if 'todayWin' in data:
-            for player, today_wins in data['todayWin'].items():
-                if not SessionDataManager.should_ignore_player(player):
-                    player_data = {
-                        'today': today_wins,
-                        'total': data.get('totalWin', {}).get(player, 0)
-                    }
+            all_players.update(data['todayWin'].keys())
+        if 'today' in data:
+            all_players.update(data['today'].keys())
+        
+        for player in all_players:
+            if not SessionDataManager.should_ignore_player(player):
+                # Récupérer today_wins depuis todayWin, ou 0 si absent
+                today_wins = data.get('todayWin', {}).get(player, 0)
+                # Récupérer total_wins depuis totalWin, ou depuis total.win si absent
+                total_wins = data.get('totalWin', {}).get(player, 
+                    data.get('total', {}).get(player, {}).get('win', 0))
+                
+                player_data = {
+                    'today': today_wins,
+                    'total': total_wins
+                }
+                
+                # Ajouter les stats détaillées si disponibles
+                if has_detailed:
+                    today_stats = data.get('today', {}).get(player, {})
+                    total_stats = data.get('total', {}).get(player, {})
                     
-                    # Ajouter les stats détaillées si disponibles
-                    if has_detailed:
-                        today_stats = data.get('today', {}).get(player, {})
-                        total_stats = data.get('total', {}).get(player, {})
-                        
-                        if today_stats or total_stats:
-                            player_data['detailed'] = {
-                                'kill': total_stats.get('kill', 0),
-                                'death': total_stats.get('death', 0),
-                                'self': total_stats.get('self', 0),
-                                'killFrom': total_stats.get('killFrom', {}),
-                                'killBy': total_stats.get('killBy', {})
-                            }
-                    
-                    players[player] = player_data
+                    if today_stats or total_stats:
+                        player_data['detailed'] = {
+                            'kill': total_stats.get('kill', 0),
+                            'death': total_stats.get('death', 0),
+                            'self': total_stats.get('self', 0),
+                            'killFrom': total_stats.get('killFrom', {}),
+                            'killBy': total_stats.get('killBy', {})
+                        }
+                
+                players[player] = player_data
         
         return players
 
