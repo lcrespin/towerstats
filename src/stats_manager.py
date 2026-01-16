@@ -301,21 +301,50 @@ class SessionStatsManager:
         }
     
     def get_kill_relationships(self):
-        """Crée une matrice montrant qui tue qui (killBy agrégé).
+        """Crée une matrice montrant qui tue qui avec la moyenne de kills par partie.
+        
+        Pour chaque paire (killer, victim), calcule la moyenne de kills par partie
+        en divisant le total de kills par le nombre total de parties dans les sessions
+        où les deux joueurs ont joué ensemble.
         
         Returns:
-            dict: {killer: {victim: count}} - Matrice des kills entre joueurs
+            dict: {killer: {victim: average_kills_per_game}} - Matrice des moyennes de kills entre joueurs
         """
-        relationships = defaultdict(lambda: defaultdict(int))
+        # Dictionnaires pour stocker les totaux de kills et le nombre de parties
+        total_kills = defaultdict(lambda: defaultdict(int))
+        total_games = defaultdict(lambda: defaultdict(int))
         
         for session in self.sessions:
             players = SessionDataManager.parse_session_data(session)
+            if not players:
+                continue
+            
+            # Calculer le nombre total de parties dans cette session
+            total_games_in_session = sum(stats['today'] for stats in players.values())
+            
+            # Pour chaque joueur (victime)
             for player, stats in players.items():
                 if 'detailed' in stats:
                     kill_by = stats['detailed'].get('killBy', {})
+                    # Pour chaque tueur qui a tué ce joueur
                     for killer, count in kill_by.items():
                         if not SessionDataManager.should_ignore_player(killer):
-                            relationships[killer][player] = max(relationships[killer][player], count)
+                            # Ajouter les kills au total
+                            total_kills[killer][player] += count
+                            # Ajouter le nombre de parties de cette session
+                            total_games[killer][player] += total_games_in_session
+        
+        # Calculer les moyennes
+        relationships = defaultdict(dict)
+        for killer in total_kills:
+            for victim in total_kills[killer]:
+                kills = total_kills[killer][victim]
+                games = total_games[killer][victim]
+                if games > 0:
+                    average = kills / games
+                    relationships[killer][victim] = average
+                else:
+                    relationships[killer][victim] = 0.0
         
         return dict(relationships)
     

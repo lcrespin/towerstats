@@ -547,11 +547,21 @@
                 <h2 class="txt-heading break-words">🔗 Relations de Kills</h2>
                 <button class="info-button" data-info="kill-relationships-info">?</button>
             </div>
+            <div class="text-center mb-3 sm:mb-4" style="color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+                <p class="text-[6px] sm:text-[7px] md:text-[9px] lg:text-[10px]">Moyenne de kills par partie</p>
+            </div>
             <div id="kill-relationships-info" class="info-bubble">
                 <div class="info-bubble-title">🔗 Relations de Kills</div>
                 <div class="info-bubble-content">
                     <strong>Matrice de Kills :</strong> Ce tableau montre qui tue qui. Les lignes représentent les tueurs, les colonnes les victimes.<br><br>
-                    <strong>Lecture :</strong> Plus la couleur est foncée/intense, plus le nombre de kills est élevé. Cela permet de voir quels joueurs sont les prédateurs de qui.
+                    
+                    <strong>Moyenne par partie :</strong> Les valeurs affichées représentent la moyenne de kills par partie entre deux joueurs. Cette moyenne est calculée en divisant le nombre total de kills d'un joueur sur un autre par le nombre total de parties où ils ont joué ensemble.<br><br>
+                    
+                    <strong>Exemple :</strong> Si le joueur A a tué le joueur B 25 fois au total sur 10 parties où ils ont joué ensemble, la moyenne affichée sera de 2.50 (25 ÷ 10 = 2.5). Cela signifie qu'en moyenne, A tue B 2.5 fois par partie.<br><br>
+                    
+                    <strong>Lecture visuelle :</strong> Plus la couleur est foncée/intense, plus la moyenne de kills est élevée. Cela permet d'identifier rapidement quels joueurs sont les prédateurs de qui.<br><br>
+                    
+                    <strong>Avantage de la moyenne :</strong> Utiliser une moyenne plutôt qu'un total permet de comparer les performances entre joueurs indépendamment du nombre de parties jouées ensemble. Un joueur qui tue souvent un autre sur peu de parties aura une moyenne élevée, tandis qu'un joueur qui tue rarement mais sur beaucoup de parties aura une moyenne faible.
                 </div>
             </div>
             <div class="overflow-x-auto">
@@ -570,10 +580,10 @@
                         <tr>
                             <td class="player-column" style="color: {{ get_player_color(killer) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ killer }}</td>
                             {% for victim_player in all_players_for_matrix %}
-                            {% set kill_count = victims.get(victim_player, 0) %}
-                            {% set intensity = [kill_count / max_kills_in_matrix, 1.0]|min if max_kills_in_matrix > 0 else 0 %}
-                            <td class="kill-cell" data-count="{{ kill_count }}" style="background-color: rgba(139, 69, 19, {{ intensity }});">
-                                {% if kill_count > 0 %}{{ kill_count }}{% else %}-{% endif %}
+                            {% set kill_avg = victims.get(victim_player, 0) %}
+                            {% set intensity = [kill_avg / max_kills_in_matrix, 1.0]|min if max_kills_in_matrix > 0 else 0 %}
+                            <td class="kill-cell" data-count="{{ kill_avg }}" style="background-color: rgba(139, 69, 19, {{ intensity }});">
+                                {% if kill_avg > 0 %}{{ "%.2f" % kill_avg }}{% else %}-{% endif %}
                             </td>
                             {% endfor %}
                         </tr>
