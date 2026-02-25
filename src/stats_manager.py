@@ -474,6 +474,13 @@ class SessionStatsManager:
         date_fin = max(sessions_by_date.keys()) if sessions_by_date else None
         date_debut_formatted = self.format_date(date_debut, format_short=True) if date_debut else "N/A"
         date_fin_formatted = self.format_date(date_fin, format_short=True) if date_fin else "N/A"
+
+        dates_with_detailed = [
+            self._session_date_str(s) for s in self.sessions
+            if SessionDataManager.has_detailed_stats(s) and self._session_date_str(s)
+        ]
+        date_debut_detailed = min(dates_with_detailed) if dates_with_detailed else None
+        date_debut_detailed_formatted = self.format_date(date_debut_detailed, format_short=True) if date_debut_detailed else "N/A"
         
         # Statistiques supplémentaires
         total_sessions = len(self.sessions)
@@ -623,6 +630,8 @@ class SessionStatsManager:
             'date_fin': date_fin_formatted,
             'date_debut_raw': date_debut,
             'date_fin_raw': date_fin,
+            'date_debut_detailed': date_debut_detailed_formatted,
+            'date_debut_detailed_raw': date_debut_detailed,
             'total_sessions': total_sessions,
             'unique_players_count': len(unique_players),
             'best_players': best_players,

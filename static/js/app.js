@@ -1039,9 +1039,46 @@ function initKillSourcesCharts() {
 }
 
 // Initialisation globale quand le DOM est prêt
+function initDatePickerToggle() {
+    const toggleBtn = document.getElementById('toggle-date-picker');
+    const popover = document.getElementById('date-picker-popover');
+    const closeBtn = popover && popover.querySelector('.date-picker-close');
+    if (!toggleBtn || !popover) return;
+
+    function openPopover() {
+        popover.classList.add('active');
+        popover.setAttribute('aria-hidden', 'false');
+    }
+
+    function closePopover() {
+        popover.classList.remove('active');
+        popover.setAttribute('aria-hidden', 'true');
+    }
+
+    toggleBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (popover.classList.contains('active')) {
+            closePopover();
+        } else {
+            openPopover();
+        }
+    });
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closePopover);
+    }
+
+    document.addEventListener('click', function(e) {
+        if (popover.classList.contains('active') && !popover.contains(e.target) && e.target !== toggleBtn) {
+            closePopover();
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initRankingTable();
     initEloLegacyToggle();
+    initDatePickerToggle();
     initGroupSelector();
     initSessionsPagination();
     initSmoothScroll();

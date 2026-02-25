@@ -704,6 +704,45 @@ section h2 {
     transform: scale(1.1);
 }
 
+.date-picker-popover {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(45, 27, 61, 0.98);
+    border: 3px solid #8b4513;
+    padding: 12px 14px;
+    padding-top: 28px;
+    z-index: 10000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    color: #ffd700;
+    border-radius: 6px;
+    min-width: 220px;
+}
+
+.date-picker-popover.active {
+    display: block;
+}
+
+.date-picker-popover .date-picker-close {
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    background: none;
+    border: none;
+    color: #ffd700;
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px;
+    opacity: 0.9;
+}
+
+.date-picker-popover .date-picker-close:hover {
+    opacity: 1;
+}
+
 .info-bubble {
     display: none;
     position: fixed;
