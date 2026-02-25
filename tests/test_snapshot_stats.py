@@ -148,3 +148,82 @@ def test_detailed_stats_and_kill_relationships_from_snapshot():
         assert isinstance(victims, dict)
         assert set(victims.keys()).issubset(players)
 
+
+EXPECTED_TEMPLATE_KEYS = frozenset({
+    "unique_groups", "sorted_groups", "default_group", "rankings_by_group",
+    "default_ranking", "date_debut", "date_fin", "date_debut_raw", "date_fin_raw",
+    "total_sessions", "unique_players_count", "best_players", "best_score",
+    "best_percentage_players", "best_percentage", "win_percentage_ranking",
+    "elo_ranking", "best_elo_players", "best_elo", "latest_date",
+    "latest_sessions_parsed", "sessions_by_date", "all_sessions_data",
+    "player_colors", "has_detailed_stats", "kill_death_ranking",
+    "kill_sources_aggregated", "kill_relationships", "all_players_for_matrix",
+    "max_kills_in_matrix", "top_killers", "top_deaths", "top_self_kills",
+    "best_kd_ratio", "best_kd_value",
+})
+
+
+def test_template_context_contract():
+    """Ensure prepare_template_data() returns all keys expected by the template (no regression)."""
+    stats = build_stats_from_snapshot()
+    ctx = stats.prepare_template_data()
+    actual_keys = set(ctx.keys())
+    missing = EXPECTED_TEMPLATE_KEYS - actual_keys
+    extra = actual_keys - EXPECTED_TEMPLATE_KEYS
+    assert not missing, f"Missing template keys: {missing}"
+    assert not extra, f"Unexpected keys (update EXPECTED_TEMPLATE_KEYS if intentional): {extra}"
+
+
+def test_best_elo_and_dates_from_snapshot():
+    stats = build_stats_from_snapshot()
+    ctx = stats.prepare_template_data()
+
+    assert ctx["best_elo_players"] == ["LOUIS"]
+    assert ctx["best_elo"] == ctx["elo_ranking"][0][1]
+    assert 1000 <= ctx["best_elo"] <= 2000
+
+    assert ctx["date_debut_raw"] == "2025-06-03"
+    assert ctx["date_fin_raw"] == "2026-02-25"
+
+    assert ctx["rankings_by_group"][ctx["default_group"]] == ctx["default_ranking"]
+    assert ctx["sorted_groups"][0] == "DAVID-ERIC-LOUIS"
+
+
+def test_top_killers_deaths_and_kd_from_snapshot():
+    stats = build_stats_from_snapshot()
+    ctx = stats.prepare_template_data()
+
+    top_killers = ctx["top_killers"]
+    assert len(top_killers) == 5
+    assert [t[0] for t in top_killers] == ["DAVID", "LOUIS", "ERIC", "BENOIT", "JULIEN"]
+
+    top_deaths = ctx["top_deaths"]
+    assert len(top_deaths) == 5
+    assert [t[0] for t in top_deaths] == ["ERIC", "LOUIS", "DAVID", "BENOIT", "MEHDI"]
+
+    top_self_kills = ctx["top_self_kills"]
+    assert top_self_kills == [
+        ("DAVID", 76), ("LOUIS", 66), ("ERIC", 60), ("MEHDI", 22), ("BENOIT", 20),
+    ]
+
+    assert ctx["best_kd_ratio"] == ["DAVID"]
+    assert round(ctx["best_kd_value"], 4) == 1.0721
+    assert ctx["max_kills_in_matrix"] > 1
+    assert len(ctx["all_players_for_matrix"]) == 6
+
+
+def test_date_filtering_reduces_sessions():
+    """Regression: filtering by date range must reduce sessions and update stats."""
+    manager = SessionDataManager(local_file=SNAPSHOT_PATH)
+    manager.load_all()
+    sessions = manager.get_sessions()
+
+    full = SessionStatsManager(sessions)
+    full_ctx = full.prepare_template_data()
+    assert full_ctx["total_sessions"] == 37
+
+    filtered = SessionStatsManager(sessions, date_start="2026-01-01", date_end="2026-02-25")
+    filtered_ctx = filtered.prepare_template_data()
+    assert filtered_ctx["total_sessions"] < 37
+    assert filtered_ctx["date_debut_raw"] >= "2026-01-01"
+    assert filtered_ctx["date_fin_raw"] <= "2026-02-25"

@@ -1,13 +1,13 @@
 """Gestion des statistiques et calculs à partir des sessions filtrées."""
 
-import os
-import json
 from datetime import datetime
 from collections import defaultdict
 from typing import List, Dict, Any
 
 from .data_manager import SessionDataManager
-from .config import PLAYER_TO_COLOR, get_player_color
+from .config import PLAYER_TO_COLOR
+
+MEDAL_BY_RANK = {1: '🥇', 2: '🥈', 3: '🥉'}
 
 
 class SessionStatsManager:
@@ -28,6 +28,10 @@ class SessionStatsManager:
         """
         self.sessions = self._filter_sessions_by_date(sessions, date_start, date_end)
 
+    def _session_date_str(self, session: Dict[str, Any]) -> str:
+        """Normalised YYYY-MM-DD date string for a session."""
+        return SessionDataManager.extract_date_str(str(session.get('date', '')))
+
     def _filter_sessions_by_date(
         self,
         sessions: List[Dict[str, Any]],
@@ -43,21 +47,15 @@ class SessionStatsManager:
             return sessions
 
         filtered: List[Dict[str, Any]] = []
-
         for session in sessions:
-            raw_date = session.get("date", "")
-            # Normaliser en YYYY-MM-DD
-            date_str = SessionDataManager.extract_date_str(str(raw_date))
+            date_str = self._session_date_str(session)
             if not date_str:
                 continue
-
             if date_start and date_str < date_start:
                 continue
             if date_end and date_str > date_end:
                 continue
-
             filtered.append(session)
-
         return filtered
 
     def get_unique_groups(self):
@@ -98,13 +96,9 @@ class SessionStatsManager:
     def group_sessions_by_date(self):
         """Groupe les sessions par date (soirée)."""
         sessions_by_date = defaultdict(list)
-        
         for session in self.sessions:
-            raw_date = session.get('date', '')
-            date_str = SessionDataManager.extract_date_str(str(raw_date))
+            date_str = self._session_date_str(session)
             sessions_by_date[date_str].append(session)
-        
-        # Trier les dates (plus récent en premier)
         sorted_dates = sorted(sessions_by_date.keys(), reverse=True)
         return {date: sessions_by_date[date] for date in sorted_dates}
 
@@ -169,13 +163,7 @@ class SessionStatsManager:
 
     def get_medal(self, rank):
         """Retourne la médaille correspondant au rang."""
-        if rank == 1:
-            return '🥇'
-        elif rank == 2:
-            return '🥈'
-        elif rank == 3:
-            return '🥉'
-        return ''
+        return MEDAL_BY_RANK.get(rank, '')
 
     def calculate_elo_ratings(self, initial_elo=1500, k_factor=32):
         """Calcule les ratings ELO pour chaque joueur basés sur toutes les sessions.
@@ -202,30 +190,14 @@ class SessionStatsManager:
             players = SessionDataManager.parse_session_data(session)
             if not players or len(players) < 2:
                 continue
-            
-            # Joueurs valides déjà filtrés par parse_session_data
-            valid_players = players
 
-            if len(valid_players) < 2:
-                continue
-            
-            # Trier les joueurs par score 'today' (décroissant)
-            # Le meilleur score = gagnant de la session
             sorted_players = sorted(
-                valid_players.items(),
+                players.items(),
                 key=lambda x: x[1]['today'],
                 reverse=True
             )
-            
-            # Créer un classement pour chaque joueur dans cette session
-            # (1 = premier, 2 = deuxième, etc.)
-            player_ranks = {}
-            for rank, (player, stats) in enumerate(sorted_players, start=1):
-                player_ranks[player] = rank
-            
-            # Calculer les matchups entre tous les joueurs de la session
-            # Pour chaque paire de joueurs, calculer le résultat du matchup
-            player_names = list(valid_players.keys())
+            player_ranks = {player: rank for rank, (player, _) in enumerate(sorted_players, start=1)}
+            player_names = list(players.keys())
             
             for i, player_a in enumerate(player_names):
                 for player_b in player_names[i + 1:]:
@@ -404,52 +376,6 @@ class SessionStatsManager:
                     player_self_kills[player] = max(player_self_kills[player], self_kills)
         
         return sorted(player_self_kills.items(), key=lambda x: x[1], reverse=True)
-    
-    def get_detailed_player_stats(self, player_name: str):
-        """Retourne les statistiques complètes pour un joueur spécifique.
-        
-        Args:
-            player_name: Nom du joueur
-        
-        Returns:
-            dict: Statistiques détaillées du joueur ou None si non trouvé
-        """
-        player_kills = 0
-        player_deaths = 0
-        player_self_kills = 0
-        kill_from = defaultdict(int)
-        kill_by = defaultdict(int)
-        
-        for session in self.sessions:
-            players = SessionDataManager.parse_session_data(session)
-            if player_name in players:
-                stats = players[player_name]
-                if 'detailed' in stats:
-                    detailed = stats['detailed']
-                    player_kills = max(player_kills, detailed.get('kill', 0))
-                    player_deaths = max(player_deaths, detailed.get('death', 0))
-                    player_self_kills = max(player_self_kills, detailed.get('self', 0))
-                    
-                    for source, count in detailed.get('killFrom', {}).items():
-                        kill_from[source] = max(kill_from[source], count)
-                    
-                    for killer, count in detailed.get('killBy', {}).items():
-                        kill_by[killer] = max(kill_by[killer], count)
-        
-        if player_kills == 0 and player_deaths == 0:
-            return None
-        
-        kd_ratio = player_kills / player_deaths if player_deaths > 0 else (player_kills if player_kills > 0 else 0.0)
-        
-        return {
-            'player': player_name,
-            'kills': player_kills,
-            'deaths': player_deaths,
-            'self_kills': player_self_kills,
-            'kd_ratio': kd_ratio,
-            'killFrom': dict(kill_from),
-            'killBy': dict(kill_by)
-        }
 
     def prepare_template_data(self):
         """Prépare toutes les données nécessaires pour le template HTML."""
@@ -475,15 +401,8 @@ class SessionStatsManager:
         default_group = sorted_groups[0] if sorted_groups else None
         default_ranking = rankings_by_group.get(default_group, []) if default_group else []
         
-        # Calculer les dates de début et de fin (sur les sessions potentiellement filtrées)
-        from .data_manager import SessionDataManager
-        all_dates = [
-            SessionDataManager.extract_date_str(session['date']) 
-            for session in self.sessions 
-            if session.get('date')
-        ]
-        date_debut = min(all_dates) if all_dates else None
-        date_fin = max(all_dates) if all_dates else None
+        date_debut = min(sessions_by_date.keys()) if sessions_by_date else None
+        date_fin = max(sessions_by_date.keys()) if sessions_by_date else None
         date_debut_formatted = self.format_date(date_debut, format_short=True) if date_debut else "N/A"
         date_fin_formatted = self.format_date(date_fin, format_short=True) if date_fin else "N/A"
         
@@ -535,24 +454,23 @@ class SessionStatsManager:
             best_elo = elo_ranking[0][1]
             best_elo_players = [player for player, rating in elo_ranking if rating == best_elo]
         
-        # Préparer les sessions latest avec leurs joueurs parsés
+        def sorted_players_by_today(session):
+            players = SessionDataManager.parse_session_data(session)
+            if not players:
+                return None
+            return sorted(players.items(), key=lambda x: x[1]['today'], reverse=True)
+
         latest_sessions_parsed = []
         for session in latest_sessions:
-            players = SessionDataManager.parse_session_data(session)
-            if players:
-                sorted_players = sorted(players.items(), key=lambda x: x[1]['today'], reverse=True)
-                latest_sessions_parsed.append({
-                    'session': session,
-                    'players': sorted_players
-                })
-        
-        # Préparer toutes les sessions pour JavaScript
+            sorted_players = sorted_players_by_today(session)
+            if sorted_players:
+                latest_sessions_parsed.append({'session': session, 'players': sorted_players})
+
         all_sessions_data = []
         for date, date_sessions in sessions_by_date.items():
             for session in date_sessions:
-                players = SessionDataManager.parse_session_data(session)
-                if players:
-                    sorted_players = sorted(players.items(), key=lambda x: x[1]['today'], reverse=True)
+                sorted_players = sorted_players_by_today(session)
+                if sorted_players:
                     all_sessions_data.append({
                         'id': session['id'],
                         'group': session['id'],

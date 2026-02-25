@@ -66,61 +66,53 @@ class SessionDataManager:
         """Filtre les sessions qui passent minuit."""
         if not self.sessions:
             return
-        
-        # Trier par date décroissante (plus récent en premier)
+
         sessions_sorted = sorted(self.sessions, key=lambda x: x['date'], reverse=True)
-        
         sessions_to_keep = []
-        
-        # Parcourir les sessions et détecter les paires qui passent minuit
+
         for i, session in enumerate(sessions_sorted):
-            # Vérifier s'il y a une session le jour suivant avec le même ID
-            # L'heure peut être dans data['date'] ou dans session['date']
             data = session.get('data', {})
             date_with_hour = data.get('date', session['date'])
             date_obj, hour = SessionDataManager.parse_date_with_hour(date_with_hour)
-            
+
             if date_obj is not None and hour is not None:
-                # Format avec heure : chercher session entre 00h-05h le jour suivant
                 next_day = date_obj + timedelta(days=1)
-                found_next = False
-                for j, other_session in enumerate(sessions_sorted):
-                    if j >= i or other_session['id'] != session['id']:
-                        continue
-                    other_data = other_session.get('data', {})
-                    other_date_with_hour = other_data.get('date', other_session['date'])
+                def is_next_day_early_hours(other):
+                    other_data = other.get('data', {})
+                    other_date_with_hour = other_data.get('date', other['date'])
                     other_date_obj, other_hour = SessionDataManager.parse_date_with_hour(other_date_with_hour)
-                    if (other_date_obj and other_hour is not None and
-                        other_date_obj.date() == next_day.date() and 0 <= other_hour <= 5):
-                        found_next = True
-                        break
-                if found_next:
+                    return (other_date_obj and other_hour is not None and
+                            other_date_obj.date() == next_day.date() and 0 <= other_hour <= 5)
+                if SessionDataManager._has_matching_next_day_session(sessions_sorted, i, session, is_next_day_early_hours):
                     continue
             else:
-                # Format sans heure : chercher session le jour suivant
                 try:
                     current_date = datetime.strptime(session['date'], '%Y-%m-%d')
                     next_day_date = current_date + timedelta(days=1)
-                    found_next = False
-                    for j, other_session in enumerate(sessions_sorted):
-                        if j >= i or other_session['id'] != session['id']:
-                            continue
+                    def is_next_day_date(other):
                         try:
-                            other_date = datetime.strptime(other_session['date'], '%Y-%m-%d')
-                            if other_date.date() == next_day_date.date():
-                                found_next = True
-                                break
+                            other_date = datetime.strptime(other['date'], '%Y-%m-%d')
+                            return other_date.date() == next_day_date.date()
                         except (ValueError, KeyError):
-                            continue
-                    if found_next:
+                            return False
+                    if SessionDataManager._has_matching_next_day_session(sessions_sorted, i, session, is_next_day_date):
                         continue
                 except (ValueError, KeyError):
                     pass
-            
-            # Garder la session
+
             sessions_to_keep.append(session)
-        
+
         self.sessions = sessions_to_keep
+
+    @staticmethod
+    def _has_matching_next_day_session(sessions_sorted, i, session, is_next_day_fn) -> bool:
+        """True if a session with same id exists at a later index and is_next_day_fn(other) is True."""
+        for j, other in enumerate(sessions_sorted):
+            if j >= i or other['id'] != session['id']:
+                continue
+            if is_next_day_fn(other):
+                return True
+        return False
 
     def correct_sessions(self) -> None:
         """Corrige les incohérences dans les sessions (today/total)."""
@@ -222,7 +214,6 @@ class SessionDataManager:
         Returns:
             str: ID de la session calculé (ex: 'DAVID-ERIC-LOUIS')
         """
-        # Si la session contient un joueur à ignorer, on écarte toute la session
         all_player_names = SessionDataManager.extract_player_names(session)
         if any(SessionDataManager.should_ignore_player(name) for name in all_player_names):
             return ''
@@ -230,12 +221,8 @@ class SessionDataManager:
         players = SessionDataManager.parse_session_data(session)
         if not players:
             return ''
-        
-        # Filtrer les joueurs à ignorer et récupérer leurs noms
-        player_names = [name for name in players.keys() if not SessionDataManager.should_ignore_player(name)]
-        
-        # Trier par ordre alphabétique
-        player_names.sort()
+
+        player_names = sorted(players.keys())
         
         # Concaténer avec des tirets
         return '-'.join(player_names)
