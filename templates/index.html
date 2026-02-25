@@ -40,20 +40,57 @@
     </header>
 
     <nav class="sticky top-0 z-50">
-        <div class="flex items-center justify-between w-full">
-            <ul class="flex flex-wrap justify-center gap-grid flex-1">
-                <li class="flex-1 min-w-0"><a href="#statistiques" class="block text-center">Statistiques</a></li>
-                {% if has_detailed_stats %}
-                <li class="flex-1 min-w-0"><a href="#combat-stats" class="block text-center">Combat</a></li>
-                <li class="flex-1 min-w-0"><a href="#kill-analysis" class="block text-center">Kills</a></li>
-                <li class="flex-1 min-w-0"><a href="#kill-relationships" class="block text-center">Relations</a></li>
-                {% endif %}
-                <li class="flex-1 min-w-0"><a href="#pourcentage-victoires" class="block text-center">% Victoires</a></li>
-                <li class="flex-1 min-w-0"><a href="#classement" class="block text-center">Groupes</a></li>
-                <li class="flex-1 min-w-0"><a href="#derniere-soiree" class="block text-center">Sessions</a></li>
-                <li class="flex-1 min-w-0"><a href="#evolution-scores" class="block text-center">Évolution</a></li>
-            </ul>
-            <button class="info-button global-info-button txt-xs" data-info="global-data-info">?</button>
+        <div class="flex flex-col gap-1.5 sm:gap-2.5">
+            <div class="flex items-center justify-between w-full">
+                <ul class="flex flex-wrap justify-center gap-grid flex-1">
+                    <li class="flex-1 min-w-0"><a href="#statistiques" class="block text-center">Statistiques</a></li>
+                    {% if has_detailed_stats %}
+                    <li class="flex-1 min-w-0"><a href="#combat-stats" class="block text-center">Combat</a></li>
+                    <li class="flex-1 min-w-0"><a href="#kill-analysis" class="block text-center">Kills</a></li>
+                    <li class="flex-1 min-w-0"><a href="#kill-relationships" class="block text-center">Relations</a></li>
+                    {% endif %}
+                    <li class="flex-1 min-w-0"><a href="#pourcentage-victoires" class="block text-center">% Victoires</a></li>
+                    <li class="flex-1 min-w-0"><a href="#classement" class="block text-center">Groupes</a></li>
+                    <li class="flex-1 min-w-0"><a href="#derniere-soiree" class="block text-center">Sessions</a></li>
+                    <li class="flex-1 min-w-0"><a href="#evolution-scores" class="block text-center">Évolution</a></li>
+                </ul>
+                <button class="info-button global-info-button txt-xs" data-info="global-data-info">?</button>
+            </div>
+            <!-- Datepicker global pour filtrer les stats par plage de dates -->
+            <form method="get" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-4 px-1.5 sm:px-2">
+                {% set current_start = selected_date_start or date_debut_raw %}
+                {% set current_end = selected_date_end or date_fin_raw %}
+                <div class="flex items-center gap-1 sm:gap-1.5">
+                    <label for="dateStart" class="text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
+                        Depuis :
+                    </label>
+                    <input
+                        type="date"
+                        id="dateStart"
+                        name="dateStart"
+                        value="{{ current_start }}"
+                        class="bg-black/40 border border-yellow-700 rounded px-1 py-0.5 text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] text-yellow-100"
+                    >
+                </div>
+                <div class="flex items-center gap-1 sm:gap-1.5">
+                    <label for="dateEnd" class="text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
+                        Jusqu'à :
+                    </label>
+                    <input
+                        type="date"
+                        id="dateEnd"
+                        name="dateEnd"
+                        value="{{ current_end }}"
+                        class="bg-black/40 border border-yellow-700 rounded px-1 py-0.5 text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] text-yellow-100"
+                    >
+                </div>
+                <button
+                    type="submit"
+                    class="toggle-button text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] px-2 py-1 sm:px-3 sm:py-1.5"
+                >
+                    Appliquer
+                </button>
+            </form>
         </div>
         <div id="global-data-info" class="info-bubble">
             <div class="info-bubble-title">🔧 Correction des Données</div>

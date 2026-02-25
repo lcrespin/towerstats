@@ -1,7 +1,7 @@
 """Application Flask principale pour TowerStats."""
 
 import functions_framework  # type: ignore
-from flask import Flask, send_from_directory, render_template  # type: ignore
+from flask import Flask, send_from_directory, render_template, request  # type: ignore
 import io
 import os
 
@@ -47,9 +47,16 @@ def flask_display_stats(path):
         # Erreur lors de la récupération
         return render_template('error.html', error_message=str(e)), 500
     
-    # Préparer les données pour le template
-    stats_manager = SessionStatsManager(sessions)
+    # Récupérer les filtres de dates depuis l'URL (format YYYY-MM-DD)
+    date_start = request.args.get('dateStart') or None
+    date_end = request.args.get('dateEnd') or None
+    
+    # Préparer les données pour le template avec filtre de dates éventuel
+    stats_manager = SessionStatsManager(sessions, date_start=date_start, date_end=date_end)
     template_data = stats_manager.prepare_template_data()
+    # Exposer aussi les valeurs sélectionnées pour pré-remplir le datepicker
+    template_data['selected_date_start'] = date_start
+    template_data['selected_date_end'] = date_end
     
     # Charger les fichiers statiques
     def load_static_file(filename):

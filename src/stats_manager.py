@@ -13,8 +13,52 @@ from .config import PLAYER_TO_COLOR, get_player_color
 class SessionStatsManager:
     """Effectue tous les calculs d'agrégat/statistiques à partir d'une liste de sessions filtrées."""
     
-    def __init__(self, sessions: List[Dict[str, Any]]):
-        self.sessions = sessions
+    def __init__(
+        self,
+        sessions: List[Dict[str, Any]],
+        date_start: str | None = None,
+        date_end: str | None = None,
+    ):
+        """Initialise le manager avec une éventuelle fenêtre de dates.
+
+        Args:
+            sessions: Liste de sessions déjà corrigées/triées.
+            date_start: Date de début au format YYYY-MM-DD (inclusif).
+            date_end: Date de fin au format YYYY-MM-DD (inclusif).
+        """
+        self.sessions = self._filter_sessions_by_date(sessions, date_start, date_end)
+
+    def _filter_sessions_by_date(
+        self,
+        sessions: List[Dict[str, Any]],
+        date_start: str | None,
+        date_end: str | None,
+    ) -> List[Dict[str, Any]]:
+        """Filtre les sessions selon une fenêtre de dates (inclusives).
+
+        Les dates sont comparées au format YYYY-MM-DD.
+        Si aucune date n'est fournie, toutes les sessions sont conservées.
+        """
+        if not date_start and not date_end:
+            return sessions
+
+        filtered: List[Dict[str, Any]] = []
+
+        for session in sessions:
+            raw_date = session.get("date", "")
+            # Normaliser en YYYY-MM-DD
+            date_str = SessionDataManager.extract_date_str(str(raw_date))
+            if not date_str:
+                continue
+
+            if date_start and date_str < date_start:
+                continue
+            if date_end and date_str > date_end:
+                continue
+
+            filtered.append(session)
+
+        return filtered
 
     def get_unique_groups(self):
         """Récupère tous les groupes de joueurs uniques (basés sur l'ID de session).
@@ -436,7 +480,7 @@ class SessionStatsManager:
         default_group = sorted_groups[0] if sorted_groups else None
         default_ranking = rankings_by_group.get(default_group, []) if default_group else []
         
-        # Calculer les dates de début et de fin
+        # Calculer les dates de début et de fin (sur les sessions potentiellement filtrées)
         from .data_manager import SessionDataManager
         all_dates = [
             SessionDataManager.extract_date_str(session['date']) 
@@ -580,6 +624,8 @@ class SessionStatsManager:
             'default_ranking': default_ranking,
             'date_debut': date_debut_formatted,
             'date_fin': date_fin_formatted,
+            'date_debut_raw': date_debut,
+            'date_fin_raw': date_fin,
             'total_sessions': total_sessions,
             'unique_players_count': len(unique_players),
             'best_players': best_players,
