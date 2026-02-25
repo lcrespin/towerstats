@@ -50,6 +50,24 @@ function initRankingTable() {
     }
 }
 
+// Initialisation du toggle ELO legacy
+function initEloLegacyToggle() {
+    const toggleEloLegacy = document.getElementById('toggle-elo-legacy');
+    if (toggleEloLegacy) {
+        toggleEloLegacy.addEventListener('click', function() {
+            const eloLegacyContainer = document.getElementById('elo-legacy-container');
+            if (eloLegacyContainer) {
+                eloLegacyContainer.classList.toggle('hidden');
+            }
+            if (eloLegacyContainer.classList.contains('hidden')) {
+                toggleEloLegacy.textContent = '▼ ELO legacy';
+            } else {
+                toggleEloLegacy.textContent = '▲ Masquer ELO legacy';
+            }
+        });
+    }
+}
+
 // Initialisation du sélecteur de groupe
 function initGroupSelector() {
     const groupSelect = document.getElementById('group-select');
@@ -986,6 +1004,7 @@ function initKillSourcesCharts() {
 // Initialisation globale quand le DOM est prêt
 document.addEventListener('DOMContentLoaded', function() {
     initRankingTable();
+    initEloLegacyToggle();
     initGroupSelector();
     initSessionsPagination();
     initSmoothScroll();

@@ -165,27 +165,15 @@ class SessionStatsManager:
         """Retourne la médaille correspondant au rang."""
         return MEDAL_BY_RANK.get(rank, '')
 
-    def calculate_elo_ratings(self, initial_elo=1500, k_factor=32):
-        """Calcule les ratings ELO pour chaque joueur basés sur toutes les sessions.
-        
-        Le système ELO calcule un score pour chaque joueur basé sur leurs performances
-        dans les sessions. Chaque session est traitée comme une série de matchups entre
-        tous les joueurs présents, où le classement est déterminé par le score 'today'.
-        
-        Args:
-            initial_elo: Score ELO initial pour les nouveaux joueurs (défaut: 1500)
-            k_factor: Facteur K qui détermine la vitesse de changement (défaut: 32)
-                     Plus K est élevé, plus les changements sont rapides.
-        
-        Returns:
-            dict: Dictionnaire {joueur: rating_elo} trié par rating décroissant
+    def calculate_elo_legacy_ratings(self, initial_elo=1500, k_factor=32):
+        """Calcule les ratings ELO legacy basés sur toutes les sessions.
+
+        Cette version conserve exactement la logique historique
+        (mise à jour séquentielle paire par paire dans une session).
         """
-        # Initialiser les ratings ELO pour tous les joueurs
         elo_ratings = defaultdict(lambda: initial_elo)
-        
-        # Trier les sessions par date (plus ancien en premier pour calculer chronologiquement)
         sorted_sessions = sorted(self.sessions, key=lambda x: x.get('date', ''))
-        
+
         for session in sorted_sessions:
             players = SessionDataManager.parse_session_data(session)
             if not players or len(players) < 2:
@@ -198,36 +186,74 @@ class SessionStatsManager:
             )
             player_ranks = {player: rank for rank, (player, _) in enumerate(sorted_players, start=1)}
             player_names = list(players.keys())
-            
+
             for i, player_a in enumerate(player_names):
                 for player_b in player_names[i + 1:]:
                     rank_a = player_ranks[player_a]
                     rank_b = player_ranks[player_b]
-                    
-                    # Calculer le score attendu pour le joueur A
                     elo_a = elo_ratings[player_a]
                     elo_b = elo_ratings[player_b]
-                    
-                    # Score attendu (probabilité de gagner)
                     expected_score_a = 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
-                    
-                    # Score réel basé sur le classement
-                    # Si A est mieux classé que B, A gagne (score = 1)
-                    # Si égalité, score = 0.5
-                    # Sinon, A perd (score = 0)
+
                     if rank_a < rank_b:
-                        actual_score_a = 1.0  # A gagne
+                        actual_score_a = 1.0
                     elif rank_a == rank_b:
-                        actual_score_a = 0.5  # Égalité
+                        actual_score_a = 0.5
                     else:
-                        actual_score_a = 0.0  # A perd
-                    
-                    # Mettre à jour les ratings ELO
+                        actual_score_a = 0.0
+
                     elo_change = k_factor * (actual_score_a - expected_score_a)
                     elo_ratings[player_a] += elo_change
-                    elo_ratings[player_b] -= elo_change  # Changement opposé pour B
-        
-        # Trier par rating décroissant
+                    elo_ratings[player_b] -= elo_change
+
+        sorted_elo = sorted(elo_ratings.items(), key=lambda x: x[1], reverse=True)
+        return dict(sorted_elo)
+
+    def calculate_elo_ratings(self, initial_elo=1500, k_factor=32):
+        """Calcule les ratings ELO batch (nouvelle version par session).
+
+        Pour chaque session, les deltas ELO de toutes les paires sont calculés
+        avec les ratings au début de la session puis appliqués en batch.
+        """
+        elo_ratings = defaultdict(lambda: initial_elo)
+        sorted_sessions = sorted(self.sessions, key=lambda x: x.get('date', ''))
+
+        for session in sorted_sessions:
+            players = SessionDataManager.parse_session_data(session)
+            if not players or len(players) < 2:
+                continue
+
+            sorted_players = sorted(
+                players.items(),
+                key=lambda x: x[1]['today'],
+                reverse=True
+            )
+            player_ranks = {player: rank for rank, (player, _) in enumerate(sorted_players, start=1)}
+            player_names = sorted(players.keys())
+            session_deltas = defaultdict(float)
+
+            for i, player_a in enumerate(player_names):
+                for player_b in player_names[i + 1:]:
+                    rank_a = player_ranks[player_a]
+                    rank_b = player_ranks[player_b]
+                    elo_a = elo_ratings[player_a]
+                    elo_b = elo_ratings[player_b]
+                    expected_score_a = 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
+
+                    if rank_a < rank_b:
+                        actual_score_a = 1.0
+                    elif rank_a == rank_b:
+                        actual_score_a = 0.5
+                    else:
+                        actual_score_a = 0.0
+
+                    elo_change = k_factor * (actual_score_a - expected_score_a)
+                    session_deltas[player_a] += elo_change
+                    session_deltas[player_b] -= elo_change
+
+            for player, delta in session_deltas.items():
+                elo_ratings[player] += delta
+
         sorted_elo = sorted(elo_ratings.items(), key=lambda x: x[1], reverse=True)
         return dict(sorted_elo)
 
@@ -242,6 +268,11 @@ class SessionStatsManager:
             list: Liste de tuples (joueur, rating_elo) triée par rating décroissant
         """
         elo_ratings = self.calculate_elo_ratings(initial_elo, k_factor)
+        return list(elo_ratings.items())
+
+    def get_elo_legacy_ranking(self, initial_elo=1500, k_factor=32):
+        """Retourne le classement ELO legacy des joueurs."""
+        elo_ratings = self.calculate_elo_legacy_ratings(initial_elo, k_factor)
         return list(elo_ratings.items())
     
     def has_detailed_stats(self) -> bool:
@@ -437,22 +468,39 @@ class SessionStatsManager:
                 player for player, _, _, pct in win_percentage_ranking if pct == top_percentage
             ]
         
-        # Classement ELO
+        # Classement ELO (nouvelle version batch)
         try:
             elo_ranking = self.get_elo_ranking()
             # S'assurer que elo_ranking est une liste
             if not isinstance(elo_ranking, list):
                 elo_ranking = list(elo_ranking) if elo_ranking else []
-        except Exception as e:
+        except Exception:
             # En cas d'erreur, retourner une liste vide
             elo_ranking = []
-        
-        # Meilleur ELO
+
+        # Classement ELO legacy
+        try:
+            elo_legacy_ranking = self.get_elo_legacy_ranking()
+            if not isinstance(elo_legacy_ranking, list):
+                elo_legacy_ranking = list(elo_legacy_ranking) if elo_legacy_ranking else []
+        except Exception:
+            elo_legacy_ranking = []
+
+        # Meilleur ELO (nouveau)
         best_elo_players = []
         best_elo = 0.0
         if elo_ranking:
             best_elo = elo_ranking[0][1]
             best_elo_players = [player for player, rating in elo_ranking if rating == best_elo]
+
+        # Meilleur ELO legacy
+        best_elo_legacy_players = []
+        best_elo_legacy = 0.0
+        if elo_legacy_ranking:
+            best_elo_legacy = elo_legacy_ranking[0][1]
+            best_elo_legacy_players = [
+                player for player, rating in elo_legacy_ranking if rating == best_elo_legacy
+            ]
         
         def sorted_players_by_today(session):
             players = SessionDataManager.parse_session_data(session)
@@ -548,6 +596,9 @@ class SessionStatsManager:
             'elo_ranking': elo_ranking,
             'best_elo_players': best_elo_players,
             'best_elo': best_elo,
+            'elo_legacy_ranking': elo_legacy_ranking,
+            'best_elo_legacy_players': best_elo_legacy_players,
+            'best_elo_legacy': best_elo_legacy,
             'latest_date': latest_date,
             'latest_sessions_parsed': latest_sessions_parsed,
             'sessions_by_date': sessions_by_date,

@@ -147,7 +147,7 @@
                     Le score total le plus élevé jamais atteint par un joueur dans n'importe quel groupe.<br><br>
                     
                     <strong>Joueur avec le meilleur ELO</strong><br>
-                    Le joueur ayant le score ELO le plus élevé. Le système ELO évalue le niveau de chaque joueur en fonction de leurs performances dans toutes les sessions.<br><br>
+                    Le joueur ayant le score ELO le plus élevé avec le nouveau calcul ELO (batch par session).<br><br>
                     
                     <strong>Joueurs Uniques</strong><br>
                     Nombre de joueurs différents qui ont joué au moins une fois.<br><br>
@@ -370,13 +370,21 @@
                     Un système de classement qui évalue le niveau de chaque joueur. Plus le score ELO est élevé, meilleur est le joueur.<br>
                     <a href="https://fr.wikipedia.org/wiki/Classement_Elo" target="_blank" rel="noopener noreferrer">En savoir plus sur Wikipedia</a><br><br>
                     
-                    <strong>Comment ça fonctionne ?</strong><br>
+                    <strong>Nouveau calcul ELO (par défaut)</strong><br>
                     • Tous les joueurs commencent à 1500 points<br>
-                    • Après chaque session, les scores sont ajustés selon les résultats<br>
+                    • Les joueurs sont classés selon leur score de session (today)<br>
+                    • Les confrontations sont évaluées entre toutes les paires de joueurs<br>
+                    • Les variations ELO sont calculées avec la formule standard (Wikipedia)<br>
+                    • Les variations d'une session sont appliquées en batch à la fin de la session<br>
                     • Battre un joueur plus fort fait gagner plus de points<br>
                     • Perdre contre un joueur plus faible fait perdre plus de points<br><br>
                     
-                    <strong>Le classement de la session</strong><br>
+                    <strong>Différence avec ELO legacy</strong><br>
+                    ELO legacy mettait à jour les ratings séquentiellement à l'intérieur d'une session. L'ordre des paires pouvait influencer le résultat final.<br><br>
+
+                    Le nouveau calcul batch applique toutes les variations d'une session en une seule fois, ce qui rend le résultat plus stable, déterministe et plus juste par rapport aux performances globales de la session.<br><br>
+
+                    <strong>Interprétation de la session</strong><br>
                     Les joueurs sont classés selon leur nombre de victoires dans la session. Le meilleur gagne contre tous les autres, le deuxième gagne contre tous sauf le premier, etc.<br><br>
                     
                     <strong>Facteur K = 32</strong><br>
@@ -407,6 +415,34 @@
                     {% endif %}
                 </tbody>
             </table>
+            </div>
+            <button id="toggle-elo-legacy" class="toggle-button w-full sm:w-auto text-[6px] sm:text-[7px] md:text-[9px] p-2 sm:p-2.5 md:p-3 lg:p-[12px] lg:px-5">
+                ▼ ELO legacy
+            </button>
+            <div id="elo-legacy-container" class="hidden overflow-x-auto mt-4">
+                <table class="ranking-table w-full txt-xs">
+                    <thead>
+                        <tr>
+                            <th class="player-column">Joueur</th>
+                            <th>ELO (legacy)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if elo_legacy_ranking %}
+                        {% for rank, item in elo_legacy_ranking|enumerate(1) %}
+                        {% set player, elo = item %}
+                        <tr>
+                            <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
+                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.0f" % elo }}</td>
+                        </tr>
+                        {% endfor %}
+                        {% else %}
+                        <tr>
+                            <td colspan="2" class="text-center" style="color: #ffd700; padding: 20px;">Aucun classement ELO legacy disponible</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
             </div>
         </section>
 

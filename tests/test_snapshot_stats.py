@@ -61,22 +61,22 @@ def test_best_win_percentage_from_snapshot():
         assert round(pct, 4) == expected_wp[i][3]
 
 
-def test_elo_ranking_top3_from_snapshot():
+def test_elo_legacy_ranking_top3_from_snapshot():
     stats = build_stats_from_snapshot()
     ctx = stats.prepare_template_data()
 
-    elo_ranking = ctx["elo_ranking"]
-    assert len(elo_ranking) >= 3
+    elo_legacy_ranking = ctx["elo_legacy_ranking"]
+    assert len(elo_legacy_ranking) >= 3
 
-    top3_names = [name for name, _elo in elo_ranking[:3]]
+    top3_names = [name for name, _elo in elo_legacy_ranking[:3]]
     assert top3_names == ["LOUIS", "ERIC", "DAVID"]
 
 
-def test_elo_scores_for_all_players_from_snapshot():
+def test_elo_legacy_scores_for_all_players_from_snapshot():
     stats = build_stats_from_snapshot()
     ctx = stats.prepare_template_data()
 
-    elo_ranking = ctx["elo_ranking"]
+    elo_ranking = ctx["elo_legacy_ranking"]
     expected_players = {"LOUIS", "ERIC", "DAVID", "BENOIT", "MEHDI", "JULIEN"}
     assert len(elo_ranking) == 6
     assert {name for name, _ in elo_ranking} == expected_players
@@ -91,6 +91,38 @@ def test_elo_scores_for_all_players_from_snapshot():
         assert 1000 <= elo <= 2000, f"{name}: ELO {elo} hors plage"
         if i < len(elo_ranking) - 1:
             assert elo >= elo_ranking[i + 1][1], "Classement ELO doit être décroissant"
+
+
+def test_elo_batch_scores_for_all_players_from_snapshot():
+    stats = build_stats_from_snapshot()
+    ctx = stats.prepare_template_data()
+
+    elo_ranking = ctx["elo_ranking"]
+    expected_players = {"LOUIS", "ERIC", "DAVID", "BENOIT", "MEHDI", "JULIEN"}
+    assert len(elo_ranking) == 6
+    assert {name for name, _ in elo_ranking} == expected_players
+
+    for i, (name, elo) in enumerate(elo_ranking):
+        assert 1000 <= elo <= 2000, f"{name}: ELO {elo} hors plage"
+        if i < len(elo_ranking) - 1:
+            assert elo >= elo_ranking[i + 1][1], "Classement ELO batch doit être décroissant"
+
+
+def test_elo_batch_differs_from_legacy_from_snapshot():
+    stats = build_stats_from_snapshot()
+    ctx = stats.prepare_template_data()
+
+    assert ctx["elo_ranking"] != ctx["elo_legacy_ranking"]
+
+
+def test_elo_batch_is_deterministic_from_snapshot():
+    stats_1 = build_stats_from_snapshot()
+    stats_2 = build_stats_from_snapshot()
+
+    ctx_1 = stats_1.prepare_template_data()
+    ctx_2 = stats_2.prepare_template_data()
+
+    assert ctx_1["elo_ranking"] == ctx_2["elo_ranking"]
 
 
 def test_default_group_ranking_from_snapshot():
@@ -154,7 +186,9 @@ EXPECTED_TEMPLATE_KEYS = frozenset({
     "default_ranking", "date_debut", "date_fin", "date_debut_raw", "date_fin_raw",
     "total_sessions", "unique_players_count", "best_players", "best_score",
     "best_percentage_players", "best_percentage", "win_percentage_ranking",
-    "elo_ranking", "best_elo_players", "best_elo", "latest_date",
+    "elo_ranking", "best_elo_players", "best_elo",
+    "elo_legacy_ranking", "best_elo_legacy_players", "best_elo_legacy",
+    "latest_date",
     "latest_sessions_parsed", "sessions_by_date", "all_sessions_data",
     "player_colors", "has_detailed_stats", "kill_death_ranking",
     "kill_sources_aggregated", "kill_relationships", "all_players_for_matrix",
@@ -178,9 +212,11 @@ def test_best_elo_and_dates_from_snapshot():
     stats = build_stats_from_snapshot()
     ctx = stats.prepare_template_data()
 
-    assert ctx["best_elo_players"] == ["LOUIS"]
     assert ctx["best_elo"] == ctx["elo_ranking"][0][1]
     assert 1000 <= ctx["best_elo"] <= 2000
+    assert ctx["best_elo_legacy_players"] == ["LOUIS"]
+    assert ctx["best_elo_legacy"] == ctx["elo_legacy_ranking"][0][1]
+    assert 1000 <= ctx["best_elo_legacy"] <= 2000
 
     assert ctx["date_debut_raw"] == "2025-06-03"
     assert ctx["date_fin_raw"] == "2026-02-25"
