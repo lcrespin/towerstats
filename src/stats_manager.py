@@ -100,8 +100,8 @@ class SessionStatsManager:
         sessions_by_date = defaultdict(list)
         
         for session in self.sessions:
-            # Extraire la date (sans l'heure)
-            date_str = session['date'].split(' ')[0] if ' ' in session['date'] else session['date'][:10]
+            raw_date = session.get('date', '')
+            date_str = SessionDataManager.extract_date_str(str(raw_date))
             sessions_by_date[date_str].append(session)
         
         # Trier les dates (plus récent en premier)
@@ -203,12 +203,9 @@ class SessionStatsManager:
             if not players or len(players) < 2:
                 continue
             
-            # Filtrer les joueurs valides et obtenir leurs scores
-            valid_players = {
-                name: stats for name, stats in players.items()
-                if not SessionDataManager.should_ignore_player(name)
-            }
-            
+            # Joueurs valides déjà filtrés par parse_session_data
+            valid_players = players
+
             if len(valid_players) < 2:
                 continue
             
@@ -372,11 +369,10 @@ class SessionStatsManager:
                     kill_by = stats['detailed'].get('killBy', {})
                     # Pour chaque tueur qui a tué ce joueur
                     for killer, count in kill_by.items():
-                        if not SessionDataManager.should_ignore_player(killer):
-                            # Ajouter les kills au total
-                            total_kills[killer][player] += count
-                            # Ajouter le nombre de parties de cette session
-                            total_games[killer][player] += total_games_in_session
+                        # Ajouter les kills au total
+                        total_kills[killer][player] += count
+                        # Ajouter le nombre de parties de cette session
+                        total_games[killer][player] += total_games_in_session
         
         # Calculer les moyennes
         relationships = defaultdict(dict)
@@ -438,8 +434,7 @@ class SessionStatsManager:
                         kill_from[source] = max(kill_from[source], count)
                     
                     for killer, count in detailed.get('killBy', {}).items():
-                        if not SessionDataManager.should_ignore_player(killer):
-                            kill_by[killer] = max(kill_by[killer], count)
+                        kill_by[killer] = max(kill_by[killer], count)
         
         if player_kills == 0 and player_deaths == 0:
             return None
@@ -497,8 +492,7 @@ class SessionStatsManager:
         unique_players = set()
         for session in self.sessions:
             players = SessionDataManager.parse_session_data(session)
-            filtered_players = {p: v for p, v in players.items() if not SessionDataManager.should_ignore_player(p)}
-            unique_players.update(filtered_players.keys())
+            unique_players.update(players.keys())
         
         # Meilleur joueur (parmi tous les groupes)
         all_player_totals = defaultdict(int)

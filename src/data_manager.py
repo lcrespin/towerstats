@@ -294,6 +294,33 @@ class SessionDataManager:
                 total_win = data.get('total', {}).get(player, {}).get('win', 0)
                 data['totalWin'][player] = total_win
 
+        # Nettoyer les stats détaillées (killBy/killFrom) des joueurs ignorés
+        SessionDataManager._clean_detailed_stats_ignored_players(data)
+
+    @staticmethod
+    def _clean_detailed_stats_ignored_players(data: Dict[str, Any]) -> None:
+        """Nettoie les stats détaillées en retirant les entrées concernant les joueurs ignorés
+        dans les dictionnaires killBy / killFrom."""
+        for key in ('today', 'total'):
+            stats_by_player = data.get(key, {})
+            if not isinstance(stats_by_player, dict):
+                continue
+
+            for player_stats in stats_by_player.values():
+                if not isinstance(player_stats, dict):
+                    continue
+
+                for field in ('killBy', 'killFrom'):
+                    raw = player_stats.get(field)
+                    if not isinstance(raw, dict):
+                        continue
+                    filtered = {
+                        name: count
+                        for name, count in raw.items()
+                        if not SessionDataManager.should_ignore_player(name)
+                    }
+                    player_stats[field] = filtered
+
     @staticmethod
     def has_detailed_stats(session: Dict[str, Any]) -> bool:
         """Vérifie si une session contient des statistiques détaillées.

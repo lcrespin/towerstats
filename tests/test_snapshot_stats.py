@@ -105,3 +105,46 @@ def test_default_group_ranking_from_snapshot():
         ("ERIC", 201),
     ]
 
+
+def test_group_sessions_by_date_from_snapshot():
+    stats = build_stats_from_snapshot()
+
+    sessions_by_date = stats.group_sessions_by_date()
+    all_sessions = stats.sessions
+
+    # Toutes les sessions sont présentes dans le regroupement
+    total_grouped = sum(len(v) for v in sessions_by_date.values())
+    assert total_grouped == len(all_sessions)
+
+    # Les clés du dict correspondent aux dates distinctes des sessions
+    expected_dates = {session["date"][:10] for session in all_sessions if session.get("date")}
+    assert set(sessions_by_date.keys()) == expected_dates
+
+
+def test_detailed_stats_and_kill_relationships_from_snapshot():
+    stats = build_stats_from_snapshot()
+    ctx = stats.prepare_template_data()
+
+    assert ctx["has_detailed_stats"] is True
+
+    # Classement K/D cohérent avec le nombre de joueurs uniques
+    kill_death_ranking = ctx["kill_death_ranking"]
+    assert len(kill_death_ranking) == ctx["unique_players_count"]
+    for player, kills, deaths, self_kills, kd_ratio in kill_death_ranking:
+        assert isinstance(player, str)
+        assert kills >= 0
+        assert deaths >= 0
+        assert self_kills >= 0
+        assert kd_ratio >= 0
+
+    # Relations de kills cohérentes avec la liste des joueurs
+    kill_relationships = ctx["kill_relationships"]
+    players = {p for p, *_ in kill_death_ranking}
+
+    assert isinstance(kill_relationships, dict)
+    assert set(kill_relationships.keys()).issubset(players)
+    for killer, victims in kill_relationships.items():
+        assert killer in players
+        assert isinstance(victims, dict)
+        assert set(victims.keys()).issubset(players)
+
