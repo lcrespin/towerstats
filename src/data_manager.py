@@ -22,9 +22,14 @@ class SessionDataManager:
     def fetch(self) -> None:
         """Télécharge et parse les données sources."""
         try:
-            # Télécharge le CSV
-            with urllib.request.urlopen(self.csv_url) as response:
-                csv_data = response.read().decode('utf-8')
+            # Récupère le CSV depuis un fichier local ou depuis l'URL distante
+            if self.local_file:
+                with open(self.local_file, 'r', encoding='utf-8') as f:
+                    csv_data = f.read()
+            else:
+                # Télécharge le CSV distant
+                with urllib.request.urlopen(self.csv_url) as response:
+                    csv_data = response.read().decode('utf-8')
             
             # Parse le CSV
             csv_reader = csv.DictReader(io.StringIO(csv_data))

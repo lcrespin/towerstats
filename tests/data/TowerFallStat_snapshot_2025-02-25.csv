@@ -1,0 +1,6889 @@
+id,date,value,,
+DAVID-ERIC-LOUIS,2025-06-02,"{
+  ""todayWin"": {
+    ""ERIC"": 18,
+    ""DAVID"": 6,
+    ""LOUIS"": 8
+  },
+  ""totalWin"": {
+    ""ERIC"": 18,
+    ""DAVID"": 6,
+    ""LOUIS"": 8
+  },
+  ""date"": ""2025-06-02-23""
+}",,"{
+  ""version"": ""v1"",
+  ""pinkTodayWins"": 0,
+  ""greenTodayWins"": 0,
+  ""orangeTodayWins"": 8,
+  ""blueTodayWins"": 0,
+  ""redTodayWins"": 0,
+  ""yellowTodayWins"": 0,
+  ""purpleTodayWins"": 18,
+  ""blue2TodayWins"": 0,
+  ""whiteTodayWins"": 6,
+  ""pinkTotalWins"": 0,
+  ""greenTotalWins"": 0,
+  ""orangeTotalWins"": 8,
+  ""blueTotalWins"": 0,
+  ""redTotalWins"": 0,
+  ""yellowTotalWins"": 0,
+  ""purpleTotalWins"": 18,
+  ""blue2TotalWins"": 0,
+  ""whiteTotalWins"": 6,
+  ""date"": ""2025-06-02-23""
+}"
+DAVID-ERIC-LOUIS,2025-06-03,"{
+  ""todayWin"": {
+    ""ERIC"": 23,
+    ""DAVID"": 11,
+    ""LOUIS"": 13
+  },
+  ""totalWin"": {
+    ""ERIC"": 23,
+    ""DAVID"": 11,
+    ""LOUIS"": 13
+  },
+  ""date"": ""2025-06-03-00""
+}",,"{
+  ""version"": ""v1"",
+  ""pinkTodayWins"": 0,
+  ""greenTodayWins"": 0,
+  ""orangeTodayWins"": 13,
+  ""blueTodayWins"": 0,
+  ""redTodayWins"": 0,
+  ""yellowTodayWins"": 0,
+  ""purpleTodayWins"": 23,
+  ""blue2TodayWins"": 0,
+  ""whiteTodayWins"": 11,
+  ""pinkTotalWins"": 0,
+  ""greenTotalWins"": 0,
+  ""orangeTotalWins"": 13,
+  ""blueTotalWins"": 0,
+  ""redTotalWins"": 0,
+  ""yellowTotalWins"": 0,
+  ""purpleTotalWins"": 23,
+  ""blue2TotalWins"": 0,
+  ""whiteTotalWins"": 11,
+  ""date"": ""2025-06-03-00""
+}"
+DAVID-ERIC-LOUIS,2025-06-04,"{
+  ""todayWin"": {
+    ""ERIC"": 18,
+    ""DAVID"": 19,
+    ""LOUIS"": 12
+  },
+  ""totalWin"": {
+    ""ERIC"": 41,
+    ""DAVID"": 30,
+    ""LOUIS"": 25
+  },
+  ""date"": ""2025-06-04-23""
+}",,"{
+  ""version"": ""v1"",
+  ""pinkTodayWins"": 0,
+  ""greenTodayWins"": 0,
+  ""orangeTodayWins"": 12,
+  ""blueTodayWins"": 0,
+  ""redTodayWins"": 0,
+  ""yellowTodayWins"": 0,
+  ""purpleTodayWins"": 18,
+  ""blue2TodayWins"": 0,
+  ""whiteTodayWins"": 19,
+  ""pinkTotalWins"": 0,
+  ""greenTotalWins"": 0,
+  ""orangeTotalWins"": 25,
+  ""blueTotalWins"": 0,
+  ""redTotalWins"": 0,
+  ""yellowTotalWins"": 0,
+  ""purpleTotalWins"": 41,
+  ""blue2TotalWins"": 0,
+  ""whiteTotalWins"": 30,
+  ""date"": ""2025-06-04-23""
+}"
+DAVID-ERIC-LOUIS,2025-06-05,"{
+  ""todayWin"": {
+    ""ERIC"": 23,
+    ""DAVID"": 26,
+    ""LOUIS"": 17
+  },
+  ""totalWin"": {
+    ""ERIC"": 46,
+    ""DAVID"": 37,
+    ""LOUIS"": 30
+  },
+  ""date"": ""2025-06-05-00""
+}",,"{
+  ""version"": ""v1"",
+  ""pinkTodayWins"": 0,
+  ""greenTodayWins"": 0,
+  ""orangeTodayWins"": 17,
+  ""blueTodayWins"": 0,
+  ""redTodayWins"": 0,
+  ""yellowTodayWins"": 0,
+  ""purpleTodayWins"": 23,
+  ""blue2TodayWins"": 0,
+  ""whiteTodayWins"": 26,
+  ""pinkTotalWins"": 0,
+  ""greenTotalWins"": 0,
+  ""orangeTotalWins"": 30,
+  ""blueTotalWins"": 0,
+  ""redTotalWins"": 0,
+  ""yellowTotalWins"": 0,
+  ""purpleTotalWins"": 46,
+  ""blue2TotalWins"": 0,
+  ""whiteTotalWins"": 37,
+  ""date"": ""2025-06-05-00""
+}"
+DAVID-ERIC-LOUIS,2025-09-11,"{
+  ""todayWin"": {
+    ""ERIC"": 0,
+    ""DAVID"": 2,
+    ""LOUIS"": 2
+  },
+  ""totalWin"": {
+    ""ERIC"": 66,
+    ""DAVID"": 54,
+    ""LOUIS"": 51
+  },
+  ""date"": ""2025-09-11-23""
+}",,"{
+  ""version"": ""v1"",
+  ""pinkTodayWins"": 0,
+  ""greenTodayWins"": 0,
+  ""orangeTodayWins"": 2,
+  ""blueTodayWins"": 0,
+  ""redTodayWins"": 0,
+  ""yellowTodayWins"": 0,
+  ""purpleTodayWins"": 0,
+  ""blue2TodayWins"": 0,
+  ""whiteTodayWins"": 2,
+  ""pinkTotalWins"": 0,
+  ""greenTotalWins"": 0,
+  ""orangeTotalWins"": 51,
+  ""blueTotalWins"": 0,
+  ""redTotalWins"": 0,
+  ""yellowTotalWins"": 0,
+  ""purpleTotalWins"": 66,
+  ""blue2TotalWins"": 0,
+  ""whiteTotalWins"": 54,
+  ""date"": ""2025-09-11-23""
+}"
+DAVID-ERIC-LOUIS,2025-09-12,"{
+  ""todayWin"": {
+    ""ERIC"": 4,
+    ""DAVID"": 3,
+    ""LOUIS"": 3
+  },
+  ""totalWin"": {
+    ""ERIC"": 70,
+    ""DAVID"": 55,
+    ""LOUIS"": 52
+  },
+  ""date"": ""2025-09-12-00""
+}",,"{
+  ""version"": ""v1"",
+  ""pinkTodayWins"": 0,
+  ""greenTodayWins"": 0,
+  ""orangeTodayWins"": 3,
+  ""blueTodayWins"": 0,
+  ""redTodayWins"": 0,
+  ""yellowTodayWins"": 0,
+  ""purpleTodayWins"": 4,
+  ""blue2TodayWins"": 0,
+  ""whiteTodayWins"": 3,
+  ""pinkTotalWins"": 0,
+  ""greenTotalWins"": 0,
+  ""orangeTotalWins"": 52,
+  ""blueTotalWins"": 0,
+  ""redTotalWins"": 0,
+  ""yellowTotalWins"": 0,
+  ""purpleTotalWins"": 70,
+  ""blue2TotalWins"": 0,
+  ""whiteTotalWins"": 55,
+  ""date"": ""2025-09-12-00""
+}"
+DAVID-ERIC-LOUIS,2025-09-16,"{
+  ""todayWin"": {
+    ""ERIC"": 9,
+    ""DAVID"": 8,
+    ""LOUIS"": 7
+  },
+  ""totalWin"": {
+    ""ERIC"": 79,
+    ""DAVID"": 63,
+    ""LOUIS"": 59
+  },
+  ""date"": ""2025-09-16-23""
+}",,"{
+  ""version"": ""v1"",
+  ""pinkTodayWins"": 0,
+  ""greenTodayWins"": 0,
+  ""orangeTodayWins"": 7,
+  ""blueTodayWins"": 0,
+  ""redTodayWins"": 0,
+  ""yellowTodayWins"": 0,
+  ""purpleTodayWins"": 9,
+  ""blue2TodayWins"": 0,
+  ""whiteTodayWins"": 8,
+  ""pinkTotalWins"": 0,
+  ""greenTotalWins"": 0,
+  ""orangeTotalWins"": 59,
+  ""blueTotalWins"": 0,
+  ""redTotalWins"": 0,
+  ""yellowTotalWins"": 0,
+  ""purpleTotalWins"": 79,
+  ""blue2TotalWins"": 0,
+  ""whiteTotalWins"": 63,
+  ""date"": ""2025-09-16-23""
+}"
+DAVID-ERIC-LOUIS,2025-09-17,"{
+  ""todayWin"": {
+    ""ERIC"": 18,
+    ""DAVID"": 34,
+    ""LOUIS"": 27
+  },
+  ""totalWin"": {
+    ""ERIC"": 88,
+    ""DAVID"": 89,
+    ""LOUIS"": 79
+  },
+  ""date"": ""2025-09-17-01""
+}",,"{
+  ""version"": ""v1"",
+  ""pinkTodayWins"": 0,
+  ""greenTodayWins"": 0,
+  ""orangeTodayWins"": 27,
+  ""blueTodayWins"": 0,
+  ""redTodayWins"": 0,
+  ""yellowTodayWins"": 0,
+  ""purpleTodayWins"": 18,
+  ""blue2TodayWins"": 0,
+  ""whiteTodayWins"": 34,
+  ""pinkTotalWins"": 0,
+  ""greenTotalWins"": 0,
+  ""orangeTotalWins"": 79,
+  ""blueTotalWins"": 0,
+  ""redTotalWins"": 0,
+  ""yellowTotalWins"": 0,
+  ""purpleTotalWins"": 88,
+  ""blue2TotalWins"": 0,
+  ""whiteTotalWins"": 89,
+  ""date"": ""2025-09-17-01""
+}"
+DAVID-ERIC-LOUIS,2025-10-01,"{
+  ""todayWin"": {
+    ""ERIC"": 6,
+    ""DAVID"": 7,
+    ""LOUIS"": 6
+  },
+  ""totalWin"": {
+    ""ERIC"": 94,
+    ""DAVID"": 96,
+    ""LOUIS"": 85
+  },
+  ""date"": ""2025-10-01-23""
+}
+",,"{
+  ""version"": ""v1"",
+  ""pinkTodayWins"": 0,
+  ""greenTodayWins"": 0,
+  ""orangeTodayWins"": 6,
+  ""blueTodayWins"": 0,
+  ""redTodayWins"": 0,
+  ""yellowTodayWins"": 0,
+  ""purpleTodayWins"": 6,
+  ""blue2TodayWins"": 0,
+  ""whiteTodayWins"": 7,
+  ""pinkTotalWins"": 0,
+  ""greenTotalWins"": 0,
+  ""orangeTotalWins"": 85,
+  ""blueTotalWins"": 0,
+  ""redTotalWins"": 0,
+  ""yellowTotalWins"": 0,
+  ""purpleTotalWins"": 94,
+  ""blue2TotalWins"": 0,
+  ""whiteTotalWins"": 96,
+  ""date"": ""2025-10-01-23""
+}"
+DAVID-ERIC-LOUIS,2025-10-02,"{
+  ""todayWin"": {
+    ""ERIC"": 15,
+    ""DAVID"": 14,
+    ""LOUIS"": 14
+  },
+  ""totalWin"": {
+    ""ERIC"": 103,
+    ""DAVID"": 103,
+    ""LOUIS"": 93
+  },
+  ""date"": ""2025-10-02-00""
+}",,"{
+  ""version"": ""v1"",
+  ""pinkTodayWins"": 0,
+  ""greenTodayWins"": 0,
+  ""orangeTodayWins"": 14,
+  ""blueTodayWins"": 0,
+  ""redTodayWins"": 0,
+  ""yellowTodayWins"": 0,
+  ""purpleTodayWins"": 15,
+  ""blue2TodayWins"": 0,
+  ""whiteTodayWins"": 14,
+  ""pinkTotalWins"": 0,
+  ""greenTotalWins"": 0,
+  ""orangeTotalWins"": 93,
+  ""blueTotalWins"": 0,
+  ""redTotalWins"": 0,
+  ""yellowTotalWins"": 0,
+  ""purpleTotalWins"": 103,
+  ""blue2TotalWins"": 0,
+  ""whiteTotalWins"": 103,
+  ""date"": ""2025-10-02-00""
+}"
+DAVID-ERIC-LOUIS,2025-10-15,"{
+  ""todayWin"": {
+    ""ERIC"": 7,
+    ""DAVID"": 9,
+    ""LOUIS"": 15
+  },
+  ""totalWin"": {
+    ""ERIC"": 110,
+    ""DAVID"": 112,
+    ""LOUIS"": 108
+  },
+  ""date"": ""2025-10-15-23""
+}",,"{
+  ""version"": ""v1"",
+  ""pinkTodayWins"": 0,
+  ""greenTodayWins"": 0,
+  ""orangeTodayWins"": 15,
+  ""blueTodayWins"": 0,
+  ""redTodayWins"": 0,
+  ""yellowTodayWins"": 0,
+  ""purpleTodayWins"": 7,
+  ""blue2TodayWins"": 0,
+  ""whiteTodayWins"": 9,
+  ""pinkTotalWins"": 0,
+  ""greenTotalWins"": 0,
+  ""orangeTotalWins"": 108,
+  ""blueTotalWins"": 0,
+  ""redTotalWins"": 0,
+  ""yellowTotalWins"": 0,
+  ""purpleTotalWins"": 110,
+  ""blue2TotalWins"": 0,
+  ""whiteTotalWins"": 112,
+  ""date"": ""2025-10-15-23""
+}"
+DAVID-ERIC-LOUIS,2025-10-16,"{
+  ""todayWin"": {
+    ""ERIC"": 11,
+    ""DAVID"": 10,
+    ""LOUIS"": 17
+  },
+  ""totalWin"": {
+    ""ERIC"": 114,
+    ""DAVID"": 113,
+    ""LOUIS"": 110
+  },
+  ""date"": ""2025-10-16-00""
+}
+
+",,"{
+  ""version"": ""v1"",
+  ""pinkTodayWins"": 0,
+  ""greenTodayWins"": 0,
+  ""orangeTodayWins"": 17,
+  ""blueTodayWins"": 0,
+  ""redTodayWins"": 0,
+  ""yellowTodayWins"": 0,
+  ""purpleTodayWins"": 11,
+  ""blue2TodayWins"": 0,
+  ""whiteTodayWins"": 10,
+  ""pinkTotalWins"": 0,
+  ""greenTotalWins"": 0,
+  ""orangeTotalWins"": 110,
+  ""blueTotalWins"": 0,
+  ""redTotalWins"": 0,
+  ""yellowTotalWins"": 0,
+  ""purpleTotalWins"": 114,
+  ""blue2TotalWins"": 0,
+  ""whiteTotalWins"": 113,
+  ""date"": ""2025-10-16-00""
+}"
+DAVID-ERIC-LOUIS,2025-10-23,"{
+  ""todayWin"": {
+    ""LOUIS"": 9,
+    ""DAVID"": 1,
+    ""ERIC"": 3
+  },
+  ""totalWin"": {
+    ""ERIC"": 117,
+    ""DAVID"": 114,
+    ""LOUIS"": 119
+  },
+  ""date"": ""2025-10-23-23""
+}",,
+DAVID-ERIC-LOUIS,2025-10-24,"{
+  ""todayWin"": {
+    ""LOUIS"": 16,
+    ""DAVID"": 7,
+    ""ERIC"": 3
+  },
+  ""totalWin"": {
+    ""LOUIS"": 124,
+    ""DAVID"": 121,
+    ""ERIC"": 119
+  },
+  ""date"": ""2025-10-24-00""
+}",,
+DAVID-ERIC-LOUIS,2025-11-11,"{
+  ""todayWin"": {
+    ""ERIC"": 5,
+    ""DAVID"": 1,
+    ""LOUIS"": 8
+  },
+  ""totalWin"": {
+    ""LOUIS"": 132,
+    ""DAVID"": 122,
+    ""ERIC"": 124
+  },
+  ""date"": ""2025-11-11-23""
+}",,
+DAVID-ERIC-LOUIS,2025-11-12,"{
+  ""todayWin"": {
+    ""ERIC"": 6,
+    ""DAVID"": 1,
+    ""LOUIS"": 8
+  },
+  ""totalWin"": {
+    ""LOUIS"": 132,
+    ""DAVID"": 122,
+    ""ERIC"": 125
+  },
+  ""date"": ""2025-11-12-00""
+}",,
+ERIC-LOUIS,2025-11-12,"{
+  ""todayWin"": {
+    ""ERIC"": 0,
+    ""LOUIS"": 3
+  },
+  ""totalWin"": {
+    ""LOUIS"": 3,
+    ""ERIC"": 0
+  },
+  ""date"": ""2025-11-12-00""
+}",,
+DAVID-ERIC-LOUIS,2025-11-18,"{
+  ""todayWin"": {
+    ""LOUIS"": 4,
+    ""DAVID"": 3,
+    ""ERIC"": 1
+  },
+  ""totalWin"": {
+    ""LOUIS"": 136,
+    ""DAVID"": 125,
+    ""ERIC"": 126
+  },
+  ""date"": ""2025-11-18-22""
+}",,
+BENOIT-DAVID-ERIC-LOUIS,2025-11-18,"{
+  ""todayWin"": {
+    ""ERIC"": 5,
+    ""LOUIS"": 5,
+    ""DAVID"": 9,
+    ""BENOIT"": 2
+  },
+  ""totalWin"": {
+    ""ERIC"": 5,
+    ""LOUIS"": 5,
+    ""DAVID"": 9,
+    ""BENOIT"": 2
+  },
+  ""date"": ""2025-11-18-23""
+}",,
+BENOIT-DAVID-ERIC-LOUIS,2025-11-19,"{
+  ""todayWin"": {
+    ""ERIC"": 5,
+    ""LOUIS"": 7,
+    ""DAVID"": 12,
+    ""BENOIT"": 3
+  },
+  ""totalWin"": {
+    ""ERIC"": 5,
+    ""LOUIS"": 7,
+    ""DAVID"": 12,
+    ""BENOIT"": 3
+  },
+  ""date"": ""2025-11-19-00""
+}",,
+DAVID-ERIC-JULIEN,2025-11-21,"{
+  ""todayWin"": {
+    ""DAVID"": 3,
+    ""ERIC"": 7,
+    ""JULIEN"": 0
+  },
+  ""totalWin"": {
+    ""DAVID"": 3,
+    ""ERIC"": 7,
+    ""JULIEN"": 0
+  },
+  ""date"": ""2025-11-21-21""
+}",,
+DAVID-ERIC-JULIEN-MEHDI,2025-11-21,"{
+  ""todayWin"": {
+    ""DAVID"": 10,
+    ""MEHDI"": 2,
+    ""ERIC"": 4,
+    ""JULIEN"": 4
+  },
+  ""totalWin"": {
+    ""DAVID"": 10,
+    ""MEHDI"": 2,
+    ""ERIC"": 4,
+    ""JULIEN"": 4
+  },
+  ""date"": ""2025-11-21-23""
+}",,
+DAVID-ERIC-JULIEN-MEHDI,2025-11-22,"{
+  ""todayWin"": {
+    ""DAVID"": 14,
+    ""MEHDI"": 3,
+    ""ERIC"": 12,
+    ""JULIEN"": 4
+  },
+  ""totalWin"": {
+    ""DAVID"": 14,
+    ""MEHDI"": 3,
+    ""ERIC"": 12,
+    ""JULIEN"": 4
+  },
+  ""date"": ""2025-11-22-01""
+}",,
+DAVID-ERIC-LOUIS,2025-11-27,"{
+  ""todayWin"": {
+    ""DAVID"": 9,
+    ""LOUIS"": 4,
+    ""ERIC"": 10
+  },
+  ""totalWin"": {
+    ""LOUIS"": 140,
+    ""DAVID"": 134,
+    ""ERIC"": 136
+  },
+  ""date"": ""2025-11-27-23""
+}",,
+DAVID-ERIC-LOUIS,2025-11-28,"{
+  ""todayWin"": {
+    ""DAVID"": 10,
+    ""LOUIS"": 5,
+    ""ERIC"": 12
+  },
+  ""totalWin"": {
+    ""LOUIS"": 141,
+    ""DAVID"": 135,
+    ""ERIC"": 138
+  },
+  ""date"": ""2025-11-28-00""
+}",,
+ERIC-JULIEN,2025-12-01,"{
+  ""todayWin"": {
+    ""ERIC"": 1,
+    ""JULIEN"": 0
+  },
+  ""totalWin"": {
+    ""ERIC"": 1,
+    ""JULIEN"": 0
+  },
+  ""date"": ""2025-12-01-20""
+}",,
+DAVID-ERIC-JULIEN,2025-12-01,"{
+  ""todayWin"": {
+    ""ERIC"": 8,
+    ""JULIEN"": 1,
+    ""DAVID"": 1
+  },
+  ""totalWin"": {
+    ""DAVID"": 4,
+    ""ERIC"": 15,
+    ""JULIEN"": 1
+  },
+  ""date"": ""2025-12-01-21""
+}",,
+DAVID-ERIC-LOUIS,2025-12-03,"{
+  ""todayWin"": {
+    ""LOUIS"": 14,
+    ""ERIC"": 10,
+    ""DAVID"": 9
+  },
+  ""totalWin"": {
+    ""LOUIS"": 155,
+    ""DAVID"": 144,
+    ""ERIC"": 148
+  },
+  ""date"": ""2025-12-03-23""
+}",,
+DAVID-ERIC-LOUIS,2025-12-04,"{
+  ""todayWin"": {
+    ""LOUIS"": 14,
+    ""ERIC"": 12,
+    ""DAVID"": 9
+  },
+  ""totalWin"": {
+    ""LOUIS"": 155,
+    ""DAVID"": 144,
+    ""ERIC"": 150
+  },
+  ""date"": ""2025-12-04-00""
+}",,
+P1-P2-P3,2025-12-06,"{
+  ""todayWin"": {
+    ""P3"": 2
+  },
+  ""totalWin"": {
+    ""P3"": 2
+  },
+  ""today"": {
+    ""P2"": {
+      ""win"": 0,
+      ""kill"": 0,
+      ""death"": 2,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 1,
+        ""Arrow"": 1
+      },
+      ""killBy"": {
+        ""P3"": 2
+      }
+    },
+    ""P3"": {
+      ""win"": 2,
+      ""kill"": 4,
+      ""death"": 0,
+      ""self"": 0,
+      ""killFrom"": {},
+      ""killBy"": {}
+    },
+    ""P1"": {
+      ""win"": 0,
+      ""kill"": 0,
+      ""death"": 2,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 1,
+        ""Arrow"": 1
+      },
+      ""killBy"": {
+        ""P3"": 2
+      }
+    }
+  },
+  ""total"": {
+    ""P2"": {
+      ""win"": 0,
+      ""kill"": 0,
+      ""death"": 2,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 1,
+        ""Arrow"": 1
+      },
+      ""killBy"": {
+        ""P3"": 2
+      }
+    },
+    ""P3"": {
+      ""win"": 2,
+      ""kill"": 4,
+      ""death"": 0,
+      ""self"": 0,
+      ""killFrom"": {},
+      ""killBy"": {}
+    },
+    ""P1"": {
+      ""win"": 0,
+      ""kill"": 0,
+      ""death"": 2,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 1,
+        ""Arrow"": 1
+      },
+      ""killBy"": {
+        ""P3"": 2
+      }
+    }
+  },
+  ""date"": ""2025-12-07-21""
+}",,
+DAVID-ERIC,2025-12-08,"{
+  ""todayWin"": {
+    ""DAVID"": 2, ""ERIC"": 0
+  },
+  ""totalWin"": {
+    ""DAVID"": 2, ""ERIC"": 0
+  },
+  ""today"": {
+    ""ERIC"": {
+      ""win"": 0,
+      ""kill"": 0,
+      ""death"": 8,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 4,
+        ""Arrow"": 4
+      },
+      ""killBy"": {
+        ""DAVID"": 8
+      }
+    },
+    ""DAVID"": {
+      ""win"": 2,
+      ""kill"": 8,
+      ""death"": 0,
+      ""self"": 0,
+      ""killFrom"": {},
+      ""killBy"": {}
+    }
+  },
+  ""total"": {
+    ""ERIC"": {
+      ""win"": 0,
+      ""kill"": 0,
+      ""death"": 8,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 4,
+        ""Arrow"": 4
+      },
+      ""killBy"": {
+        ""DAVID"": 8
+      }
+    },
+    ""DAVID"": {
+      ""win"": 2,
+      ""kill"": 8,
+      ""death"": 0,
+      ""self"": 0,
+      ""killFrom"": {},
+      ""killBy"": {}
+    }
+  },
+  ""date"": ""2025-12-08-12""
+}",,
+AIJIMMY 4-P2,2025-12-09,"{
+  ""todayWin"": {
+    ""AIJIMMY 4"": 2
+  },
+  ""totalWin"": {
+    ""AIJIMMY 4"": 2
+  },
+  ""today"": {
+    ""P2"": {
+      ""win"": 0,
+      ""kill"": 2,
+      ""death"": 8,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 8
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 8
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 2,
+      ""kill"": 8,
+      ""death"": 2,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 1,
+        ""Arrow"": 1
+      },
+      ""killBy"": {
+        ""P2"": 2
+      }
+    }
+  },
+  ""total"": {
+    ""P2"": {
+      ""win"": 0,
+      ""kill"": 2,
+      ""death"": 8,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 8
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 8
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 2,
+      ""kill"": 8,
+      ""death"": 2,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 1,
+        ""Arrow"": 1
+      },
+      ""killBy"": {
+        ""P2"": 2
+      }
+    }
+  },
+  ""date"": ""2025-12-09-20""
+}",,
+DAVID-ERIC-LOUIS,2025-12-10,"{
+  ""todayWin"": {
+    ""LOUIS"": 8,
+    ""DAVID"": 6,
+    ""ERIC"": 12
+  },
+  ""totalWin"": {
+    ""LOUIS"": 163,
+    ""DAVID"": 150,
+    ""ERIC"": 162
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 8,
+      ""kill"": 169,
+      ""death"": 178,
+      ""self"": 12,
+      ""killFrom"": {
+        ""Lava"": 3,
+        ""Arrow"": 132,
+        ""JumpedOn"": 28,
+        ""Explosion"": 11,
+        ""FallingObject"": 2,
+        ""Shock"": 1,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 85,
+        ""DAVID"": 81,
+        ""LOUIS"": 12
+      }
+    },
+    ""DAVID"": {
+      ""win"": 6,
+      ""kill"": 160,
+      ""death"": 167,
+      ""self"": 12,
+      ""killFrom"": {
+        ""Arrow"": 121,
+        ""JumpedOn"": 27,
+        ""Brambles"": 2,
+        ""Lava"": 3,
+        ""Explosion"": 10,
+        ""Squish"": 3,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 85,
+        ""LOUIS"": 67,
+        ""DAVID"": 12
+      }
+    },
+    ""ERIC"": {
+      ""win"": 12,
+      ""kill"": 180,
+      ""death"": 168,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 133,
+        ""Explosion"": 9,
+        ""JumpedOn"": 22,
+        ""Brambles"": 2,
+        ""Miasma"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 90,
+        ""ERIC"": 10,
+        ""DAVID"": 67
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 163,
+      ""kill"": 169,
+      ""death"": 178,
+      ""self"": 12,
+      ""killFrom"": {
+        ""Lava"": 3,
+        ""Arrow"": 132,
+        ""JumpedOn"": 28,
+        ""Explosion"": 11,
+        ""FallingObject"": 2,
+        ""Shock"": 1,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 85,
+        ""DAVID"": 81,
+        ""LOUIS"": 12
+      }
+    },
+    ""DAVID"": {
+      ""win"": 150,
+      ""kill"": 160,
+      ""death"": 167,
+      ""self"": 12,
+      ""killFrom"": {
+        ""Arrow"": 121,
+        ""JumpedOn"": 27,
+        ""Brambles"": 2,
+        ""Lava"": 3,
+        ""Explosion"": 10,
+        ""Squish"": 3,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 85,
+        ""LOUIS"": 67,
+        ""DAVID"": 12
+      }
+    },
+    ""ERIC"": {
+      ""win"": 162,
+      ""kill"": 180,
+      ""death"": 168,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 133,
+        ""Explosion"": 9,
+        ""JumpedOn"": 22,
+        ""Brambles"": 2,
+        ""Miasma"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 90,
+        ""ERIC"": 10,
+        ""DAVID"": 67
+      }
+    }
+  },
+  ""date"": ""2025-12-10-23""
+}",,
+AIJIMMY 4-DAVID-ERIC-LOUIS,2025-12-10,"{
+  ""todayWin"": {
+    ""AIJIMMY 4"": 2,
+    ""LOUIS"": 1,
+    ""DAVID"": 1,
+    ""ERIC"": 1
+  },
+  ""totalWin"": {
+    ""AIJIMMY 4"": 2,
+    ""LOUIS"": 1,
+    ""DAVID"": 1,
+    ""ERIC"": 1
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 1,
+      ""kill"": 40,
+      ""death"": 43,
+      ""self"": 6,
+      ""killFrom"": {
+        ""Arrow"": 36,
+        ""Explosion"": 2,
+        ""JumpedOn"": 4,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 12,
+        ""DAVID"": 13,
+        ""LOUIS"": 6,
+        ""ERIC"": 12
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 2,
+      ""kill"": 41,
+      ""death"": 45,
+      ""self"": 3,
+      ""killFrom"": {
+        ""JumpedOn"": 6,
+        ""Arrow"": 38,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 15,
+        ""LOUIS"": 15,
+        ""DAVID"": 12,
+        ""AIJIMMY 4"": 3
+      }
+    },
+    ""DAVID"": {
+      ""win"": 1,
+      ""kill"": 41,
+      ""death"": 37,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 30,
+        ""Miasma"": 1,
+        ""Lava"": 1,
+        ""Explosion"": 1,
+        ""JumpedOn"": 3,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 13,
+        ""LOUIS"": 9,
+        ""ERIC"": 11,
+        ""DAVID"": 3
+      }
+    },
+    ""ERIC"": {
+      ""win"": 1,
+      ""kill"": 40,
+      ""death"": 40,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Miasma"": 2,
+        ""JumpedOn"": 3,
+        ""Arrow"": 33,
+        ""Explosion"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 13,
+        ""LOUIS"": 10,
+        ""AIJIMMY 4"": 13,
+        ""ERIC"": 2
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 1,
+      ""kill"": 40,
+      ""death"": 43,
+      ""self"": 6,
+      ""killFrom"": {
+        ""Arrow"": 36,
+        ""Explosion"": 2,
+        ""JumpedOn"": 4,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 12,
+        ""DAVID"": 13,
+        ""LOUIS"": 6,
+        ""ERIC"": 12
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 2,
+      ""kill"": 41,
+      ""death"": 45,
+      ""self"": 3,
+      ""killFrom"": {
+        ""JumpedOn"": 6,
+        ""Arrow"": 38,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 15,
+        ""LOUIS"": 15,
+        ""DAVID"": 12,
+        ""AIJIMMY 4"": 3
+      }
+    },
+    ""DAVID"": {
+      ""win"": 1,
+      ""kill"": 41,
+      ""death"": 37,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 30,
+        ""Miasma"": 1,
+        ""Lava"": 1,
+        ""Explosion"": 1,
+        ""JumpedOn"": 3,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 13,
+        ""LOUIS"": 9,
+        ""ERIC"": 11,
+        ""DAVID"": 3
+      }
+    },
+    ""ERIC"": {
+      ""win"": 1,
+      ""kill"": 40,
+      ""death"": 40,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Miasma"": 2,
+        ""JumpedOn"": 3,
+        ""Arrow"": 33,
+        ""Explosion"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 13,
+        ""LOUIS"": 10,
+        ""AIJIMMY 4"": 13,
+        ""ERIC"": 2
+      }
+    }
+  },
+  ""date"": ""2025-12-10-22""
+}",,
+DAVID-ERIC-LOUIS,2025-12-11,"{
+  ""todayWin"": {
+    ""LOUIS"": 8,
+    ""DAVID"": 7,
+    ""ERIC"": 13
+  },
+  ""totalWin"": {
+    ""LOUIS"": 163,
+    ""DAVID"": 151,
+    ""ERIC"": 163
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 8,
+      ""kill"": 180,
+      ""death"": 193,
+      ""self"": 12,
+      ""killFrom"": {
+        ""Lava"": 3,
+        ""Arrow"": 145,
+        ""JumpedOn"": 30,
+        ""Explosion"": 11,
+        ""FallingObject"": 2,
+        ""Shock"": 1,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 93,
+        ""DAVID"": 88,
+        ""LOUIS"": 12
+      }
+    },
+    ""DAVID"": {
+      ""win"": 7,
+      ""kill"": 175,
+      ""death"": 178,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Arrow"": 128,
+        ""JumpedOn"": 31,
+        ""Brambles"": 2,
+        ""Lava"": 3,
+        ""Explosion"": 10,
+        ""Squish"": 3,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 89,
+        ""LOUIS"": 73,
+        ""DAVID"": 13
+      }
+    },
+    ""ERIC"": {
+      ""win"": 13,
+      ""kill"": 192,
+      ""death"": 180,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 142,
+        ""Explosion"": 9,
+        ""JumpedOn"": 25,
+        ""Brambles"": 2,
+        ""Miasma"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 95,
+        ""ERIC"": 10,
+        ""DAVID"": 74
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 163,
+      ""kill"": 180,
+      ""death"": 193,
+      ""self"": 12,
+      ""killFrom"": {
+        ""Lava"": 3,
+        ""Arrow"": 145,
+        ""JumpedOn"": 30,
+        ""Explosion"": 11,
+        ""FallingObject"": 2,
+        ""Shock"": 1,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 93,
+        ""DAVID"": 88,
+        ""LOUIS"": 12
+      }
+    },
+    ""DAVID"": {
+      ""win"": 151,
+      ""kill"": 175,
+      ""death"": 178,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Arrow"": 128,
+        ""JumpedOn"": 31,
+        ""Brambles"": 2,
+        ""Lava"": 3,
+        ""Explosion"": 10,
+        ""Squish"": 3,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 89,
+        ""LOUIS"": 73,
+        ""DAVID"": 13
+      }
+    },
+    ""ERIC"": {
+      ""win"": 163,
+      ""kill"": 192,
+      ""death"": 180,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 142,
+        ""Explosion"": 9,
+        ""JumpedOn"": 25,
+        ""Brambles"": 2,
+        ""Miasma"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 95,
+        ""ERIC"": 10,
+        ""DAVID"": 74
+      }
+    }
+  },
+  ""date"": ""2025-12-11-00""
+}",,
+DAVID-ERIC-LOUIS,2025-12-17,"{
+  ""todayWin"": {
+    ""ERIC"": 11,
+    ""DAVID"": 11,
+    ""LOUIS"": 9
+  },
+  ""totalWin"": {
+    ""LOUIS"": 172,
+    ""DAVID"": 162,
+    ""ERIC"": 174
+  },
+  ""today"": {
+    ""ERIC"": {
+      ""win"": 11,
+      ""kill"": 175,
+      ""death"": 199,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Arrow"": 149,
+        ""JumpedOn"": 39,
+        ""Brambles"": 6,
+        ""Explosion"": 4,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 92,
+        ""LOUIS"": 94,
+        ""ERIC"": 13
+      }
+    },
+    ""DAVID"": {
+      ""win"": 11,
+      ""kill"": 199,
+      ""death"": 171,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 130,
+        ""Brambles"": 5,
+        ""JumpedOn"": 28,
+        ""Explosion"": 5,
+        ""Lava"": 2,
+        ""Shock"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 85,
+        ""LOUIS"": 76,
+        ""DAVID"": 10
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 9,
+      ""kill"": 183,
+      ""death"": 187,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Arrow"": 141,
+        ""JumpedOn"": 32,
+        ""Brambles"": 5,
+        ""Explosion"": 8,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 77,
+        ""DAVID"": 97,
+        ""LOUIS"": 13
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 172,
+      ""kill"": 363,
+      ""death"": 380,
+      ""self"": 25,
+      ""killFrom"": {
+        ""Lava"": 4,
+        ""Arrow"": 286,
+        ""JumpedOn"": 62,
+        ""Explosion"": 19,
+        ""FallingObject"": 2,
+        ""Shock"": 1,
+        ""Brambles"": 6
+      },
+      ""killBy"": {
+        ""ERIC"": 170,
+        ""DAVID"": 185,
+        ""LOUIS"": 25
+      }
+    },
+    ""DAVID"": {
+      ""win"": 162,
+      ""kill"": 374,
+      ""death"": 349,
+      ""self"": 23,
+      ""killFrom"": {
+        ""Arrow"": 258,
+        ""JumpedOn"": 59,
+        ""Brambles"": 7,
+        ""Lava"": 5,
+        ""Explosion"": 15,
+        ""Squish"": 3,
+        ""SpikeBall"": 1,
+        ""Shock"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 174,
+        ""LOUIS"": 149,
+        ""DAVID"": 23
+      }
+    },
+    ""ERIC"": {
+      ""win"": 174,
+      ""kill"": 367,
+      ""death"": 379,
+      ""self"": 23,
+      ""killFrom"": {
+        ""Arrow"": 291,
+        ""Explosion"": 13,
+        ""JumpedOn"": 64,
+        ""Brambles"": 8,
+        ""Miasma"": 1,
+        ""Lava"": 2
+      },
+      ""killBy"": {
+        ""LOUIS"": 189,
+        ""ERIC"": 23,
+        ""DAVID"": 166
+      }
+    }
+  },
+  ""date"": ""2025-12-17-23""
+}",,
+DAVID-ERIC-LOUIS,2025-12-18,"{
+  ""todayWin"": {
+    ""ERIC"": 12,
+    ""DAVID"": 11,
+    ""LOUIS"": 9
+  },
+  ""totalWin"": {
+    ""LOUIS"": 172,
+    ""DAVID"": 162,
+    ""ERIC"": 175
+  },
+  ""today"": {
+    ""ERIC"": {
+      ""win"": 12,
+      ""kill"": 184,
+      ""death"": 203,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Arrow"": 153,
+        ""JumpedOn"": 39,
+        ""Brambles"": 6,
+        ""Explosion"": 4,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 94,
+        ""LOUIS"": 96,
+        ""ERIC"": 13
+      }
+    },
+    ""DAVID"": {
+      ""win"": 11,
+      ""kill"": 203,
+      ""death"": 178,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 136,
+        ""Brambles"": 5,
+        ""JumpedOn"": 29,
+        ""Explosion"": 5,
+        ""Lava"": 2,
+        ""Shock"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 89,
+        ""LOUIS"": 79,
+        ""DAVID"": 10
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 9,
+      ""kill"": 188,
+      ""death"": 194,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Arrow"": 145,
+        ""JumpedOn"": 35,
+        ""Brambles"": 5,
+        ""Explosion"": 8,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 82,
+        ""DAVID"": 99,
+        ""LOUIS"": 13
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 172,
+      ""kill"": 368,
+      ""death"": 387,
+      ""self"": 25,
+      ""killFrom"": {
+        ""Lava"": 4,
+        ""Arrow"": 290,
+        ""JumpedOn"": 65,
+        ""Explosion"": 19,
+        ""FallingObject"": 2,
+        ""Shock"": 1,
+        ""Brambles"": 6
+      },
+      ""killBy"": {
+        ""ERIC"": 175,
+        ""DAVID"": 187,
+        ""LOUIS"": 25
+      }
+    },
+    ""DAVID"": {
+      ""win"": 162,
+      ""kill"": 378,
+      ""death"": 356,
+      ""self"": 23,
+      ""killFrom"": {
+        ""Arrow"": 264,
+        ""JumpedOn"": 60,
+        ""Brambles"": 7,
+        ""Lava"": 5,
+        ""Explosion"": 15,
+        ""Squish"": 3,
+        ""SpikeBall"": 1,
+        ""Shock"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 178,
+        ""LOUIS"": 152,
+        ""DAVID"": 23
+      }
+    },
+    ""ERIC"": {
+      ""win"": 175,
+      ""kill"": 376,
+      ""death"": 383,
+      ""self"": 23,
+      ""killFrom"": {
+        ""Arrow"": 295,
+        ""Explosion"": 13,
+        ""JumpedOn"": 64,
+        ""Brambles"": 8,
+        ""Miasma"": 1,
+        ""Lava"": 2
+      },
+      ""killBy"": {
+        ""LOUIS"": 191,
+        ""ERIC"": 23,
+        ""DAVID"": 168
+      }
+    }
+  },
+  ""date"": ""2025-12-18-00""
+}",,
+BENOIT-DAVID-ERIC-LOUIS,2025-12-18,"{
+  ""todayWin"": {
+    ""DAVID"": 5,
+    ""LOUIS"": 6,
+    ""ERIC"": 4,
+    ""BENOIT"": 1
+  },
+  ""totalWin"": {
+    ""DAVID"": 5,
+    ""LOUIS"": 6,
+    ""ERIC"": 4,
+    ""BENOIT"": 1
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 6,
+      ""kill"": 101,
+      ""death"": 119,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 88,
+        ""JumpedOn"": 26,
+        ""FallingObject"": 1,
+        ""Explosion"": 1,
+        ""Brambles"": 1,
+        ""Squish"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 49,
+        ""ERIC"": 37,
+        ""BENOIT"": 29,
+        ""LOUIS"": 2
+      }
+    },
+    ""DAVID"": {
+      ""win"": 5,
+      ""kill"": 134,
+      ""death"": 109,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 76,
+        ""JumpedOn"": 25,
+        ""Squish"": 2,
+        ""FallingObject"": 2,
+        ""Lava"": 1,
+        ""Explosion"": 2,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 40,
+        ""LOUIS"": 35,
+        ""DAVID"": 7,
+        ""BENOIT"": 25
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 1,
+      ""kill"": 96,
+      ""death"": 115,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 98,
+        ""JumpedOn"": 10,
+        ""Explosion"": 4,
+        ""Brambles"": 2,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 40,
+        ""ERIC"": 40,
+        ""LOUIS"": 31,
+        ""BENOIT"": 3
+      }
+    },
+    ""ERIC"": {
+      ""win"": 4,
+      ""kill"": 120,
+      ""death"": 114,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 85,
+        ""JumpedOn"": 21,
+        ""Squish"": 1,
+        ""Shock"": 1,
+        ""Explosion"": 2,
+        ""Brambles"": 4
+      },
+      ""killBy"": {
+        ""DAVID"": 38,
+        ""BENOIT"": 39,
+        ""LOUIS"": 33,
+        ""ERIC"": 3
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 6,
+      ""kill"": 101,
+      ""death"": 119,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 88,
+        ""JumpedOn"": 26,
+        ""FallingObject"": 1,
+        ""Explosion"": 1,
+        ""Brambles"": 1,
+        ""Squish"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 49,
+        ""ERIC"": 37,
+        ""BENOIT"": 29,
+        ""LOUIS"": 2
+      }
+    },
+    ""DAVID"": {
+      ""win"": 5,
+      ""kill"": 134,
+      ""death"": 109,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 76,
+        ""JumpedOn"": 25,
+        ""Squish"": 2,
+        ""FallingObject"": 2,
+        ""Lava"": 1,
+        ""Explosion"": 2,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 40,
+        ""LOUIS"": 35,
+        ""DAVID"": 7,
+        ""BENOIT"": 25
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 1,
+      ""kill"": 96,
+      ""death"": 115,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 98,
+        ""JumpedOn"": 10,
+        ""Explosion"": 4,
+        ""Brambles"": 2,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 40,
+        ""ERIC"": 40,
+        ""LOUIS"": 31,
+        ""BENOIT"": 3
+      }
+    },
+    ""ERIC"": {
+      ""win"": 4,
+      ""kill"": 120,
+      ""death"": 114,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 85,
+        ""JumpedOn"": 21,
+        ""Squish"": 1,
+        ""Shock"": 1,
+        ""Explosion"": 2,
+        ""Brambles"": 4
+      },
+      ""killBy"": {
+        ""DAVID"": 38,
+        ""BENOIT"": 39,
+        ""LOUIS"": 33,
+        ""ERIC"": 3
+      }
+    }
+  },
+  ""date"": ""2025-12-18-23""
+}",,
+BENOIT-DAVID-LOUIS,2025-12-19,"{
+  ""todayWin"": {
+    ""LOUIS"": 4,
+    ""DAVID"": 8,
+    ""BENOIT"": 0
+  },
+  ""totalWin"": {
+    ""LOUIS"": 4,
+    ""DAVID"": 8,
+    ""BENOIT"": 0
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 4,
+      ""kill"": 69,
+      ""death"": 71,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 62,
+        ""SpikeBall"": 1,
+        ""Brambles"": 1,
+        ""JumpedOn"": 7
+      },
+      ""killBy"": {
+        ""DAVID"": 42,
+        ""BENOIT"": 25,
+        ""LOUIS"": 3
+      }
+    },
+    ""DAVID"": {
+      ""win"": 8,
+      ""kill"": 99,
+      ""death"": 64,
+      ""self"": 6,
+      ""killFrom"": {
+        ""Arrow"": 50,
+        ""JumpedOn"": 6,
+        ""Brambles"": 4,
+        ""Explosion"": 2,
+        ""FallingObject"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""BENOIT"": 19,
+        ""LOUIS"": 39,
+        ""DAVID"": 6
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 0,
+      ""kill"": 51,
+      ""death"": 87,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 53,
+        ""JumpedOn"": 21,
+        ""SpikeBall"": 2,
+        ""Brambles"": 2,
+        ""Explosion"": 7,
+        ""FallingObject"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 51,
+        ""LOUIS"": 27,
+        ""BENOIT"": 7
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 4,
+      ""kill"": 69,
+      ""death"": 71,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 62,
+        ""SpikeBall"": 1,
+        ""Brambles"": 1,
+        ""JumpedOn"": 7
+      },
+      ""killBy"": {
+        ""DAVID"": 42,
+        ""BENOIT"": 25,
+        ""LOUIS"": 3
+      }
+    },
+    ""DAVID"": {
+      ""win"": 8,
+      ""kill"": 99,
+      ""death"": 64,
+      ""self"": 6,
+      ""killFrom"": {
+        ""Arrow"": 50,
+        ""JumpedOn"": 6,
+        ""Brambles"": 4,
+        ""Explosion"": 2,
+        ""FallingObject"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""BENOIT"": 19,
+        ""LOUIS"": 39,
+        ""DAVID"": 6
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 0,
+      ""kill"": 51,
+      ""death"": 87,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 53,
+        ""JumpedOn"": 21,
+        ""SpikeBall"": 2,
+        ""Brambles"": 2,
+        ""Explosion"": 7,
+        ""FallingObject"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 51,
+        ""LOUIS"": 27,
+        ""BENOIT"": 7
+      }
+    }
+  },
+  ""date"": ""2025-12-19-00""
+}",,
+ERIC-LOUIS,2026-01-07,"{
+  ""todayWin"": {
+    ""ERIC"": 9,
+    ""LOUIS"": 2
+  },
+  ""totalWin"": {
+    ""ERIC"": 9,
+    ""LOUIS"": 2
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 2,
+      ""kill"": 77,
+      ""death"": 101,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 70,
+        ""JumpedOn"": 18,
+        ""Explosion"": 5,
+        ""Brambles"": 6,
+        ""Miasma"": 2
+      },
+      ""killBy"": {
+        ""LOUIS"": 7,
+        ""ERIC"": 92
+      }
+    },
+    ""ERIC"": {
+      ""win"": 9,
+      ""kill"": 94,
+      ""death"": 74,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 59,
+        ""Explosion"": 5,
+        ""Brambles"": 1,
+        ""JumpedOn"": 7,
+        ""Squish"": 2
+      },
+      ""killBy"": {
+        ""LOUIS"": 70,
+        ""ERIC"": 2
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 2,
+      ""kill"": 77,
+      ""death"": 101,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 70,
+        ""JumpedOn"": 18,
+        ""Explosion"": 5,
+        ""Brambles"": 6,
+        ""Miasma"": 2
+      },
+      ""killBy"": {
+        ""LOUIS"": 7,
+        ""ERIC"": 92
+      }
+    },
+    ""ERIC"": {
+      ""win"": 9,
+      ""kill"": 94,
+      ""death"": 74,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 59,
+        ""Explosion"": 5,
+        ""Brambles"": 1,
+        ""JumpedOn"": 7,
+        ""Squish"": 2
+      },
+      ""killBy"": {
+        ""LOUIS"": 70,
+        ""ERIC"": 2
+      }
+    }
+  },
+  ""date"": ""2026-01-07-23""
+}",,
+ERIC-LOUIS,2026-01-08,"{
+  ""todayWin"": {
+    ""ERIC"": 10,
+    ""LOUIS"": 2
+  },
+  ""totalWin"": {
+    ""ERIC"": 10,
+    ""LOUIS"": 5
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 2,
+      ""kill"": 80,
+      ""death"": 106,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 73,
+        ""JumpedOn"": 20,
+        ""Explosion"": 5,
+        ""Brambles"": 6,
+        ""Miasma"": 2
+      },
+      ""killBy"": {
+        ""LOUIS"": 7,
+        ""ERIC"": 97
+      }
+    },
+    ""ERIC"": {
+      ""win"": 10,
+      ""kill"": 99,
+      ""death"": 77,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 61,
+        ""Explosion"": 5,
+        ""Brambles"": 1,
+        ""JumpedOn"": 8,
+        ""Squish"": 2
+      },
+      ""killBy"": {
+        ""LOUIS"": 73,
+        ""ERIC"": 2
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 5,
+      ""kill"": 80,
+      ""death"": 106,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 73,
+        ""JumpedOn"": 20,
+        ""Explosion"": 5,
+        ""Brambles"": 6,
+        ""Miasma"": 2
+      },
+      ""killBy"": {
+        ""LOUIS"": 7,
+        ""ERIC"": 97
+      }
+    },
+    ""ERIC"": {
+      ""win"": 10,
+      ""kill"": 99,
+      ""death"": 77,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 61,
+        ""Explosion"": 5,
+        ""Brambles"": 1,
+        ""JumpedOn"": 8,
+        ""Squish"": 2
+      },
+      ""killBy"": {
+        ""LOUIS"": 73,
+        ""ERIC"": 2
+      }
+    }
+  },
+  ""date"": ""2026-01-08-00""
+}",,
+P1-P2,2026-01-12,"{
+  ""todayWin"": {
+    ""P1"": 1
+  },
+  ""totalWin"": {
+    ""P1"": 1
+  },
+  ""today"": {
+    ""P2"": {
+      ""win"": 0,
+      ""kill"": 0,
+      ""death"": 5,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 3,
+        ""Arrow"": 2
+      },
+      ""killBy"": {
+        ""P1"": 5
+      }
+    },
+    ""P1"": {
+      ""win"": 1,
+      ""kill"": 5,
+      ""death"": 0,
+      ""self"": 0,
+      ""killFrom"": {},
+      ""killBy"": {}
+    }
+  },
+  ""total"": {
+    ""P2"": {
+      ""win"": 0,
+      ""kill"": 0,
+      ""death"": 5,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 3,
+        ""Arrow"": 2
+      },
+      ""killBy"": {
+        ""P1"": 5
+      }
+    },
+    ""P1"": {
+      ""win"": 1,
+      ""kill"": 5,
+      ""death"": 0,
+      ""self"": 0,
+      ""killFrom"": {},
+      ""killBy"": {}
+    }
+  },
+  ""date"": ""2026-01-12-22""
+}",,
+DAVID-ERIC-LOUIS,2026-01-12,"{
+  ""todayWin"": {
+    ""LOUIS"": 6,
+    ""DAVID"": 3,
+    ""ERIC"": 5
+  },
+  ""totalWin"": {
+    ""LOUIS"": 178,
+    ""DAVID"": 165,
+    ""ERIC"": 180
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 6,
+      ""kill"": 89,
+      ""death"": 90,
+      ""self"": 5,
+      ""killFrom"": {
+        ""Arrow"": 64,
+        ""JumpedOn"": 17,
+        ""Brambles"": 3,
+        ""Explosion"": 4,
+        ""Squish"": 1,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 42,
+        ""ERIC"": 41,
+        ""LOUIS"": 5
+      }
+    },
+    ""DAVID"": {
+      ""win"": 3,
+      ""kill"": 100,
+      ""death"": 95,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Arrow"": 68,
+        ""Brambles"": 5,
+        ""Explosion"": 10,
+        ""JumpedOn"": 11,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 42,
+        ""LOUIS"": 39,
+        ""DAVID"": 13
+      }
+    },
+    ""ERIC"": {
+      ""win"": 5,
+      ""kill"": 85,
+      ""death"": 94,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 65,
+        ""JumpedOn"": 17,
+        ""Explosion"": 6,
+        ""Squish"": 2,
+        ""Shock"": 2,
+        ""Brambles"": 2
+      },
+      ""killBy"": {
+        ""LOUIS"": 45,
+        ""DAVID"": 45,
+        ""ERIC"": 2
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 178,
+      ""kill"": 457,
+      ""death"": 477,
+      ""self"": 30,
+      ""killFrom"": {
+        ""Lava"": 4,
+        ""Arrow"": 354,
+        ""JumpedOn"": 82,
+        ""Explosion"": 23,
+        ""FallingObject"": 2,
+        ""Shock"": 1,
+        ""Brambles"": 9,
+        ""Squish"": 1,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 216,
+        ""DAVID"": 229,
+        ""LOUIS"": 30
+      }
+    },
+    ""DAVID"": {
+      ""win"": 165,
+      ""kill"": 478,
+      ""death"": 451,
+      ""self"": 36,
+      ""killFrom"": {
+        ""Arrow"": 332,
+        ""JumpedOn"": 71,
+        ""Brambles"": 12,
+        ""Lava"": 5,
+        ""Explosion"": 25,
+        ""Squish"": 3,
+        ""SpikeBall"": 2,
+        ""Shock"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 220,
+        ""LOUIS"": 191,
+        ""DAVID"": 36
+      }
+    },
+    ""ERIC"": {
+      ""win"": 180,
+      ""kill"": 461,
+      ""death"": 477,
+      ""self"": 25,
+      ""killFrom"": {
+        ""Arrow"": 360,
+        ""Explosion"": 19,
+        ""JumpedOn"": 81,
+        ""Brambles"": 10,
+        ""Miasma"": 1,
+        ""Lava"": 2,
+        ""Squish"": 2,
+        ""Shock"": 2
+      },
+      ""killBy"": {
+        ""LOUIS"": 236,
+        ""ERIC"": 25,
+        ""DAVID"": 213
+      }
+    }
+  },
+  ""date"": ""2026-01-12-23""
+}",,
+DAVID-ERIC-LOUIS,2026-01-13,"{
+  ""todayWin"": {
+    ""LOUIS"": 11,
+    ""DAVID"": 6,
+    ""ERIC"": 7
+  },
+  ""totalWin"": {
+    ""LOUIS"": 183,
+    ""DAVID"": 168,
+    ""ERIC"": 182
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 11,
+      ""kill"": 166,
+      ""death"": 158,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Arrow"": 115,
+        ""JumpedOn"": 30,
+        ""Brambles"": 5,
+        ""Explosion"": 5,
+        ""Squish"": 1,
+        ""SpikeBall"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 64,
+        ""ERIC"": 79,
+        ""LOUIS"": 13
+      }
+    },
+    ""DAVID"": {
+      ""win"": 6,
+      ""kill"": 155,
+      ""death"": 163,
+      ""self"": 15,
+      ""killFrom"": {
+        ""Arrow"": 123,
+        ""Brambles"": 5,
+        ""Explosion"": 12,
+        ""JumpedOn"": 21,
+        ""SpikeBall"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 73,
+        ""LOUIS"": 73,
+        ""DAVID"": 15
+      }
+    },
+    ""ERIC"": {
+      ""win"": 7,
+      ""kill"": 159,
+      ""death"": 167,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 127,
+        ""JumpedOn"": 21,
+        ""Explosion"": 9,
+        ""Squish"": 3,
+        ""Shock"": 2,
+        ""Brambles"": 4,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 80,
+        ""DAVID"": 76,
+        ""ERIC"": 7
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 183,
+      ""kill"": 534,
+      ""death"": 545,
+      ""self"": 38,
+      ""killFrom"": {
+        ""Lava"": 5,
+        ""Arrow"": 405,
+        ""JumpedOn"": 95,
+        ""Explosion"": 24,
+        ""FallingObject"": 2,
+        ""Shock"": 1,
+        ""Brambles"": 11,
+        ""Squish"": 1,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 254,
+        ""DAVID"": 251,
+        ""LOUIS"": 38
+      }
+    },
+    ""DAVID"": {
+      ""win"": 168,
+      ""kill"": 533,
+      ""death"": 519,
+      ""self"": 38,
+      ""killFrom"": {
+        ""Arrow"": 387,
+        ""JumpedOn"": 81,
+        ""Brambles"": 12,
+        ""Lava"": 5,
+        ""Explosion"": 27,
+        ""Squish"": 4,
+        ""SpikeBall"": 2,
+        ""Shock"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 251,
+        ""LOUIS"": 225,
+        ""DAVID"": 38
+      }
+    },
+    ""ERIC"": {
+      ""win"": 182,
+      ""kill"": 535,
+      ""death"": 550,
+      ""self"": 30,
+      ""killFrom"": {
+        ""Arrow"": 422,
+        ""Explosion"": 22,
+        ""JumpedOn"": 85,
+        ""Brambles"": 12,
+        ""Miasma"": 1,
+        ""Lava"": 2,
+        ""Squish"": 3,
+        ""Shock"": 2,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 271,
+        ""ERIC"": 30,
+        ""DAVID"": 244
+      }
+    }
+  },
+  ""date"": ""2026-01-13-00""
+}",,
+DAVID-ERIC-LOUIS-MEHDI,2026-01-14,"{
+  ""todayWin"": {
+    ""LOUIS"": 5,
+    ""ERIC"": 8,
+    ""DAVID"": 8
+  },
+  ""totalWin"": {
+    ""LOUIS"": 5,
+    ""ERIC"": 8,
+    ""DAVID"": 8
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 5,
+      ""kill"": 170,
+      ""death"": 154,
+      ""self"": 9,
+      ""killFrom"": {
+        ""Arrow"": 116,
+        ""JumpedOn"": 25,
+        ""Brambles"": 1,
+        ""Explosion"": 9,
+        ""FallingObject"": 2,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 51,
+        ""MEHDI"": 33,
+        ""DAVID"": 60,
+        ""LOUIS"": 9
+      }
+    },
+    ""ERIC"": {
+      ""win"": 8,
+      ""kill"": 175,
+      ""death"": 154,
+      ""self"": 6,
+      ""killFrom"": {
+        ""JumpedOn"": 26,
+        ""Explosion"": 6,
+        ""Arrow"": 118,
+        ""Brambles"": 2,
+        ""Lava"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 62,
+        ""MEHDI"": 27,
+        ""LOUIS"": 59,
+        ""ERIC"": 6
+      }
+    },
+    ""DAVID"": {
+      ""win"": 8,
+      ""kill"": 190,
+      ""death"": 138,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 108,
+        ""Explosion"": 5,
+        ""JumpedOn"": 20,
+        ""Squish"": 2,
+        ""Brambles"": 2,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""MEHDI"": 29,
+        ""ERIC"": 52,
+        ""LOUIS"": 46,
+        ""DAVID"": 10
+      }
+    },
+    ""MEHDI"": {
+      ""win"": 0,
+      ""kill"": 99,
+      ""death"": 190,
+      ""self"": 10,
+      ""killFrom"": {
+        ""JumpedOn"": 35,
+        ""Arrow"": 146,
+        ""Squish"": 2,
+        ""FallingObject"": 1,
+        ""Explosion"": 4,
+        ""Lava"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 58,
+        ""ERIC"": 66,
+        ""LOUIS"": 56,
+        ""MEHDI"": 10
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 5,
+      ""kill"": 170,
+      ""death"": 154,
+      ""self"": 9,
+      ""killFrom"": {
+        ""Arrow"": 116,
+        ""JumpedOn"": 25,
+        ""Brambles"": 1,
+        ""Explosion"": 9,
+        ""FallingObject"": 2,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 51,
+        ""MEHDI"": 33,
+        ""DAVID"": 60,
+        ""LOUIS"": 9
+      }
+    },
+    ""ERIC"": {
+      ""win"": 8,
+      ""kill"": 175,
+      ""death"": 154,
+      ""self"": 6,
+      ""killFrom"": {
+        ""JumpedOn"": 26,
+        ""Explosion"": 6,
+        ""Arrow"": 118,
+        ""Brambles"": 2,
+        ""Lava"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 62,
+        ""MEHDI"": 27,
+        ""LOUIS"": 59,
+        ""ERIC"": 6
+      }
+    },
+    ""DAVID"": {
+      ""win"": 8,
+      ""kill"": 190,
+      ""death"": 138,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 108,
+        ""Explosion"": 5,
+        ""JumpedOn"": 20,
+        ""Squish"": 2,
+        ""Brambles"": 2,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""MEHDI"": 29,
+        ""ERIC"": 52,
+        ""LOUIS"": 46,
+        ""DAVID"": 10
+      }
+    },
+    ""MEHDI"": {
+      ""win"": 0,
+      ""kill"": 99,
+      ""death"": 190,
+      ""self"": 10,
+      ""killFrom"": {
+        ""JumpedOn"": 35,
+        ""Arrow"": 146,
+        ""Squish"": 2,
+        ""FallingObject"": 1,
+        ""Explosion"": 4,
+        ""Lava"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 58,
+        ""ERIC"": 66,
+        ""LOUIS"": 56,
+        ""MEHDI"": 10
+      }
+    }
+  },
+  ""date"": ""2026-01-14-23""
+}",,
+DAVID-ERIC-LOUIS-MEHDI,2026-01-15,"{
+  ""todayWin"": {
+    ""LOUIS"": 6,
+    ""ERIC"": 8,
+    ""DAVID"": 10,
+    ""MEHDI"": 0
+
+  },
+  ""totalWin"": {
+    ""LOUIS"": 6,
+    ""ERIC"": 8,
+    ""DAVID"": 10,
+    ""MEHDI"": 0
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 6,
+      ""kill"": 195,
+      ""death"": 173,
+      ""self"": 9,
+      ""killFrom"": {
+        ""Arrow"": 129,
+        ""JumpedOn"": 31,
+        ""Brambles"": 1,
+        ""Explosion"": 9,
+        ""FallingObject"": 2,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 60,
+        ""MEHDI"": 36,
+        ""DAVID"": 67,
+        ""LOUIS"": 9
+      }
+    },
+    ""ERIC"": {
+      ""win"": 8,
+      ""kill"": 197,
+      ""death"": 176,
+      ""self"": 7,
+      ""killFrom"": {
+        ""JumpedOn"": 28,
+        ""Explosion"": 7,
+        ""Arrow"": 136,
+        ""Brambles"": 3,
+        ""Lava"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 71,
+        ""MEHDI"": 29,
+        ""LOUIS"": 69,
+        ""ERIC"": 7
+      }
+    },
+    ""DAVID"": {
+      ""win"": 10,
+      ""kill"": 217,
+      ""death"": 155,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 122,
+        ""Explosion"": 5,
+        ""JumpedOn"": 23,
+        ""Squish"": 2,
+        ""Brambles"": 2,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""MEHDI"": 32,
+        ""ERIC"": 59,
+        ""LOUIS"": 53,
+        ""DAVID"": 10
+      }
+    },
+    ""MEHDI"": {
+      ""win"": 0,
+      ""kill"": 107,
+      ""death"": 214,
+      ""self"": 10,
+      ""killFrom"": {
+        ""JumpedOn"": 39,
+        ""Arrow"": 166,
+        ""Squish"": 2,
+        ""FallingObject"": 1,
+        ""Explosion"": 4,
+        ""Lava"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 69,
+        ""ERIC"": 71,
+        ""LOUIS"": 64,
+        ""MEHDI"": 10
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 6,
+      ""kill"": 195,
+      ""death"": 173,
+      ""self"": 9,
+      ""killFrom"": {
+        ""Arrow"": 129,
+        ""JumpedOn"": 31,
+        ""Brambles"": 1,
+        ""Explosion"": 9,
+        ""FallingObject"": 2,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 60,
+        ""MEHDI"": 36,
+        ""DAVID"": 67,
+        ""LOUIS"": 9
+      }
+    },
+    ""ERIC"": {
+      ""win"": 8,
+      ""kill"": 197,
+      ""death"": 176,
+      ""self"": 7,
+      ""killFrom"": {
+        ""JumpedOn"": 28,
+        ""Explosion"": 7,
+        ""Arrow"": 136,
+        ""Brambles"": 3,
+        ""Lava"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 71,
+        ""MEHDI"": 29,
+        ""LOUIS"": 69,
+        ""ERIC"": 7
+      }
+    },
+    ""DAVID"": {
+      ""win"": 10,
+      ""kill"": 217,
+      ""death"": 155,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 122,
+        ""Explosion"": 5,
+        ""JumpedOn"": 23,
+        ""Squish"": 2,
+        ""Brambles"": 2,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""MEHDI"": 32,
+        ""ERIC"": 59,
+        ""LOUIS"": 53,
+        ""DAVID"": 10
+      }
+    },
+    ""MEHDI"": {
+      ""win"": 0,
+      ""kill"": 107,
+      ""death"": 214,
+      ""self"": 10,
+      ""killFrom"": {
+        ""JumpedOn"": 39,
+        ""Arrow"": 166,
+        ""Squish"": 2,
+        ""FallingObject"": 1,
+        ""Explosion"": 4,
+        ""Lava"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 69,
+        ""ERIC"": 71,
+        ""LOUIS"": 64,
+        ""MEHDI"": 10
+      }
+    }
+  },
+  ""date"": ""2026-01-15-00""
+}",,
+DAVID-ERIC-JULIEN-LOUIS,2026-01-16,"{
+  ""todayWin"": {
+    ""DAVID"": 12,
+    ""ERIC"": 15,
+    ""JULIEN"": 3,
+    ""LOUIS"": 5
+  },
+  ""totalWin"": {
+    ""DAVID"": 12,
+    ""ERIC"": 15,
+    ""JULIEN"": 3,
+    ""LOUIS"": 5
+  },
+  ""today"": {
+    ""ERIC"": {
+      ""win"": 15,
+      ""kill"": 307,
+      ""death"": 254,
+      ""self"": 14,
+      ""killFrom"": {
+        ""Arrow"": 188,
+        ""JumpedOn"": 44,
+        ""Explosion"": 13,
+        ""Brambles"": 6,
+        ""SpikeBall"": 1,
+        ""Shock"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""JULIEN"": 66,
+        ""DAVID"": 101,
+        ""ERIC"": 14,
+        ""LOUIS"": 71
+      }
+    },
+    ""JULIEN"": {
+      ""win"": 3,
+      ""kill"": 211,
+      ""death"": 296,
+      ""self"": 9,
+      ""killFrom"": {
+        ""Arrow"": 217,
+        ""Explosion"": 12,
+        ""JumpedOn"": 56,
+        ""SpikeBall"": 1,
+        ""Squish"": 3,
+        ""Brambles"": 5,
+        ""Lava"": 1,
+        ""Shock"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 96,
+        ""JULIEN"": 9,
+        ""ERIC"": 109,
+        ""LOUIS"": 79
+      }
+    },
+    ""DAVID"": {
+      ""win"": 12,
+      ""kill"": 304,
+      ""death"": 264,
+      ""self"": 18,
+      ""killFrom"": {
+        ""Explosion"": 14,
+        ""Arrow"": 188,
+        ""JumpedOn"": 53,
+        ""Squish"": 2,
+        ""Brambles"": 2,
+        ""SpikeBall"": 1,
+        ""Shock"": 1,
+        ""FallingObject"": 1,
+        ""Miasma"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 18,
+        ""LOUIS"": 94,
+        ""ERIC"": 85,
+        ""JULIEN"": 64
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 5,
+      ""kill"": 257,
+      ""death"": 278,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Miasma"": 1,
+        ""Arrow"": 212,
+        ""Explosion"": 6,
+        ""JumpedOn"": 48,
+        ""SpikeBall"": 3,
+        ""Brambles"": 5,
+        ""FallingObject"": 1,
+        ""Squish"": 2
+      },
+      ""killBy"": {
+        ""JULIEN"": 72,
+        ""ERIC"": 99,
+        ""LOUIS"": 13,
+        ""DAVID"": 89
+      }
+    }
+  },
+  ""total"": {
+    ""ERIC"": {
+      ""win"": 15,
+      ""kill"": 307,
+      ""death"": 254,
+      ""self"": 14,
+      ""killFrom"": {
+        ""Arrow"": 188,
+        ""JumpedOn"": 44,
+        ""Explosion"": 13,
+        ""Brambles"": 6,
+        ""SpikeBall"": 1,
+        ""Shock"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""JULIEN"": 66,
+        ""DAVID"": 101,
+        ""ERIC"": 14,
+        ""LOUIS"": 71
+      }
+    },
+    ""JULIEN"": {
+      ""win"": 3,
+      ""kill"": 211,
+      ""death"": 296,
+      ""self"": 9,
+      ""killFrom"": {
+        ""Arrow"": 217,
+        ""Explosion"": 12,
+        ""JumpedOn"": 56,
+        ""SpikeBall"": 1,
+        ""Squish"": 3,
+        ""Brambles"": 5,
+        ""Lava"": 1,
+        ""Shock"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 96,
+        ""JULIEN"": 9,
+        ""ERIC"": 109,
+        ""LOUIS"": 79
+      }
+    },
+    ""DAVID"": {
+      ""win"": 12,
+      ""kill"": 304,
+      ""death"": 264,
+      ""self"": 18,
+      ""killFrom"": {
+        ""Explosion"": 14,
+        ""Arrow"": 188,
+        ""JumpedOn"": 53,
+        ""Squish"": 2,
+        ""Brambles"": 2,
+        ""SpikeBall"": 1,
+        ""Shock"": 1,
+        ""FallingObject"": 1,
+        ""Miasma"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 18,
+        ""LOUIS"": 94,
+        ""ERIC"": 85,
+        ""JULIEN"": 64
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 5,
+      ""kill"": 257,
+      ""death"": 278,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Miasma"": 1,
+        ""Arrow"": 212,
+        ""Explosion"": 6,
+        ""JumpedOn"": 48,
+        ""SpikeBall"": 3,
+        ""Brambles"": 5,
+        ""FallingObject"": 1,
+        ""Squish"": 2
+      },
+      ""killBy"": {
+        ""JULIEN"": 72,
+        ""ERIC"": 99,
+        ""LOUIS"": 13,
+        ""DAVID"": 89
+      }
+    }
+  },
+  ""date"": ""2026-01-16-23""
+}",,
+DAVID-ERIC-JULIEN-LOUIS,2026-01-17,"{
+  ""todayWin"": {
+    ""DAVID"": 20,
+    ""ERIC"": 19,
+    ""JULIEN"": 4,
+    ""LOUIS"": 15
+  },
+  ""totalWin"": {
+    ""DAVID"": 20,
+    ""ERIC"": 19,
+    ""JULIEN"": 4,
+    ""LOUIS"": 15
+  },
+  ""today"": {
+    ""ERIC"": {
+      ""win"": 19,
+      ""kill"": 475,
+      ""death"": 411,
+      ""self"": 21,
+      ""killFrom"": {
+        ""Arrow"": 304,
+        ""JumpedOn"": 78,
+        ""Explosion"": 17,
+        ""Brambles"": 6,
+        ""SpikeBall"": 2,
+        ""Shock"": 1,
+        ""Squish"": 2,
+        ""FallingObject"": 1
+      },
+      ""killBy"": {
+        ""JULIEN"": 105,
+        ""DAVID"": 153,
+        ""ERIC"": 21,
+        ""LOUIS"": 129
+      }
+    },
+    ""JULIEN"": {
+      ""win"": 4,
+      ""kill"": 325,
+      ""death"": 481,
+      ""self"": 12,
+      ""killFrom"": {
+        ""Arrow"": 373,
+        ""Explosion"": 14,
+        ""JumpedOn"": 78,
+        ""SpikeBall"": 2,
+        ""Squish"": 5,
+        ""Brambles"": 6,
+        ""Lava"": 1,
+        ""Shock"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 163,
+        ""JULIEN"": 12,
+        ""ERIC"": 177,
+        ""LOUIS"": 123
+      }
+    },
+    ""DAVID"": {
+      ""win"": 20,
+      ""kill"": 485,
+      ""death"": 417,
+      ""self"": 26,
+      ""killFrom"": {
+        ""Explosion"": 17,
+        ""Arrow"": 301,
+        ""JumpedOn"": 84,
+        ""Squish"": 6,
+        ""Brambles"": 2,
+        ""SpikeBall"": 2,
+        ""Shock"": 1,
+        ""FallingObject"": 1,
+        ""Miasma"": 2,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 26,
+        ""LOUIS"": 152,
+        ""ERIC"": 130,
+        ""JULIEN"": 101
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 15,
+      ""kill"": 424,
+      ""death"": 424,
+      ""self"": 20,
+      ""killFrom"": {
+        ""Miasma"": 2,
+        ""Arrow"": 323,
+        ""Explosion"": 13,
+        ""JumpedOn"": 71,
+        ""SpikeBall"": 4,
+        ""Brambles"": 7,
+        ""FallingObject"": 1,
+        ""Squish"": 3
+      },
+      ""killBy"": {
+        ""JULIEN"": 107,
+        ""ERIC"": 147,
+        ""LOUIS"": 20,
+        ""DAVID"": 143
+      }
+    }
+  },
+  ""total"": {
+    ""ERIC"": {
+      ""win"": 19,
+      ""kill"": 475,
+      ""death"": 411,
+      ""self"": 21,
+      ""killFrom"": {
+        ""Arrow"": 304,
+        ""JumpedOn"": 78,
+        ""Explosion"": 17,
+        ""Brambles"": 6,
+        ""SpikeBall"": 2,
+        ""Shock"": 1,
+        ""Squish"": 2,
+        ""FallingObject"": 1
+      },
+      ""killBy"": {
+        ""JULIEN"": 105,
+        ""DAVID"": 153,
+        ""ERIC"": 21,
+        ""LOUIS"": 129
+      }
+    },
+    ""JULIEN"": {
+      ""win"": 4,
+      ""kill"": 325,
+      ""death"": 481,
+      ""self"": 12,
+      ""killFrom"": {
+        ""Arrow"": 373,
+        ""Explosion"": 14,
+        ""JumpedOn"": 78,
+        ""SpikeBall"": 2,
+        ""Squish"": 5,
+        ""Brambles"": 6,
+        ""Lava"": 1,
+        ""Shock"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 163,
+        ""JULIEN"": 12,
+        ""ERIC"": 177,
+        ""LOUIS"": 123
+      }
+    },
+    ""DAVID"": {
+      ""win"": 20,
+      ""kill"": 485,
+      ""death"": 417,
+      ""self"": 26,
+      ""killFrom"": {
+        ""Explosion"": 17,
+        ""Arrow"": 301,
+        ""JumpedOn"": 84,
+        ""Squish"": 6,
+        ""Brambles"": 2,
+        ""SpikeBall"": 2,
+        ""Shock"": 1,
+        ""FallingObject"": 1,
+        ""Miasma"": 2,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 26,
+        ""LOUIS"": 152,
+        ""ERIC"": 130,
+        ""JULIEN"": 101
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 15,
+      ""kill"": 424,
+      ""death"": 424,
+      ""self"": 20,
+      ""killFrom"": {
+        ""Miasma"": 2,
+        ""Arrow"": 323,
+        ""Explosion"": 13,
+        ""JumpedOn"": 71,
+        ""SpikeBall"": 4,
+        ""Brambles"": 7,
+        ""FallingObject"": 1,
+        ""Squish"": 3
+      },
+      ""killBy"": {
+        ""JULIEN"": 107,
+        ""ERIC"": 147,
+        ""LOUIS"": 20,
+        ""DAVID"": 143
+      }
+    }
+  },
+  ""date"": ""2026-01-17-01""
+}",,
+P1-P2,2026-01-17,"{
+  ""todayWin"": {
+    ""P1"": 6,
+    ""P2"": 0
+  },
+  ""totalWin"": {
+    ""P1"": 7,
+    ""P2"": 0
+  },
+  ""today"": {
+    ""P1"": {
+      ""win"": 6,
+      ""kill"": 12,
+      ""death"": 0,
+      ""self"": 0,
+      ""killFrom"": {},
+      ""killBy"": {}
+    },
+    ""P2"": {
+      ""win"": 0,
+      ""kill"": 0,
+      ""death"": 12,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 9,
+        ""JumpedOn"": 2,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""P1"": 12
+      }
+    }
+  },
+  ""total"": {
+    ""P2"": {
+      ""win"": 0,
+      ""kill"": 0,
+      ""death"": 17,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 5,
+        ""Arrow"": 11,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""P1"": 17
+      }
+    },
+    ""P1"": {
+      ""win"": 7,
+      ""kill"": 17,
+      ""death"": 0,
+      ""self"": 0,
+      ""killFrom"": {},
+      ""killBy"": {}
+    }
+  },
+  ""date"": ""2026-01-17-17""
+}",,
+AIJIMMY 3-P1,2026-01-17,"{
+  ""todayWin"": {
+    ""P1"": 2
+  },
+  ""totalWin"": {
+    ""P1"": 2
+  },
+  ""today"": {
+    ""AIJIMMY 3"": {
+      ""win"": 0,
+      ""kill"": 2,
+      ""death"": 12,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 8,
+        ""Miasma"": 3,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""P1"": 9
+      }
+    },
+    ""P1"": {
+      ""win"": 2,
+      ""kill"": 9,
+      ""death"": 4,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 2,
+        ""Miasma"": 2
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 2
+      }
+    }
+  },
+  ""total"": {
+    ""AIJIMMY 3"": {
+      ""win"": 0,
+      ""kill"": 2,
+      ""death"": 12,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 8,
+        ""Miasma"": 3,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""P1"": 9
+      }
+    },
+    ""P1"": {
+      ""win"": 2,
+      ""kill"": 9,
+      ""death"": 4,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 2,
+        ""Miasma"": 2
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 2
+      }
+    }
+  },
+  ""date"": ""2026-01-17-20""
+}",,
+AIJIMMY 2-AIJIMMY 3-AIJIMMY 4,2026-01-17,"{
+  ""todayWin"": {
+    ""AIJIMMY 4"": 3,
+    ""AIJIMMY 3"": 1
+  },
+  ""totalWin"": {
+    ""AIJIMMY 4"": 3,
+    ""AIJIMMY 3"": 1
+  },
+  ""today"": {
+    ""AIJIMMY 4"": {
+      ""win"": 3,
+      ""kill"": 31,
+      ""death"": 20,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 17,
+        ""JumpedOn"": 3
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 14,
+        ""AIJIMMY 2"": 6
+      }
+    },
+    ""AIJIMMY 3"": {
+      ""win"": 1,
+      ""kill"": 23,
+      ""death"": 22,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 21,
+        ""JumpedOn"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 8,
+        ""AIJIMMY 4"": 14
+      }
+    },
+    ""AIJIMMY 2"": {
+      ""win"": 0,
+      ""kill"": 14,
+      ""death"": 26,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 23,
+        ""JumpedOn"": 3
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 17,
+        ""AIJIMMY 3"": 9
+      }
+    }
+  },
+  ""total"": {
+    ""AIJIMMY 4"": {
+      ""win"": 3,
+      ""kill"": 31,
+      ""death"": 20,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 17,
+        ""JumpedOn"": 3
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 14,
+        ""AIJIMMY 2"": 6
+      }
+    },
+    ""AIJIMMY 3"": {
+      ""win"": 1,
+      ""kill"": 23,
+      ""death"": 22,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 21,
+        ""JumpedOn"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 8,
+        ""AIJIMMY 4"": 14
+      }
+    },
+    ""AIJIMMY 2"": {
+      ""win"": 0,
+      ""kill"": 14,
+      ""death"": 26,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 23,
+        ""JumpedOn"": 3
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 17,
+        ""AIJIMMY 3"": 9
+      }
+    }
+  },
+  ""date"": ""2026-01-17-20""
+}",,
+AIJIMMY 1-AIJIMMY 2-AIJIMMY 3-AIJIMMY 4,2026-01-18,"{
+  ""todayWin"": {
+    ""AIJIMMY 1"": 2,
+    ""AIJIMMY 4"": 2,
+    ""AIJIMMY 2"": 1,
+    ""AIJIMMY 3"": 1
+  },
+  ""totalWin"": {
+    ""AIJIMMY 1"": 2,
+    ""AIJIMMY 4"": 2,
+    ""AIJIMMY 2"": 1,
+    ""AIJIMMY 3"": 1
+  },
+  ""today"": {
+    ""AIJIMMY 3"": {
+      ""win"": 1,
+      ""kill"": 44,
+      ""death"": 42,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 33,
+        ""Explosion"": 1,
+        ""JumpedOn"": 7,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 1"": 15,
+        ""AIJIMMY 2"": 14,
+        ""AIJIMMY 3"": 2,
+        ""AIJIMMY 4"": 11
+      }
+    },
+    ""AIJIMMY 1"": {
+      ""win"": 2,
+      ""kill"": 37,
+      ""death"": 41,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 33,
+        ""Miasma"": 1,
+        ""JumpedOn"": 5,
+        ""SpikeBall"": 1,
+        ""Explosion"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 14,
+        ""AIJIMMY 3"": 14,
+        ""AIJIMMY 4"": 11
+      }
+    },
+    ""AIJIMMY 2"": {
+      ""win"": 1,
+      ""kill"": 42,
+      ""death"": 41,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 34,
+        ""JumpedOn"": 5,
+        ""SpikeBall"": 1,
+        ""Explosion"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 1"": 15,
+        ""AIJIMMY 3"": 12,
+        ""AIJIMMY 4"": 12,
+        ""AIJIMMY 2"": 1
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 2,
+      ""kill"": 34,
+      ""death"": 37,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 34,
+        ""Miasma"": 1,
+        ""JumpedOn"": 2
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 16,
+        ""AIJIMMY 1"": 7,
+        ""AIJIMMY 2"": 13
+      }
+    }
+  },
+  ""total"": {
+    ""AIJIMMY 3"": {
+      ""win"": 1,
+      ""kill"": 44,
+      ""death"": 42,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 33,
+        ""Explosion"": 1,
+        ""JumpedOn"": 7,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 1"": 15,
+        ""AIJIMMY 2"": 14,
+        ""AIJIMMY 3"": 2,
+        ""AIJIMMY 4"": 11
+      }
+    },
+    ""AIJIMMY 1"": {
+      ""win"": 2,
+      ""kill"": 37,
+      ""death"": 41,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 33,
+        ""Miasma"": 1,
+        ""JumpedOn"": 5,
+        ""SpikeBall"": 1,
+        ""Explosion"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 14,
+        ""AIJIMMY 3"": 14,
+        ""AIJIMMY 4"": 11
+      }
+    },
+    ""AIJIMMY 2"": {
+      ""win"": 1,
+      ""kill"": 42,
+      ""death"": 41,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 34,
+        ""JumpedOn"": 5,
+        ""SpikeBall"": 1,
+        ""Explosion"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 1"": 15,
+        ""AIJIMMY 3"": 12,
+        ""AIJIMMY 4"": 12,
+        ""AIJIMMY 2"": 1
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 2,
+      ""kill"": 34,
+      ""death"": 37,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 34,
+        ""Miasma"": 1,
+        ""JumpedOn"": 2
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 16,
+        ""AIJIMMY 1"": 7,
+        ""AIJIMMY 2"": 13
+      }
+    }
+  },
+  ""date"": ""2026-01-18-17""
+}",,
+AIJIMMY 2-AIJIMMY 3-P1,2026-01-18,"{
+  ""todayWin"": {
+    ""P1"": 6,
+    ""AIJIMMY 3"": 4,
+    ""AIJIMMY 2"": 9
+  },
+  ""totalWin"": {
+    ""P1"": 6,
+    ""AIJIMMY 3"": 4,
+    ""AIJIMMY 2"": 9
+  },
+  ""today"": {
+    ""P1"": {
+      ""win"": 6,
+      ""kill"": 108,
+      ""death"": 107,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 91,
+        ""JumpedOn"": 13,
+        ""FallingObject"": 1,
+        ""Explosion"": 2
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 58,
+        ""AIJIMMY 3"": 48,
+        ""P1"": 1
+      }
+    },
+    ""AIJIMMY 2"": {
+      ""win"": 9,
+      ""kill"": 127,
+      ""death"": 115,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 88,
+        ""Explosion"": 3,
+        ""SpikeBall"": 1,
+        ""JumpedOn"": 20,
+        ""Miasma"": 2,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""P1"": 55,
+        ""AIJIMMY 3"": 57
+      }
+    },
+    ""AIJIMMY 3"": {
+      ""win"": 4,
+      ""kill"": 106,
+      ""death"": 124,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 104,
+        ""Explosion"": 3,
+        ""Miasma"": 2,
+        ""JumpedOn"": 14,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 69,
+        ""P1"": 52,
+        ""AIJIMMY 3"": 1
+      }
+    }
+  },
+  ""total"": {
+    ""P1"": {
+      ""win"": 6,
+      ""kill"": 108,
+      ""death"": 107,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 91,
+        ""JumpedOn"": 13,
+        ""FallingObject"": 1,
+        ""Explosion"": 2
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 58,
+        ""AIJIMMY 3"": 48,
+        ""P1"": 1
+      }
+    },
+    ""AIJIMMY 2"": {
+      ""win"": 9,
+      ""kill"": 127,
+      ""death"": 115,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 88,
+        ""Explosion"": 3,
+        ""SpikeBall"": 1,
+        ""JumpedOn"": 20,
+        ""Miasma"": 2,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""P1"": 55,
+        ""AIJIMMY 3"": 57
+      }
+    },
+    ""AIJIMMY 3"": {
+      ""win"": 4,
+      ""kill"": 106,
+      ""death"": 124,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 104,
+        ""Explosion"": 3,
+        ""Miasma"": 2,
+        ""JumpedOn"": 14,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 69,
+        ""P1"": 52,
+        ""AIJIMMY 3"": 1
+      }
+    }
+  },
+  ""date"": ""2026-01-18-19""
+}",,
+AIJIMMY 2-AIJIMMY 3-AIJIMMY 4-P1,2026-01-19,"{
+  ""todayWin"": {
+    ""AIJIMMY 3"": 2,
+    ""AIJIMMY 4"": 1,
+    ""P1"": 1
+  },
+  ""totalWin"": {
+    ""AIJIMMY 3"": 2,
+    ""AIJIMMY 4"": 1,
+    ""P1"": 1
+  },
+  ""today"": {
+    ""AIJIMMY 4"": {
+      ""win"": 1,
+      ""kill"": 30,
+      ""death"": 37,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 30,
+        ""JumpedOn"": 5,
+        ""Explosion"": 2
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 15,
+        ""AIJIMMY 2"": 16,
+        ""AIJIMMY 4"": 3,
+        ""P1"": 3
+      }
+    },
+    ""AIJIMMY 3"": {
+      ""win"": 2,
+      ""kill"": 39,
+      ""death"": 31,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 25,
+        ""FallingObject"": 1,
+        ""JumpedOn"": 1,
+        ""Explosion"": 1,
+        ""Miasma"": 1,
+        ""Brambles"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 10,
+        ""AIJIMMY 3"": 1,
+        ""P1"": 9,
+        ""AIJIMMY 4"": 9
+      }
+    },
+    ""AIJIMMY 2"": {
+      ""win"": 0,
+      ""kill"": 32,
+      ""death"": 28,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 2,
+        ""Arrow"": 23,
+        ""Explosion"": 2,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""P1"": 9,
+        ""AIJIMMY 3"": 9,
+        ""AIJIMMY 4"": 9
+      }
+    },
+    ""P1"": {
+      ""win"": 1,
+      ""kill"": 22,
+      ""death"": 31,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 27,
+        ""JumpedOn"": 2,
+        ""Explosion"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 14,
+        ""AIJIMMY 2"": 6,
+        ""AIJIMMY 4"": 9,
+        ""P1"": 1
+      }
+    }
+  },
+  ""total"": {
+    ""AIJIMMY 4"": {
+      ""win"": 1,
+      ""kill"": 30,
+      ""death"": 37,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 30,
+        ""JumpedOn"": 5,
+        ""Explosion"": 2
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 15,
+        ""AIJIMMY 2"": 16,
+        ""AIJIMMY 4"": 3,
+        ""P1"": 3
+      }
+    },
+    ""AIJIMMY 3"": {
+      ""win"": 2,
+      ""kill"": 39,
+      ""death"": 31,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 25,
+        ""FallingObject"": 1,
+        ""JumpedOn"": 1,
+        ""Explosion"": 1,
+        ""Miasma"": 1,
+        ""Brambles"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 10,
+        ""AIJIMMY 3"": 1,
+        ""P1"": 9,
+        ""AIJIMMY 4"": 9
+      }
+    },
+    ""AIJIMMY 2"": {
+      ""win"": 0,
+      ""kill"": 32,
+      ""death"": 28,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 2,
+        ""Arrow"": 23,
+        ""Explosion"": 2,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""P1"": 9,
+        ""AIJIMMY 3"": 9,
+        ""AIJIMMY 4"": 9
+      }
+    },
+    ""P1"": {
+      ""win"": 1,
+      ""kill"": 22,
+      ""death"": 31,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 27,
+        ""JumpedOn"": 2,
+        ""Explosion"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 14,
+        ""AIJIMMY 2"": 6,
+        ""AIJIMMY 4"": 9,
+        ""P1"": 1
+      }
+    }
+  },
+  ""date"": ""2026-01-19-17""
+}",,
+ERIC-LOUIS,2026-01-21,"{
+  ""todayWin"": {
+    ""ERIC"": 3,
+    ""LOUIS"": 9
+  },
+  ""totalWin"": {
+    ""ERIC"": 13,
+    ""LOUIS"": 14
+  },
+  ""today"": {
+    ""ERIC"": {
+      ""win"": 3,
+      ""kill"": 82,
+      ""death"": 95,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 71,
+        ""JumpedOn"": 10,
+        ""Miasma"": 1,
+        ""Brambles"": 4,
+        ""Squish"": 3,
+        ""SpikeBall"": 1,
+        ""Explosion"": 5
+      },
+      ""killBy"": {
+        ""LOUIS"": 83,
+        ""ERIC"": 7
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 9,
+      ""kill"": 88,
+      ""death"": 81,
+      ""self"": 5,
+      ""killFrom"": {
+        ""Arrow"": 51,
+        ""JumpedOn"": 16,
+        ""Explosion"": 6,
+        ""Brambles"": 6,
+        ""Squish"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 75,
+        ""LOUIS"": 5
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 14,
+      ""kill"": 168,
+      ""death"": 187,
+      ""self"": 12,
+      ""killFrom"": {
+        ""Arrow"": 124,
+        ""JumpedOn"": 36,
+        ""Explosion"": 11,
+        ""Brambles"": 12,
+        ""Miasma"": 2,
+        ""Squish"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 12,
+        ""ERIC"": 172
+      }
+    },
+    ""ERIC"": {
+      ""win"": 13,
+      ""kill"": 181,
+      ""death"": 172,
+      ""self"": 9,
+      ""killFrom"": {
+        ""Arrow"": 132,
+        ""Explosion"": 10,
+        ""Brambles"": 5,
+        ""JumpedOn"": 18,
+        ""Squish"": 5,
+        ""Miasma"": 1,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 156,
+        ""ERIC"": 9
+      }
+    }
+  },
+  ""date"": ""2026-01-21-23""
+}",,
+ERIC-LOUIS,2026-01-22,"{
+  ""todayWin"": {
+    ""ERIC"": 5,
+    ""LOUIS"": 12
+  },
+  ""totalWin"": {
+    ""ERIC"": 15,
+    ""LOUIS"": 17
+  },
+  ""today"": {
+    ""ERIC"": {
+      ""win"": 5,
+      ""kill"": 122,
+      ""death"": 140,
+      ""self"": 8,
+      ""killFrom"": {
+        ""Arrow"": 108,
+        ""JumpedOn"": 16,
+        ""Miasma"": 1,
+        ""Brambles"": 5,
+        ""Squish"": 3,
+        ""SpikeBall"": 1,
+        ""Explosion"": 5,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 127,
+        ""ERIC"": 8
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 12,
+      ""kill"": 133,
+      ""death"": 123,
+      ""self"": 6,
+      ""killFrom"": {
+        ""Arrow"": 82,
+        ""JumpedOn"": 25,
+        ""Explosion"": 6,
+        ""Brambles"": 6,
+        ""Squish"": 1,
+        ""Lava"": 1,
+        ""Miasma"": 2
+      },
+      ""killBy"": {
+        ""ERIC"": 114,
+        ""LOUIS"": 6
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 17,
+      ""kill"": 213,
+      ""death"": 229,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Arrow"": 155,
+        ""JumpedOn"": 45,
+        ""Explosion"": 11,
+        ""Brambles"": 12,
+        ""Miasma"": 4,
+        ""Squish"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 13,
+        ""ERIC"": 211
+      }
+    },
+    ""ERIC"": {
+      ""win"": 15,
+      ""kill"": 221,
+      ""death"": 217,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 169,
+        ""Explosion"": 10,
+        ""Brambles"": 6,
+        ""JumpedOn"": 24,
+        ""Squish"": 5,
+        ""Miasma"": 1,
+        ""SpikeBall"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 200,
+        ""ERIC"": 10
+      }
+    }
+  },
+  ""date"": ""2026-01-22-00""
+}",,
+AIJIMMY 3-AIJIMMY 4-ERIC-LOUIS,2026-01-22,"{
+  ""todayWin"": {
+    ""AIJIMMY 3"": 1
+  },
+  ""totalWin"": {
+    ""AIJIMMY 3"": 1
+  },
+  ""today"": {
+    ""AIJIMMY 3"": {
+      ""win"": 1,
+      ""kill"": 21,
+      ""death"": 17,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 11,
+        ""Lava"": 1,
+        ""JumpedOn"": 5
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 3,
+        ""AIJIMMY 3"": 1,
+        ""LOUIS"": 10,
+        ""ERIC"": 3
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 0,
+      ""kill"": 13,
+      ""death"": 20,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 13,
+        ""JumpedOn"": 4,
+        ""Squish"": 2,
+        ""Shock"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 5,
+        ""AIJIMMY 3"": 7,
+        ""ERIC"": 6
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 0,
+      ""kill"": 21,
+      ""death"": 20,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 17,
+        ""JumpedOn"": 3
+      },
+      ""killBy"": {
+        ""ERIC"": 9,
+        ""AIJIMMY 4"": 4,
+        ""AIJIMMY 3"": 6,
+        ""LOUIS"": 1
+      }
+    },
+    ""ERIC"": {
+      ""win"": 0,
+      ""kill"": 18,
+      ""death"": 18,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 18
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 6,
+        ""AIJIMMY 3"": 7,
+        ""LOUIS"": 5
+      }
+    }
+  },
+  ""total"": {
+    ""AIJIMMY 3"": {
+      ""win"": 1,
+      ""kill"": 21,
+      ""death"": 17,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 11,
+        ""Lava"": 1,
+        ""JumpedOn"": 5
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 3,
+        ""AIJIMMY 3"": 1,
+        ""LOUIS"": 10,
+        ""ERIC"": 3
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 0,
+      ""kill"": 13,
+      ""death"": 20,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 13,
+        ""JumpedOn"": 4,
+        ""Squish"": 2,
+        ""Shock"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 5,
+        ""AIJIMMY 3"": 7,
+        ""ERIC"": 6
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 0,
+      ""kill"": 21,
+      ""death"": 20,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 17,
+        ""JumpedOn"": 3
+      },
+      ""killBy"": {
+        ""ERIC"": 9,
+        ""AIJIMMY 4"": 4,
+        ""AIJIMMY 3"": 6,
+        ""LOUIS"": 1
+      }
+    },
+    ""ERIC"": {
+      ""win"": 0,
+      ""kill"": 18,
+      ""death"": 18,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 18
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 6,
+        ""AIJIMMY 3"": 7,
+        ""LOUIS"": 5
+      }
+    }
+  },
+  ""date"": ""2026-01-22-00""
+}",,
+ERIC-JULIEN,2026-01-22,"{
+  ""todayWin"": {
+    ""ERIC"": 13,
+    ""JULIEN"": 5
+  },
+  ""totalWin"": {
+    ""ERIC"": 14,
+    ""JULIEN"": 5
+  },
+  ""today"": {
+    ""ERIC"": {
+      ""win"": 13,
+      ""kill"": 86,
+      ""death"": 67,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 48,
+        ""JumpedOn"": 13,
+        ""Explosion"": 4,
+        ""Lava"": 1,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""JULIEN"": 60,
+        ""ERIC"": 7
+      }
+    },
+    ""JULIEN"": {
+      ""win"": 5,
+      ""kill"": 68,
+      ""death"": 89,
+      ""self"": 8,
+      ""killFrom"": {
+        ""Arrow"": 68,
+        ""SpikeBall"": 1,
+        ""JumpedOn"": 11,
+        ""Miasma"": 1,
+        ""Explosion"": 6,
+        ""Squish"": 1,
+        ""FallingObject"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 79,
+        ""JULIEN"": 8
+      }
+    }
+  },
+  ""total"": {
+    ""ERIC"": {
+      ""win"": 14,
+      ""kill"": 86,
+      ""death"": 67,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 48,
+        ""JumpedOn"": 13,
+        ""Explosion"": 4,
+        ""Lava"": 1,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""JULIEN"": 60,
+        ""ERIC"": 7
+      }
+    },
+    ""JULIEN"": {
+      ""win"": 5,
+      ""kill"": 68,
+      ""death"": 89,
+      ""self"": 8,
+      ""killFrom"": {
+        ""Arrow"": 68,
+        ""SpikeBall"": 1,
+        ""JumpedOn"": 11,
+        ""Miasma"": 1,
+        ""Explosion"": 6,
+        ""Squish"": 1,
+        ""FallingObject"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 79,
+        ""JULIEN"": 8
+      }
+    }
+  },
+  ""date"": ""2026-01-22-20""
+}",,
+AIJIMMY 1-AIJIMMY 2-AIJIMMY 3-AIJIMMY 4,2026-01-22,"{
+  ""todayWin"": {
+    ""AIJIMMY 1"": 1,
+    ""AIJIMMY 2"": 0,
+    ""AIJIMMY 3"": 0,
+    ""AIJIMMY 4"": 0
+  },
+  ""totalWin"": {
+    ""AIJIMMY 1"": 3,
+    ""AIJIMMY 4"": 2,
+    ""AIJIMMY 2"": 1,
+    ""AIJIMMY 3"": 1
+  },
+  ""today"": {
+    ""AIJIMMY 1"": {
+      ""win"": 1,
+      ""kill"": 12,
+      ""death"": 6,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 6
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 2,
+        ""AIJIMMY 4"": 2,
+        ""AIJIMMY 1"": 1,
+        ""AIJIMMY 2"": 1
+      }
+    },
+    ""AIJIMMY 2"": {
+      ""win"": 0,
+      ""kill"": 6,
+      ""death"": 8,
+      ""self"": 0,
+      ""killFrom"": {
+        ""JumpedOn"": 2,
+        ""Arrow"": 6
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 4,
+        ""AIJIMMY 4"": 1,
+        ""AIJIMMY 1"": 3
+      }
+    },
+    ""AIJIMMY 3"": {
+      ""win"": 0,
+      ""kill"": 7,
+      ""death"": 8,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 8
+      },
+      ""killBy"": {
+        ""AIJIMMY 1"": 5,
+        ""AIJIMMY 2"": 2,
+        ""AIJIMMY 4"": 1
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 0,
+      ""kill"": 4,
+      ""death"": 7,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 6,
+        ""JumpedOn"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 1"": 3,
+        ""AIJIMMY 3"": 1,
+        ""AIJIMMY 2"": 3
+      }
+    }
+  },
+  ""total"": {
+    ""AIJIMMY 3"": {
+      ""win"": 1,
+      ""kill"": 51,
+      ""death"": 50,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 41,
+        ""Explosion"": 1,
+        ""JumpedOn"": 7,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 1"": 20,
+        ""AIJIMMY 2"": 16,
+        ""AIJIMMY 3"": 2,
+        ""AIJIMMY 4"": 12
+      }
+    },
+    ""AIJIMMY 1"": {
+      ""win"": 3,
+      ""kill"": 49,
+      ""death"": 47,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 39,
+        ""Miasma"": 1,
+        ""JumpedOn"": 5,
+        ""SpikeBall"": 1,
+        ""Explosion"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 15,
+        ""AIJIMMY 3"": 16,
+        ""AIJIMMY 4"": 13,
+        ""AIJIMMY 1"": 1
+      }
+    },
+    ""AIJIMMY 2"": {
+      ""win"": 1,
+      ""kill"": 48,
+      ""death"": 49,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 40,
+        ""JumpedOn"": 7,
+        ""SpikeBall"": 1,
+        ""Explosion"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 1"": 18,
+        ""AIJIMMY 3"": 16,
+        ""AIJIMMY 4"": 13,
+        ""AIJIMMY 2"": 1
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 2,
+      ""kill"": 38,
+      ""death"": 44,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 40,
+        ""Miasma"": 1,
+        ""JumpedOn"": 3
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 17,
+        ""AIJIMMY 1"": 10,
+        ""AIJIMMY 2"": 16
+      }
+    }
+  },
+  ""date"": ""2026-01-22-20""
+}",,
+BENOIT-JULIEN-LOUIS,2026-01-29,"{
+  ""todayWin"": {
+    ""BENOIT"": 3,
+    ""JULIEN"": 1,
+    ""LOUIS"": 2
+  },
+  ""totalWin"": {
+    ""BENOIT"": 3,
+    ""JULIEN"": 1,
+    ""LOUIS"": 2
+  },
+  ""today"": {
+    ""JULIEN"": {
+      ""win"": 1,
+      ""kill"": 39,
+      ""death"": 48,
+      ""self"": 4,
+      ""killFrom"": {
+        ""Arrow"": 34,
+        ""JumpedOn"": 10,
+        ""FallingObject"": 1,
+        ""Explosion"": 1,
+        ""Squish"": 1,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""BENOIT"": 25,
+        ""LOUIS"": 19,
+        ""JULIEN"": 4
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 3,
+      ""kill"": 46,
+      ""death"": 34,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 23,
+        ""JumpedOn"": 8,
+        ""Explosion"": 1,
+        ""Lava"": 1,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 16,
+        ""JULIEN"": 16,
+        ""BENOIT"": 2
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 2,
+      ""kill"": 38,
+      ""death"": 42,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 30,
+        ""JumpedOn"": 8,
+        ""Explosion"": 2,
+        ""Lava"": 1,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""BENOIT"": 19,
+        ""JULIEN"": 19,
+        ""LOUIS"": 3
+      }
+    }
+  },
+  ""total"": {
+    ""JULIEN"": {
+      ""win"": 1,
+      ""kill"": 39,
+      ""death"": 48,
+      ""self"": 4,
+      ""killFrom"": {
+        ""Arrow"": 34,
+        ""JumpedOn"": 10,
+        ""FallingObject"": 1,
+        ""Explosion"": 1,
+        ""Squish"": 1,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""BENOIT"": 25,
+        ""LOUIS"": 19,
+        ""JULIEN"": 4
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 3,
+      ""kill"": 46,
+      ""death"": 34,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 23,
+        ""JumpedOn"": 8,
+        ""Explosion"": 1,
+        ""Lava"": 1,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 16,
+        ""JULIEN"": 16,
+        ""BENOIT"": 2
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 2,
+      ""kill"": 38,
+      ""death"": 42,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 30,
+        ""JumpedOn"": 8,
+        ""Explosion"": 2,
+        ""Lava"": 1,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""BENOIT"": 19,
+        ""JULIEN"": 19,
+        ""LOUIS"": 3
+      }
+    }
+  },
+  ""date"": ""2026-01-29-23""
+}",,
+BENOIT-DAVID-JULIEN-LOUIS,2026-01-29,"{
+  ""todayWin"": {
+    ""DAVID"": 2,
+    ""LOUIS"": 1,
+    ""JULIEN"": 1,
+    ""BENOIT"": 2
+  },
+  ""totalWin"": {
+    ""DAVID"": 2,
+    ""LOUIS"": 1,
+    ""JULIEN"": 1,
+    ""BENOIT"": 2
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 1,
+      ""kill"": 47,
+      ""death"": 48,
+      ""self"": 5,
+      ""killFrom"": {
+        ""Arrow"": 40,
+        ""JumpedOn"": 5,
+        ""Explosion"": 3
+      },
+      ""killBy"": {
+        ""BENOIT"": 18,
+        ""JULIEN"": 15,
+        ""LOUIS"": 5,
+        ""DAVID"": 10
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 2,
+      ""kill"": 45,
+      ""death"": 42,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Explosion"": 1,
+        ""Arrow"": 37,
+        ""JumpedOn"": 4
+      },
+      ""killBy"": {
+        ""DAVID"": 18,
+        ""JULIEN"": 10,
+        ""LOUIS"": 14
+      }
+    },
+    ""JULIEN"": {
+      ""win"": 1,
+      ""kill"": 43,
+      ""death"": 48,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 38,
+        ""Explosion"": 3,
+        ""JumpedOn"": 7
+      },
+      ""killBy"": {
+        ""BENOIT"": 13,
+        ""DAVID"": 18,
+        ""JULIEN"": 2,
+        ""LOUIS"": 15
+      }
+    },
+    ""DAVID"": {
+      ""win"": 2,
+      ""kill"": 48,
+      ""death"": 45,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 33,
+        ""Explosion"": 2,
+        ""JumpedOn"": 10
+      },
+      ""killBy"": {
+        ""JULIEN"": 16,
+        ""LOUIS"": 13,
+        ""DAVID"": 2,
+        ""BENOIT"": 14
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 1,
+      ""kill"": 47,
+      ""death"": 48,
+      ""self"": 5,
+      ""killFrom"": {
+        ""Arrow"": 40,
+        ""JumpedOn"": 5,
+        ""Explosion"": 3
+      },
+      ""killBy"": {
+        ""BENOIT"": 18,
+        ""JULIEN"": 15,
+        ""LOUIS"": 5,
+        ""DAVID"": 10
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 2,
+      ""kill"": 45,
+      ""death"": 42,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Explosion"": 1,
+        ""Arrow"": 37,
+        ""JumpedOn"": 4
+      },
+      ""killBy"": {
+        ""DAVID"": 18,
+        ""JULIEN"": 10,
+        ""LOUIS"": 14
+      }
+    },
+    ""JULIEN"": {
+      ""win"": 1,
+      ""kill"": 43,
+      ""death"": 48,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 38,
+        ""Explosion"": 3,
+        ""JumpedOn"": 7
+      },
+      ""killBy"": {
+        ""BENOIT"": 13,
+        ""DAVID"": 18,
+        ""JULIEN"": 2,
+        ""LOUIS"": 15
+      }
+    },
+    ""DAVID"": {
+      ""win"": 2,
+      ""kill"": 48,
+      ""death"": 45,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 33,
+        ""Explosion"": 2,
+        ""JumpedOn"": 10
+      },
+      ""killBy"": {
+        ""JULIEN"": 16,
+        ""LOUIS"": 13,
+        ""DAVID"": 2,
+        ""BENOIT"": 14
+      }
+    }
+  },
+  ""date"": ""2026-01-29-23""
+}",,
+BENOIT-DAVID-JULIEN-LOUIS,2026-01-30,"{
+  ""todayWin"": {
+    ""DAVID"": 8,
+    ""LOUIS"": 3,
+    ""JULIEN"": 3,
+    ""BENOIT"": 4
+  },
+  ""totalWin"": {
+    ""DAVID"": 8,
+    ""LOUIS"": 3,
+    ""JULIEN"": 3,
+    ""BENOIT"": 4
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 3,
+      ""kill"": 148,
+      ""death"": 143,
+      ""self"": 8,
+      ""killFrom"": {
+        ""Arrow"": 109,
+        ""JumpedOn"": 25,
+        ""Explosion"": 7,
+        ""Miasma"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""BENOIT"": 43,
+        ""JULIEN"": 41,
+        ""LOUIS"": 8,
+        ""DAVID"": 50
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 4,
+      ""kill"": 129,
+      ""death"": 136,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Explosion"": 6,
+        ""Arrow"": 108,
+        ""JumpedOn"": 22
+      },
+      ""killBy"": {
+        ""DAVID"": 58,
+        ""JULIEN"": 32,
+        ""LOUIS"": 43,
+        ""BENOIT"": 3
+      }
+    },
+    ""JULIEN"": {
+      ""win"": 3,
+      ""kill"": 121,
+      ""death"": 145,
+      ""self"": 6,
+      ""killFrom"": {
+        ""Arrow"": 107,
+        ""Explosion"": 8,
+        ""JumpedOn"": 29,
+        ""FallingObject"": 1
+      },
+      ""killBy"": {
+        ""BENOIT"": 47,
+        ""DAVID"": 43,
+        ""JULIEN"": 6,
+        ""LOUIS"": 49
+      }
+    },
+    ""DAVID"": {
+      ""win"": 8,
+      ""kill"": 159,
+      ""death"": 134,
+      ""self"": 8,
+      ""killFrom"": {
+        ""Arrow"": 96,
+        ""Explosion"": 7,
+        ""JumpedOn"": 31
+      },
+      ""killBy"": {
+        ""JULIEN"": 42,
+        ""LOUIS"": 48,
+        ""DAVID"": 8,
+        ""BENOIT"": 36
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 3,
+      ""kill"": 148,
+      ""death"": 143,
+      ""self"": 8,
+      ""killFrom"": {
+        ""Arrow"": 109,
+        ""JumpedOn"": 25,
+        ""Explosion"": 7,
+        ""Miasma"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""BENOIT"": 43,
+        ""JULIEN"": 41,
+        ""LOUIS"": 8,
+        ""DAVID"": 50
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 4,
+      ""kill"": 129,
+      ""death"": 136,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Explosion"": 6,
+        ""Arrow"": 108,
+        ""JumpedOn"": 22
+      },
+      ""killBy"": {
+        ""DAVID"": 58,
+        ""JULIEN"": 32,
+        ""LOUIS"": 43,
+        ""BENOIT"": 3
+      }
+    },
+    ""JULIEN"": {
+      ""win"": 3,
+      ""kill"": 121,
+      ""death"": 145,
+      ""self"": 6,
+      ""killFrom"": {
+        ""Arrow"": 107,
+        ""Explosion"": 8,
+        ""JumpedOn"": 29,
+        ""FallingObject"": 1
+      },
+      ""killBy"": {
+        ""BENOIT"": 47,
+        ""DAVID"": 43,
+        ""JULIEN"": 6,
+        ""LOUIS"": 49
+      }
+    },
+    ""DAVID"": {
+      ""win"": 8,
+      ""kill"": 159,
+      ""death"": 134,
+      ""self"": 8,
+      ""killFrom"": {
+        ""Arrow"": 96,
+        ""Explosion"": 7,
+        ""JumpedOn"": 31
+      },
+      ""killBy"": {
+        ""JULIEN"": 42,
+        ""LOUIS"": 48,
+        ""DAVID"": 8,
+        ""BENOIT"": 36
+      }
+    }
+  },
+  ""date"": ""2026-01-30-00""
+}",,
+BENOIT-DAVID-LOUIS,2026-01-30,"{
+  ""todayWin"": {
+    ""LOUIS"": 8,
+    ""BENOIT"": 4,
+    ""DAVID"": 3
+  },
+  ""totalWin"": {
+    ""LOUIS"": 12,
+    ""DAVID"": 11,
+    ""BENOIT"": 4
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 8,
+      ""kill"": 95,
+      ""death"": 81,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 65,
+        ""JumpedOn"": 10,
+        ""Explosion"": 4,
+        ""SpikeBall"": 1,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""BENOIT"": 47,
+        ""DAVID"": 31,
+        ""LOUIS"": 2
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 4,
+      ""kill"": 90,
+      ""death"": 96,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 77,
+        ""JumpedOn"": 13,
+        ""Explosion"": 2,
+        ""SpikeBall"": 1,
+        ""Brambles"": 2,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 46,
+        ""LOUIS"": 46,
+        ""BENOIT"": 3
+      }
+    },
+    ""DAVID"": {
+      ""win"": 3,
+      ""kill"": 86,
+      ""death"": 97,
+      ""self"": 9,
+      ""killFrom"": {
+        ""Arrow"": 70,
+        ""Explosion"": 5,
+        ""JumpedOn"": 16,
+        ""Lava"": 1,
+        ""FallingObject"": 1,
+        ""Miasma"": 1,
+        ""Brambles"": 1,
+        ""Squish"": 2
+      },
+      ""killBy"": {
+        ""BENOIT"": 40,
+        ""LOUIS"": 47,
+        ""DAVID"": 9
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 12,
+      ""kill"": 164,
+      ""death"": 152,
+      ""self"": 5,
+      ""killFrom"": {
+        ""Arrow"": 127,
+        ""SpikeBall"": 2,
+        ""Brambles"": 2,
+        ""JumpedOn"": 17,
+        ""Explosion"": 4
+      },
+      ""killBy"": {
+        ""DAVID"": 73,
+        ""BENOIT"": 72,
+        ""LOUIS"": 5
+      }
+    },
+    ""DAVID"": {
+      ""win"": 11,
+      ""kill"": 185,
+      ""death"": 161,
+      ""self"": 15,
+      ""killFrom"": {
+        ""Arrow"": 120,
+        ""JumpedOn"": 22,
+        ""Brambles"": 5,
+        ""Explosion"": 7,
+        ""FallingObject"": 2,
+        ""Squish"": 3,
+        ""Lava"": 1,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""BENOIT"": 59,
+        ""LOUIS"": 86,
+        ""DAVID"": 15
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 4,
+      ""kill"": 141,
+      ""death"": 183,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 130,
+        ""JumpedOn"": 34,
+        ""SpikeBall"": 3,
+        ""Brambles"": 4,
+        ""Explosion"": 9,
+        ""FallingObject"": 1,
+        ""Squish"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 97,
+        ""LOUIS"": 73,
+        ""BENOIT"": 10
+      }
+    }
+  },
+  ""date"": ""2026-01-30-01""
+}",,
+AIJIMMY 1-AIJIMMY 3-AIJIMMY 4-ERIC,2026-01-30,"{
+  ""todayWin"": {
+    ""AIJIMMY 3"": 3,
+    ""AIJIMMY 4"": 1,
+    ""AIJIMMY 1"": 2,
+    ""ERIC"": 1
+  },
+  ""totalWin"": {
+    ""AIJIMMY 3"": 3,
+    ""AIJIMMY 4"": 1,
+    ""AIJIMMY 1"": 2,
+    ""ERIC"": 1
+  },
+  ""today"": {
+    ""AIJIMMY 3"": {
+      ""win"": 3,
+      ""kill"": 59,
+      ""death"": 60,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 47,
+        ""JumpedOn"": 10,
+        ""Miasma"": 3
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 17,
+        ""AIJIMMY 1"": 20,
+        ""ERIC"": 20
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 1,
+      ""kill"": 55,
+      ""death"": 52,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 42,
+        ""JumpedOn"": 8,
+        ""Explosion"": 1,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 16,
+        ""AIJIMMY 3"": 18,
+        ""AIJIMMY 1"": 16,
+        ""AIJIMMY 4"": 1
+      }
+    },
+    ""ERIC"": {
+      ""win"": 1,
+      ""kill"": 54,
+      ""death"": 61,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 51,
+        ""JumpedOn"": 9,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 3,
+        ""AIJIMMY 3"": 17,
+        ""AIJIMMY 1"": 21,
+        ""AIJIMMY 4"": 19
+      }
+    },
+    ""AIJIMMY 1"": {
+      ""win"": 2,
+      ""kill"": 58,
+      ""death"": 59,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 51,
+        ""JumpedOn"": 7,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 18,
+        ""AIJIMMY 3"": 24,
+        ""ERIC"": 15,
+        ""AIJIMMY 1"": 1
+      }
+    }
+  },
+  ""total"": {
+    ""AIJIMMY 3"": {
+      ""win"": 3,
+      ""kill"": 59,
+      ""death"": 60,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 47,
+        ""JumpedOn"": 10,
+        ""Miasma"": 3
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 17,
+        ""AIJIMMY 1"": 20,
+        ""ERIC"": 20
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 1,
+      ""kill"": 55,
+      ""death"": 52,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 42,
+        ""JumpedOn"": 8,
+        ""Explosion"": 1,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 16,
+        ""AIJIMMY 3"": 18,
+        ""AIJIMMY 1"": 16,
+        ""AIJIMMY 4"": 1
+      }
+    },
+    ""ERIC"": {
+      ""win"": 1,
+      ""kill"": 54,
+      ""death"": 61,
+      ""self"": 3,
+      ""killFrom"": {
+        ""Arrow"": 51,
+        ""JumpedOn"": 9,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 3,
+        ""AIJIMMY 3"": 17,
+        ""AIJIMMY 1"": 21,
+        ""AIJIMMY 4"": 19
+      }
+    },
+    ""AIJIMMY 1"": {
+      ""win"": 2,
+      ""kill"": 58,
+      ""death"": 59,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 51,
+        ""JumpedOn"": 7,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 18,
+        ""AIJIMMY 3"": 24,
+        ""ERIC"": 15,
+        ""AIJIMMY 1"": 1
+      }
+    }
+  },
+  ""date"": ""2026-01-30-19""
+}",,
+AIJIMMY 2-AIJIMMY 3-AIJIMMY 4-ERIC,2026-02-05,"{
+  ""todayWin"": {
+    ""AIJIMMY 2"": 2,
+    ""AIJIMMY 4"": 1,
+    ""AIJIMMY 3"": 3,
+    ""ERIC"": 4
+  },
+  ""totalWin"": {
+    ""AIJIMMY 2"": 2,
+    ""AIJIMMY 4"": 1,
+    ""AIJIMMY 3"": 3,
+    ""ERIC"": 4
+  },
+  ""today"": {
+    ""AIJIMMY 2"": {
+      ""win"": 2,
+      ""kill"": 64,
+      ""death"": 77,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 67,
+        ""JumpedOn"": 8,
+        ""Brambles"": 1,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 29,
+        ""AIJIMMY 4"": 27,
+        ""AIJIMMY 3"": 18,
+        ""AIJIMMY 2"": 2
+      }
+    },
+    ""ERIC"": {
+      ""win"": 4,
+      ""kill"": 85,
+      ""death"": 60,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 53,
+        ""JumpedOn"": 7
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 18,
+        ""AIJIMMY 3"": 17,
+        ""AIJIMMY 4"": 24,
+        ""ERIC"": 1
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 1,
+      ""kill"": 72,
+      ""death"": 77,
+      ""self"": 2,
+      ""killFrom"": {
+        ""JumpedOn"": 10,
+        ""Arrow"": 64,
+        ""Brambles"": 1,
+        ""Squish"": 1,
+        ""Explosion"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 29,
+        ""AIJIMMY 2"": 18,
+        ""ERIC"": 27,
+        ""AIJIMMY 4"": 2
+      }
+    },
+    ""AIJIMMY 3"": {
+      ""win"": 3,
+      ""kill"": 65,
+      ""death"": 74,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 61,
+        ""JumpedOn"": 11,
+        ""Explosion"": 1,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 19,
+        ""AIJIMMY 2"": 26,
+        ""ERIC"": 28,
+        ""AIJIMMY 3"": 1
+      }
+    }
+  },
+  ""total"": {
+    ""AIJIMMY 2"": {
+      ""win"": 2,
+      ""kill"": 64,
+      ""death"": 77,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 67,
+        ""JumpedOn"": 8,
+        ""Brambles"": 1,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 29,
+        ""AIJIMMY 4"": 27,
+        ""AIJIMMY 3"": 18,
+        ""AIJIMMY 2"": 2
+      }
+    },
+    ""ERIC"": {
+      ""win"": 4,
+      ""kill"": 85,
+      ""death"": 60,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 53,
+        ""JumpedOn"": 7
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 18,
+        ""AIJIMMY 3"": 17,
+        ""AIJIMMY 4"": 24,
+        ""ERIC"": 1
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 1,
+      ""kill"": 72,
+      ""death"": 77,
+      ""self"": 2,
+      ""killFrom"": {
+        ""JumpedOn"": 10,
+        ""Arrow"": 64,
+        ""Brambles"": 1,
+        ""Squish"": 1,
+        ""Explosion"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 29,
+        ""AIJIMMY 2"": 18,
+        ""ERIC"": 27,
+        ""AIJIMMY 4"": 2
+      }
+    },
+    ""AIJIMMY 3"": {
+      ""win"": 3,
+      ""kill"": 65,
+      ""death"": 74,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 61,
+        ""JumpedOn"": 11,
+        ""Explosion"": 1,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 19,
+        ""AIJIMMY 2"": 26,
+        ""ERIC"": 28,
+        ""AIJIMMY 3"": 1
+      }
+    }
+  },
+  ""date"": ""2026-02-05-16""
+}",,
+DAVID-ERIC-LOUIS,2026-02-05,"{
+  ""todayWin"": {
+    ""LOUIS"": 11,
+    ""ERIC"": 6,
+    ""DAVID"": 10
+  },
+  ""totalWin"": {
+    ""LOUIS"": 194,
+    ""DAVID"": 178,
+    ""ERIC"": 188
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 11,
+      ""kill"": 165,
+      ""death"": 153,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 112,
+        ""Squish"": 1,
+        ""JumpedOn"": 29,
+        ""Explosion"": 6,
+        ""SpikeBall"": 2,
+        ""Lava"": 2,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 68,
+        ""LOUIS"": 7,
+        ""DAVID"": 76
+      }
+    },
+    ""ERIC"": {
+      ""win"": 6,
+      ""kill"": 146,
+      ""death"": 174,
+      ""self"": 8,
+      ""killFrom"": {
+        ""Arrow"": 132,
+        ""Explosion"": 8,
+        ""JumpedOn"": 30,
+        ""Brambles"": 3,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 83,
+        ""DAVID"": 82,
+        ""ERIC"": 8
+      }
+    },
+    ""DAVID"": {
+      ""win"": 10,
+      ""kill"": 170,
+      ""death"": 159,
+      ""self"": 12,
+      ""killFrom"": {
+        ""Arrow"": 122,
+        ""Brambles"": 6,
+        ""JumpedOn"": 19,
+        ""Explosion"": 9,
+        ""Shock"": 1,
+        ""Squish"": 1,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 70,
+        ""LOUIS"": 75,
+        ""DAVID"": 12
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 194,
+      ""kill"": 699,
+      ""death"": 698,
+      ""self"": 45,
+      ""killFrom"": {
+        ""Lava"": 7,
+        ""Arrow"": 517,
+        ""JumpedOn"": 124,
+        ""Explosion"": 30,
+        ""FallingObject"": 2,
+        ""Shock"": 1,
+        ""Brambles"": 12,
+        ""Squish"": 2,
+        ""SpikeBall"": 3
+      },
+      ""killBy"": {
+        ""ERIC"": 322,
+        ""DAVID"": 327,
+        ""LOUIS"": 45
+      }
+    },
+    ""DAVID"": {
+      ""win"": 178,
+      ""kill"": 703,
+      ""death"": 678,
+      ""self"": 50,
+      ""killFrom"": {
+        ""Arrow"": 509,
+        ""JumpedOn"": 100,
+        ""Brambles"": 18,
+        ""Lava"": 5,
+        ""Explosion"": 36,
+        ""Squish"": 5,
+        ""SpikeBall"": 2,
+        ""Shock"": 2,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 321,
+        ""LOUIS"": 300,
+        ""DAVID"": 50
+      }
+    },
+    ""ERIC"": {
+      ""win"": 188,
+      ""kill"": 681,
+      ""death"": 724,
+      ""self"": 38,
+      ""killFrom"": {
+        ""Arrow"": 554,
+        ""Explosion"": 30,
+        ""JumpedOn"": 115,
+        ""Brambles"": 15,
+        ""Miasma"": 1,
+        ""Lava"": 2,
+        ""Squish"": 4,
+        ""Shock"": 2,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 354,
+        ""ERIC"": 38,
+        ""DAVID"": 326
+      }
+    }
+  },
+  ""date"": ""2026-02-05-23""
+}",,
+AIJIMMY 1-AIJIMMY 2-AIJIMMY 3-AIJIMMY 4,2026-02-05,"{
+  ""todayWin"": {
+    ""AIJIMMY 1"": 0,
+    ""AIJIMMY 2"": 0,
+    ""AIJIMMY 3"": 0,
+    ""AIJIMMY 4"": 1
+  },
+  ""totalWin"": {
+    ""AIJIMMY 1"": 3,
+    ""AIJIMMY 4"": 3,
+    ""AIJIMMY 2"": 1,
+    ""AIJIMMY 3"": 1
+  },
+  ""today"": {
+    ""AIJIMMY 1"": {
+      ""win"": 0,
+      ""kill"": 9,
+      ""death"": 9,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 8,
+        ""JumpedOn"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 2,
+        ""AIJIMMY 3"": 4,
+        ""AIJIMMY 4"": 3
+      }
+    },
+    ""AIJIMMY 2"": {
+      ""win"": 0,
+      ""kill"": 10,
+      ""death"": 9,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 7,
+        ""JumpedOn"": 2
+      },
+      ""killBy"": {
+        ""AIJIMMY 4"": 2,
+        ""AIJIMMY 3"": 3,
+        ""AIJIMMY 2"": 1,
+        ""AIJIMMY 1"": 3
+      }
+    },
+    ""AIJIMMY 3"": {
+      ""win"": 0,
+      ""kill"": 9,
+      ""death"": 12,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 9,
+        ""JumpedOn"": 3
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 3,
+        ""AIJIMMY 1"": 4,
+        ""AIJIMMY 4"": 5
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 1,
+      ""kill"": 10,
+      ""death"": 8,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 7,
+        ""JumpedOn"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 4,
+        ""AIJIMMY 3"": 2,
+        ""AIJIMMY 1"": 2
+      }
+    }
+  },
+  ""total"": {
+    ""AIJIMMY 3"": {
+      ""win"": 1,
+      ""kill"": 60,
+      ""death"": 62,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 50,
+        ""Explosion"": 1,
+        ""JumpedOn"": 10,
+        ""Brambles"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 1"": 24,
+        ""AIJIMMY 2"": 19,
+        ""AIJIMMY 3"": 2,
+        ""AIJIMMY 4"": 17
+      }
+    },
+    ""AIJIMMY 1"": {
+      ""win"": 3,
+      ""kill"": 58,
+      ""death"": 56,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 47,
+        ""Miasma"": 1,
+        ""JumpedOn"": 6,
+        ""SpikeBall"": 1,
+        ""Explosion"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 2"": 17,
+        ""AIJIMMY 3"": 20,
+        ""AIJIMMY 4"": 16,
+        ""AIJIMMY 1"": 1
+      }
+    },
+    ""AIJIMMY 2"": {
+      ""win"": 1,
+      ""kill"": 58,
+      ""death"": 58,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 47,
+        ""JumpedOn"": 9,
+        ""SpikeBall"": 1,
+        ""Explosion"": 1
+      },
+      ""killBy"": {
+        ""AIJIMMY 1"": 21,
+        ""AIJIMMY 3"": 19,
+        ""AIJIMMY 4"": 15,
+        ""AIJIMMY 2"": 2
+      }
+    },
+    ""AIJIMMY 4"": {
+      ""win"": 3,
+      ""kill"": 48,
+      ""death"": 52,
+      ""self"": 0,
+      ""killFrom"": {
+        ""Arrow"": 47,
+        ""Miasma"": 1,
+        ""JumpedOn"": 4
+      },
+      ""killBy"": {
+        ""AIJIMMY 3"": 19,
+        ""AIJIMMY 1"": 12,
+        ""AIJIMMY 2"": 20
+      }
+    }
+  },
+  ""date"": ""2026-02-05-23""
+}",,
+DAVID-ERIC-LOUIS,2026-02-06,"{
+  ""todayWin"": {
+    ""LOUIS"": 17,
+    ""ERIC"": 8,
+    ""DAVID"": 15
+  },
+  ""totalWin"": {
+    ""LOUIS"": 200,
+    ""DAVID"": 183,
+    ""ERIC"": 190
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 17,
+      ""kill"": 253,
+      ""death"": 234,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Arrow"": 181,
+        ""Squish"": 1,
+        ""JumpedOn"": 36,
+        ""Explosion"": 9,
+        ""SpikeBall"": 2,
+        ""Lava"": 2,
+        ""Brambles"": 3
+      },
+      ""killBy"": {
+        ""ERIC"": 103,
+        ""LOUIS"": 13,
+        ""DAVID"": 116
+      }
+    },
+    ""ERIC"": {
+      ""win"": 8,
+      ""kill"": 214,
+      ""death"": 262,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Arrow"": 198,
+        ""Explosion"": 14,
+        ""JumpedOn"": 45,
+        ""Brambles"": 3,
+        ""Squish"": 1,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 121,
+        ""DAVID"": 126,
+        ""ERIC"": 13
+      }
+    },
+    ""DAVID"": {
+      ""win"": 15,
+      ""kill"": 262,
+      ""death"": 241,
+      ""self"": 20,
+      ""killFrom"": {
+        ""Arrow"": 184,
+        ""Brambles"": 6,
+        ""JumpedOn"": 29,
+        ""Explosion"": 15,
+        ""Shock"": 1,
+        ""Squish"": 1,
+        ""Miasma"": 2,
+        ""FallingObject"": 2,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 98,
+        ""LOUIS"": 119,
+        ""DAVID"": 20
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 200,
+      ""kill"": 787,
+      ""death"": 779,
+      ""self"": 51,
+      ""killFrom"": {
+        ""Lava"": 7,
+        ""Arrow"": 586,
+        ""JumpedOn"": 131,
+        ""Explosion"": 33,
+        ""FallingObject"": 2,
+        ""Shock"": 1,
+        ""Brambles"": 14,
+        ""Squish"": 2,
+        ""SpikeBall"": 3
+      },
+      ""killBy"": {
+        ""ERIC"": 357,
+        ""DAVID"": 367,
+        ""LOUIS"": 51
+      }
+    },
+    ""DAVID"": {
+      ""win"": 183,
+      ""kill"": 795,
+      ""death"": 760,
+      ""self"": 58,
+      ""killFrom"": {
+        ""Arrow"": 571,
+        ""JumpedOn"": 110,
+        ""Brambles"": 18,
+        ""Lava"": 5,
+        ""Explosion"": 42,
+        ""Squish"": 5,
+        ""SpikeBall"": 3,
+        ""Shock"": 2,
+        ""Miasma"": 2,
+        ""FallingObject"": 2
+      },
+      ""killBy"": {
+        ""ERIC"": 349,
+        ""LOUIS"": 344,
+        ""DAVID"": 58
+      }
+    },
+    ""ERIC"": {
+      ""win"": 190,
+      ""kill"": 749,
+      ""death"": 812,
+      ""self"": 43,
+      ""killFrom"": {
+        ""Arrow"": 620,
+        ""Explosion"": 36,
+        ""JumpedOn"": 130,
+        ""Brambles"": 15,
+        ""Miasma"": 1,
+        ""Lava"": 2,
+        ""Squish"": 4,
+        ""Shock"": 2,
+        ""SpikeBall"": 2
+      },
+      ""killBy"": {
+        ""LOUIS"": 392,
+        ""ERIC"": 43,
+        ""DAVID"": 370
+      }
+    }
+  },
+  ""date"": ""2026-02-06-00""
+}",,
+DAVID-ERIC-LOUIS,2026-02-13,"{
+  ""todayWin"": {
+    ""ERIC"": 10,
+    ""DAVID"": 20,
+    ""LOUIS"": 16
+  },
+  ""totalWin"": {
+    ""LOUIS"": 216,
+    ""DAVID"": 203,
+    ""ERIC"": 200
+  },
+  ""today"": {
+    ""ERIC"": {
+      ""win"": 10,
+      ""kill"": 252,
+      ""death"": 300,
+      ""self"": 16,
+      ""killFrom"": {
+        ""Arrow"": 221,
+        ""JumpedOn"": 48,
+        ""Brambles"": 7,
+        ""Explosion"": 17,
+        ""Lava"": 1,
+        ""Squish"": 4,
+        ""FallingObject"": 1,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 135,
+        ""DAVID"": 145,
+        ""ERIC"": 16
+      }
+    },
+    ""DAVID"": {
+      ""win"": 20,
+      ""kill"": 300,
+      ""death"": 266,
+      ""self"": 16,
+      ""killFrom"": {
+        ""Arrow"": 200,
+        ""Brambles"": 12,
+        ""JumpedOn"": 36,
+        ""Explosion"": 9,
+        ""Lava"": 2,
+        ""SpikeBall"": 4,
+        ""Squish"": 2,
+        ""Shock"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 101,
+        ""LOUIS"": 143,
+        ""DAVID"": 16
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 16,
+      ""kill"": 292,
+      ""death"": 292,
+      ""self"": 14,
+      ""killFrom"": {
+        ""Arrow"": 207,
+        ""JumpedOn"": 56,
+        ""Brambles"": 9,
+        ""Explosion"": 12,
+        ""SpikeBall"": 2,
+        ""Lava"": 2,
+        ""FallingObject"": 2,
+        ""Squish"": 2
+      },
+      ""killBy"": {
+        ""ERIC"": 135,
+        ""DAVID"": 139,
+        ""LOUIS"": 14
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 216,
+      ""kill"": 1079,
+      ""death"": 1071,
+      ""self"": 65,
+      ""killFrom"": {
+        ""Lava"": 9,
+        ""Arrow"": 793,
+        ""JumpedOn"": 187,
+        ""Explosion"": 45,
+        ""FallingObject"": 4,
+        ""Shock"": 1,
+        ""Brambles"": 23,
+        ""Squish"": 4,
+        ""SpikeBall"": 5
+      },
+      ""killBy"": {
+        ""ERIC"": 492,
+        ""DAVID"": 506,
+        ""LOUIS"": 65
+      }
+    },
+    ""DAVID"": {
+      ""win"": 203,
+      ""kill"": 1095,
+      ""death"": 1026,
+      ""self"": 74,
+      ""killFrom"": {
+        ""Arrow"": 771,
+        ""JumpedOn"": 146,
+        ""Brambles"": 30,
+        ""Lava"": 7,
+        ""Explosion"": 51,
+        ""Squish"": 7,
+        ""SpikeBall"": 7,
+        ""Shock"": 3,
+        ""Miasma"": 2,
+        ""FallingObject"": 2
+      },
+      ""killBy"": {
+        ""ERIC"": 450,
+        ""LOUIS"": 487,
+        ""DAVID"": 74
+      }
+    },
+    ""ERIC"": {
+      ""win"": 200,
+      ""kill"": 1001,
+      ""death"": 1112,
+      ""self"": 59,
+      ""killFrom"": {
+        ""Arrow"": 841,
+        ""Explosion"": 53,
+        ""JumpedOn"": 178,
+        ""Brambles"": 22,
+        ""Miasma"": 1,
+        ""Lava"": 3,
+        ""Squish"": 8,
+        ""Shock"": 2,
+        ""SpikeBall"": 3,
+        ""FallingObject"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 527,
+        ""ERIC"": 59,
+        ""DAVID"": 515
+      }
+    }
+  },
+  ""date"": ""2026-02-13-23""
+}",,
+BENOIT-DAVID-ERIC-LOUIS,2026-02-14,"{
+  ""todayWin"": {
+    ""ERIC"": 11,
+    ""DAVID"": 8,
+    ""LOUIS"": 6,
+    ""BENOIT"": 3
+  },
+  ""totalWin"": {
+    ""DAVID"": 13,
+    ""LOUIS"": 12,
+    ""ERIC"": 15,
+    ""BENOIT"": 4
+  },
+  ""today"": {
+    ""ERIC"": {
+      ""win"": 11,
+      ""kill"": 232,
+      ""death"": 195,
+      ""self"": 11,
+      ""killFrom"": {
+        ""Arrow"": 147,
+        ""Explosion"": 13,
+        ""JumpedOn"": 32,
+        ""Brambles"": 2,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 68,
+        ""BENOIT"": 60,
+        ""ERIC"": 11,
+        ""DAVID"": 55
+      }
+    },
+    ""DAVID"": {
+      ""win"": 8,
+      ""kill"": 217,
+      ""death"": 197,
+      ""self"": 12,
+      ""killFrom"": {
+        ""JumpedOn"": 36,
+        ""Arrow"": 144,
+        ""FallingObject"": 2,
+        ""SpikeBall"": 2,
+        ""Explosion"": 8,
+        ""Lava"": 1,
+        ""Brambles"": 3,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""BENOIT"": 51,
+        ""LOUIS"": 60,
+        ""ERIC"": 72,
+        ""DAVID"": 12
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 6,
+      ""kill"": 201,
+      ""death"": 218,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 157,
+        ""JumpedOn"": 38,
+        ""Explosion"": 12,
+        ""Brambles"": 5,
+        ""FallingObject"": 3,
+        ""Lava"": 1,
+        ""Shock"": 2
+      },
+      ""killBy"": {
+        ""BENOIT"": 58,
+        ""DAVID"": 73,
+        ""ERIC"": 77,
+        ""LOUIS"": 10
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 3,
+      ""kill"": 176,
+      ""death"": 222,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 154,
+        ""JumpedOn"": 45,
+        ""Shock"": 1,
+        ""Squish"": 3,
+        ""Explosion"": 14,
+        ""Brambles"": 1,
+        ""Lava"": 3,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 63,
+        ""ERIC"": 72,
+        ""DAVID"": 77,
+        ""BENOIT"": 7
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 12,
+      ""kill"": 302,
+      ""death"": 337,
+      ""self"": 12,
+      ""killFrom"": {
+        ""Arrow"": 245,
+        ""JumpedOn"": 64,
+        ""FallingObject"": 4,
+        ""Explosion"": 13,
+        ""Brambles"": 6,
+        ""Squish"": 2,
+        ""Lava"": 1,
+        ""Shock"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 122,
+        ""ERIC"": 114,
+        ""BENOIT"": 87,
+        ""LOUIS"": 12
+      }
+    },
+    ""DAVID"": {
+      ""win"": 13,
+      ""kill"": 351,
+      ""death"": 306,
+      ""self"": 19,
+      ""killFrom"": {
+        ""Arrow"": 220,
+        ""JumpedOn"": 61,
+        ""Squish"": 3,
+        ""FallingObject"": 4,
+        ""Lava"": 2,
+        ""Explosion"": 10,
+        ""Brambles"": 4,
+        ""SpikeBall"": 2
+      },
+      ""killBy"": {
+        ""ERIC"": 112,
+        ""LOUIS"": 95,
+        ""DAVID"": 19,
+        ""BENOIT"": 76
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 4,
+      ""kill"": 272,
+      ""death"": 337,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 252,
+        ""JumpedOn"": 55,
+        ""Explosion"": 18,
+        ""Brambles"": 3,
+        ""Squish"": 4,
+        ""Shock"": 1,
+        ""Lava"": 3,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 117,
+        ""ERIC"": 112,
+        ""LOUIS"": 94,
+        ""BENOIT"": 10
+      }
+    },
+    ""ERIC"": {
+      ""win"": 15,
+      ""kill"": 352,
+      ""death"": 309,
+      ""self"": 14,
+      ""killFrom"": {
+        ""Arrow"": 232,
+        ""JumpedOn"": 53,
+        ""Squish"": 1,
+        ""Shock"": 1,
+        ""Explosion"": 15,
+        ""Brambles"": 6,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 93,
+        ""BENOIT"": 99,
+        ""LOUIS"": 101,
+        ""ERIC"": 14
+      }
+    }
+  },
+  ""date"": ""2026-02-14-02""
+}",,
+DAVID-ERIC-LOUIS,2026-02-17,"{
+  ""todayWin"": {
+    ""LOUIS"": 2,
+    ""ERIC"": 1,
+    ""DAVID"": 2
+  },
+  ""totalWin"": {
+    ""LOUIS"": 218,
+    ""DAVID"": 205,
+    ""ERIC"": 201
+  },
+  ""today"": {
+    ""LOUIS"": {
+      ""win"": 2,
+      ""kill"": 27,
+      ""death"": 29,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Arrow"": 22,
+        ""JumpedOn"": 3,
+        ""Explosion"": 3,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 15,
+        ""ERIC"": 12,
+        ""LOUIS"": 1
+      }
+    },
+    ""ERIC"": {
+      ""win"": 1,
+      ""kill"": 24,
+      ""death"": 30,
+      ""self"": 1,
+      ""killFrom"": {
+        ""Explosion"": 2,
+        ""Arrow"": 24,
+        ""Brambles"": 2,
+        ""JumpedOn"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 18,
+        ""LOUIS"": 11,
+        ""ERIC"": 1
+      }
+    },
+    ""DAVID"": {
+      ""win"": 2,
+      ""kill"": 35,
+      ""death"": 28,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 22,
+        ""Explosion"": 3,
+        ""JumpedOn"": 3
+      },
+      ""killBy"": {
+        ""LOUIS"": 15,
+        ""ERIC"": 11,
+        ""DAVID"": 2
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 218,
+      ""kill"": 1106,
+      ""death"": 1100,
+      ""self"": 66,
+      ""killFrom"": {
+        ""Lava"": 9,
+        ""Arrow"": 815,
+        ""JumpedOn"": 190,
+        ""Explosion"": 48,
+        ""FallingObject"": 4,
+        ""Shock"": 1,
+        ""Brambles"": 23,
+        ""Squish"": 5,
+        ""SpikeBall"": 5
+      },
+      ""killBy"": {
+        ""ERIC"": 504,
+        ""DAVID"": 521,
+        ""LOUIS"": 66
+      }
+    },
+    ""DAVID"": {
+      ""win"": 205,
+      ""kill"": 1130,
+      ""death"": 1054,
+      ""self"": 76,
+      ""killFrom"": {
+        ""Arrow"": 793,
+        ""JumpedOn"": 149,
+        ""Brambles"": 30,
+        ""Lava"": 7,
+        ""Explosion"": 54,
+        ""Squish"": 7,
+        ""SpikeBall"": 7,
+        ""Shock"": 3,
+        ""Miasma"": 2,
+        ""FallingObject"": 2
+      },
+      ""killBy"": {
+        ""ERIC"": 461,
+        ""LOUIS"": 502,
+        ""DAVID"": 76
+      }
+    },
+    ""ERIC"": {
+      ""win"": 201,
+      ""kill"": 1025,
+      ""death"": 1142,
+      ""self"": 60,
+      ""killFrom"": {
+        ""Arrow"": 865,
+        ""Explosion"": 55,
+        ""JumpedOn"": 180,
+        ""Brambles"": 24,
+        ""Miasma"": 1,
+        ""Lava"": 3,
+        ""Squish"": 8,
+        ""Shock"": 2,
+        ""SpikeBall"": 3,
+        ""FallingObject"": 1
+      },
+      ""killBy"": {
+        ""LOUIS"": 538,
+        ""ERIC"": 60,
+        ""DAVID"": 533
+      }
+    }
+  },
+  ""date"": ""2026-02-17-22""
+}",,
+DAVID-ERIC-LOUIS-MEHDI,2026-02-17,"{
+  ""todayWin"": {
+    ""ERIC"": 8,
+    ""DAVID"": 6,
+    ""MEHDI"": 2,
+    ""LOUIS"": 5
+  },
+  ""totalWin"": {
+    ""LOUIS"": 11,
+    ""ERIC"": 16,
+    ""DAVID"": 16,
+    ""MEHDI"": 2
+  },
+  ""today"": {
+    ""ERIC"": {
+      ""win"": 8,
+      ""kill"": 178,
+      ""death"": 140,
+      ""self"": 7,
+      ""killFrom"": {
+        ""Arrow"": 103,
+        ""JumpedOn"": 27,
+        ""Squish"": 2,
+        ""FallingObject"": 2,
+        ""Brambles"": 2,
+        ""Explosion"": 3,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 49,
+        ""MEHDI"": 30,
+        ""LOUIS"": 54,
+        ""ERIC"": 7
+      }
+    },
+    ""DAVID"": {
+      ""win"": 6,
+      ""kill"": 160,
+      ""death"": 145,
+      ""self"": 6,
+      ""killFrom"": {
+        ""JumpedOn"": 25,
+        ""Arrow"": 116,
+        ""Lava"": 1,
+        ""Explosion"": 3
+      },
+      ""killBy"": {
+        ""ERIC"": 53,
+        ""MEHDI"": 38,
+        ""DAVID"": 6,
+        ""LOUIS"": 48
+      }
+    },
+    ""MEHDI"": {
+      ""win"": 2,
+      ""kill"": 114,
+      ""death"": 173,
+      ""self"": 2,
+      ""killFrom"": {
+        ""Arrow"": 139,
+        ""JumpedOn"": 30,
+        ""FallingObject"": 1,
+        ""Squish"": 1,
+        ""Shock"": 1,
+        ""Explosion"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 56,
+        ""ERIC"": 65,
+        ""LOUIS"": 49,
+        ""MEHDI"": 2
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 5,
+      ""kill"": 159,
+      ""death"": 154,
+      ""self"": 8,
+      ""killFrom"": {
+        ""Arrow"": 109,
+        ""JumpedOn"": 38,
+        ""Squish"": 1,
+        ""Brambles"": 1,
+        ""FallingObject"": 1,
+        ""Explosion"": 4
+      },
+      ""killBy"": {
+        ""MEHDI"": 44,
+        ""ERIC"": 53,
+        ""DAVID"": 49,
+        ""LOUIS"": 8
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 11,
+      ""kill"": 354,
+      ""death"": 327,
+      ""self"": 17,
+      ""killFrom"": {
+        ""Arrow"": 238,
+        ""JumpedOn"": 69,
+        ""Brambles"": 2,
+        ""Explosion"": 13,
+        ""FallingObject"": 3,
+        ""Squish"": 2
+      },
+      ""killBy"": {
+        ""ERIC"": 113,
+        ""MEHDI"": 80,
+        ""DAVID"": 116,
+        ""LOUIS"": 17
+      }
+    },
+    ""ERIC"": {
+      ""win"": 16,
+      ""kill"": 375,
+      ""death"": 316,
+      ""self"": 14,
+      ""killFrom"": {
+        ""JumpedOn"": 55,
+        ""Explosion"": 10,
+        ""Arrow"": 239,
+        ""Brambles"": 5,
+        ""Lava"": 2,
+        ""Squish"": 3,
+        ""FallingObject"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 120,
+        ""MEHDI"": 59,
+        ""LOUIS"": 123,
+        ""ERIC"": 14
+      }
+    },
+    ""DAVID"": {
+      ""win"": 16,
+      ""kill"": 377,
+      ""death"": 300,
+      ""self"": 16,
+      ""killFrom"": {
+        ""Arrow"": 238,
+        ""Explosion"": 8,
+        ""JumpedOn"": 48,
+        ""Squish"": 2,
+        ""Brambles"": 2,
+        ""Lava"": 2
+      },
+      ""killBy"": {
+        ""MEHDI"": 70,
+        ""ERIC"": 112,
+        ""LOUIS"": 101,
+        ""DAVID"": 16
+      }
+    },
+    ""MEHDI"": {
+      ""win"": 2,
+      ""kill"": 221,
+      ""death"": 387,
+      ""self"": 12,
+      ""killFrom"": {
+        ""JumpedOn"": 69,
+        ""Arrow"": 305,
+        ""Squish"": 3,
+        ""FallingObject"": 2,
+        ""Explosion"": 5,
+        ""Lava"": 2,
+        ""Shock"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 125,
+        ""ERIC"": 136,
+        ""LOUIS"": 113,
+        ""MEHDI"": 12
+      }
+    }
+  },
+  ""date"": ""2026-02-17-23""
+}",,
+DAVID-ERIC-LOUIS-MEHDI,2026-02-18,"{
+  ""todayWin"": {
+    ""ERIC"": 14,
+    ""DAVID"": 9,
+    ""MEHDI"": 2,
+    ""LOUIS"": 11
+  },
+  ""totalWin"": {
+    ""LOUIS"": 17,
+    ""ERIC"": 22,
+    ""DAVID"": 19,
+    ""MEHDI"": 2
+  },
+  ""today"": {
+    ""ERIC"": {
+      ""win"": 14,
+      ""kill"": 305,
+      ""death"": 241,
+      ""self"": 8,
+      ""killFrom"": {
+        ""Arrow"": 183,
+        ""JumpedOn"": 45,
+        ""Squish"": 2,
+        ""FallingObject"": 2,
+        ""Brambles"": 2,
+        ""Explosion"": 6,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 87,
+        ""MEHDI"": 47,
+        ""LOUIS"": 99,
+        ""ERIC"": 8
+      }
+    },
+    ""DAVID"": {
+      ""win"": 9,
+      ""kill"": 281,
+      ""death"": 246,
+      ""self"": 10,
+      ""killFrom"": {
+        ""JumpedOn"": 44,
+        ""Arrow"": 189,
+        ""Lava"": 1,
+        ""Explosion"": 5,
+        ""FallingObject"": 2,
+        ""SpikeBall"": 1,
+        ""Squish"": 2,
+        ""Brambles"": 2
+      },
+      ""killBy"": {
+        ""ERIC"": 97,
+        ""MEHDI"": 55,
+        ""DAVID"": 10,
+        ""LOUIS"": 81
+      }
+    },
+    ""MEHDI"": {
+      ""win"": 2,
+      ""kill"": 175,
+      ""death"": 306,
+      ""self"": 12,
+      ""killFrom"": {
+        ""Arrow"": 241,
+        ""JumpedOn"": 52,
+        ""FallingObject"": 2,
+        ""Squish"": 2,
+        ""Shock"": 1,
+        ""Explosion"": 6,
+        ""SpikeBall"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 93,
+        ""ERIC"": 99,
+        ""LOUIS"": 98,
+        ""MEHDI"": 12
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 11,
+      ""kill"": 295,
+      ""death"": 271,
+      ""self"": 17,
+      ""killFrom"": {
+        ""Arrow"": 198,
+        ""JumpedOn"": 54,
+        ""Squish"": 1,
+        ""Brambles"": 4,
+        ""FallingObject"": 2,
+        ""Explosion"": 11,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""MEHDI"": 61,
+        ""ERIC"": 101,
+        ""DAVID"": 91,
+        ""LOUIS"": 17
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 17,
+      ""kill"": 490,
+      ""death"": 444,
+      ""self"": 26,
+      ""killFrom"": {
+        ""Arrow"": 327,
+        ""JumpedOn"": 85,
+        ""Brambles"": 5,
+        ""Explosion"": 20,
+        ""FallingObject"": 4,
+        ""Squish"": 2,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 161,
+        ""MEHDI"": 97,
+        ""DAVID"": 158,
+        ""LOUIS"": 26
+      }
+    },
+    ""ERIC"": {
+      ""win"": 22,
+      ""kill"": 502,
+      ""death"": 417,
+      ""self"": 15,
+      ""killFrom"": {
+        ""JumpedOn"": 73,
+        ""Explosion"": 13,
+        ""Arrow"": 319,
+        ""Brambles"": 5,
+        ""Lava"": 2,
+        ""Squish"": 3,
+        ""FallingObject"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 158,
+        ""MEHDI"": 76,
+        ""LOUIS"": 168,
+        ""ERIC"": 15
+      }
+    },
+    ""DAVID"": {
+      ""win"": 19,
+      ""kill"": 498,
+      ""death"": 401,
+      ""self"": 20,
+      ""killFrom"": {
+        ""Arrow"": 311,
+        ""Explosion"": 10,
+        ""JumpedOn"": 67,
+        ""Squish"": 4,
+        ""Brambles"": 4,
+        ""Lava"": 2,
+        ""FallingObject"": 2,
+        ""SpikeBall"": 1
+      },
+      ""killBy"": {
+        ""MEHDI"": 87,
+        ""ERIC"": 156,
+        ""LOUIS"": 134,
+        ""DAVID"": 20
+      }
+    },
+    ""MEHDI"": {
+      ""win"": 2,
+      ""kill"": 282,
+      ""death"": 520,
+      ""self"": 22,
+      ""killFrom"": {
+        ""JumpedOn"": 91,
+        ""Arrow"": 407,
+        ""Squish"": 4,
+        ""FallingObject"": 3,
+        ""Explosion"": 10,
+        ""Lava"": 2,
+        ""Shock"": 1,
+        ""SpikeBall"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 162,
+        ""ERIC"": 170,
+        ""LOUIS"": 162,
+        ""MEHDI"": 22
+      }
+    }
+  },
+  ""date"": ""2026-02-18-00""
+}",,
+BENOIT-DAVID-ERIC-LOUIS,2026-02-24,"{
+  ""todayWin"": {
+    ""BENOIT"": 3,
+    ""LOUIS"": 9,
+    ""DAVID"": 10,
+    ""ERIC"": 11
+  },
+  ""totalWin"": {
+    ""DAVID"": 23,
+    ""LOUIS"": 21,
+    ""ERIC"": 26,
+    ""BENOIT"": 7
+  },
+  ""today"": {
+    ""BENOIT"": {
+      ""win"": 3,
+      ""kill"": 193,
+      ""death"": 248,
+      ""self"": 6,
+      ""killFrom"": {
+        ""Arrow"": 195,
+        ""JumpedOn"": 41,
+        ""Brambles"": 3,
+        ""Lava"": 2,
+        ""Explosion"": 5,
+        ""SpikeBall"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 82,
+        ""LOUIS"": 67,
+        ""ERIC"": 91,
+        ""BENOIT"": 6
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 9,
+      ""kill"": 241,
+      ""death"": 233,
+      ""self"": 9,
+      ""killFrom"": {
+        ""Arrow"": 173,
+        ""Lava"": 3,
+        ""Squish"": 1,
+        ""JumpedOn"": 39,
+        ""Brambles"": 5,
+        ""Explosion"": 9,
+        ""Shock"": 1,
+        ""SpikeBall"": 1,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 67,
+        ""DAVID"": 83,
+        ""BENOIT"": 71,
+        ""LOUIS"": 9
+      }
+    },
+    ""DAVID"": {
+      ""win"": 10,
+      ""kill"": 252,
+      ""death"": 224,
+      ""self"": 11,
+      ""killFrom"": {
+        ""Arrow"": 172,
+        ""JumpedOn"": 36,
+        ""Brambles"": 6,
+        ""SpikeBall"": 1,
+        ""FallingObject"": 3,
+        ""Lava"": 1,
+        ""Explosion"": 5
+      },
+      ""killBy"": {
+        ""LOUIS"": 92,
+        ""ERIC"": 65,
+        ""BENOIT"": 55,
+        ""DAVID"": 11
+      }
+    },
+    ""ERIC"": {
+      ""win"": 11,
+      ""kill"": 236,
+      ""death"": 226,
+      ""self"": 13,
+      ""killFrom"": {
+        ""JumpedOn"": 45,
+        ""Explosion"": 7,
+        ""Arrow"": 166,
+        ""SpikeBall"": 1,
+        ""Brambles"": 4,
+        ""Lava"": 1,
+        ""Squish"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 76,
+        ""BENOIT"": 61,
+        ""ERIC"": 13,
+        ""LOUIS"": 73
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 21,
+      ""kill"": 543,
+      ""death"": 570,
+      ""self"": 21,
+      ""killFrom"": {
+        ""Arrow"": 418,
+        ""JumpedOn"": 103,
+        ""FallingObject"": 4,
+        ""Explosion"": 22,
+        ""Brambles"": 11,
+        ""Squish"": 3,
+        ""Lava"": 4,
+        ""Shock"": 3,
+        ""SpikeBall"": 1,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 205,
+        ""ERIC"": 181,
+        ""BENOIT"": 158,
+        ""LOUIS"": 21
+      }
+    },
+    ""DAVID"": {
+      ""win"": 23,
+      ""kill"": 603,
+      ""death"": 530,
+      ""self"": 30,
+      ""killFrom"": {
+        ""Arrow"": 392,
+        ""JumpedOn"": 97,
+        ""Squish"": 3,
+        ""FallingObject"": 7,
+        ""Lava"": 3,
+        ""Explosion"": 15,
+        ""Brambles"": 10,
+        ""SpikeBall"": 3
+      },
+      ""killBy"": {
+        ""ERIC"": 177,
+        ""LOUIS"": 187,
+        ""DAVID"": 30,
+        ""BENOIT"": 131
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 7,
+      ""kill"": 465,
+      ""death"": 585,
+      ""self"": 16,
+      ""killFrom"": {
+        ""Arrow"": 447,
+        ""JumpedOn"": 96,
+        ""Explosion"": 23,
+        ""Brambles"": 6,
+        ""Squish"": 5,
+        ""Shock"": 1,
+        ""Lava"": 5,
+        ""SpikeBall"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 199,
+        ""ERIC"": 203,
+        ""LOUIS"": 161,
+        ""BENOIT"": 16
+      }
+    },
+    ""ERIC"": {
+      ""win"": 26,
+      ""kill"": 588,
+      ""death"": 535,
+      ""self"": 27,
+      ""killFrom"": {
+        ""Arrow"": 398,
+        ""JumpedOn"": 98,
+        ""Squish"": 3,
+        ""Shock"": 1,
+        ""Explosion"": 22,
+        ""Brambles"": 10,
+        ""Miasma"": 1,
+        ""SpikeBall"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 169,
+        ""BENOIT"": 160,
+        ""LOUIS"": 174,
+        ""ERIC"": 27
+      }
+    }
+  },
+  ""date"": ""2026-02-24-23""
+}",,
+BENOIT-DAVID-ERIC-LOUIS,2026-02-25,"{
+  ""todayWin"": {
+    ""BENOIT"": 4,
+    ""LOUIS"": 16,
+    ""DAVID"": 10,
+    ""ERIC"": 14
+  },
+  ""totalWin"": {
+    ""DAVID"": 23,
+    ""LOUIS"": 28,
+    ""ERIC"": 29,
+    ""BENOIT"": 8
+  },
+  ""today"": {
+    ""BENOIT"": {
+      ""win"": 4,
+      ""kill"": 256,
+      ""death"": 349,
+      ""self"": 10,
+      ""killFrom"": {
+        ""Arrow"": 269,
+        ""JumpedOn"": 63,
+        ""Brambles"": 5,
+        ""Lava"": 2,
+        ""Explosion"": 8,
+        ""SpikeBall"": 1,
+        ""Squish"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 111,
+        ""LOUIS"": 102,
+        ""ERIC"": 124,
+        ""BENOIT"": 10
+      }
+    },
+    ""LOUIS"": {
+      ""win"": 16,
+      ""kill"": 349,
+      ""death"": 303,
+      ""self"": 13,
+      ""killFrom"": {
+        ""Arrow"": 223,
+        ""Lava"": 3,
+        ""Squish"": 3,
+        ""JumpedOn"": 53,
+        ""Brambles"": 6,
+        ""Explosion"": 12,
+        ""Shock"": 1,
+        ""SpikeBall"": 1,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""ERIC"": 91,
+        ""DAVID"": 103,
+        ""BENOIT"": 92,
+        ""LOUIS"": 13
+      }
+    },
+    ""DAVID"": {
+      ""win"": 10,
+      ""kill"": 327,
+      ""death"": 310,
+      ""self"": 16,
+      ""killFrom"": {
+        ""Arrow"": 244,
+        ""JumpedOn"": 46,
+        ""Brambles"": 8,
+        ""SpikeBall"": 1,
+        ""FallingObject"": 3,
+        ""Lava"": 1,
+        ""Explosion"": 7
+      },
+      ""killBy"": {
+        ""LOUIS"": 131,
+        ""ERIC"": 90,
+        ""BENOIT"": 72,
+        ""DAVID"": 16
+      }
+    },
+    ""ERIC"": {
+      ""win"": 14,
+      ""kill"": 326,
+      ""death"": 306,
+      ""self"": 21,
+      ""killFrom"": {
+        ""JumpedOn"": 62,
+        ""Explosion"": 19,
+        ""Arrow"": 214,
+        ""SpikeBall"": 1,
+        ""Brambles"": 7,
+        ""Lava"": 1,
+        ""Squish"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 97,
+        ""BENOIT"": 82,
+        ""ERIC"": 21,
+        ""LOUIS"": 103
+      }
+    }
+  },
+  ""total"": {
+    ""LOUIS"": {
+      ""win"": 28,
+      ""kill"": 651,
+      ""death"": 640,
+      ""self"": 25,
+      ""killFrom"": {
+        ""Arrow"": 468,
+        ""JumpedOn"": 117,
+        ""FallingObject"": 4,
+        ""Explosion"": 25,
+        ""Brambles"": 12,
+        ""Squish"": 5,
+        ""Lava"": 4,
+        ""Shock"": 3,
+        ""SpikeBall"": 1,
+        ""Miasma"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 225,
+        ""ERIC"": 205,
+        ""BENOIT"": 179,
+        ""LOUIS"": 25
+      }
+    },
+    ""DAVID"": {
+      ""win"": 23,
+      ""kill"": 678,
+      ""death"": 616,
+      ""self"": 35,
+      ""killFrom"": {
+        ""Arrow"": 464,
+        ""JumpedOn"": 107,
+        ""Squish"": 3,
+        ""FallingObject"": 7,
+        ""Lava"": 3,
+        ""Explosion"": 17,
+        ""Brambles"": 12,
+        ""SpikeBall"": 3
+      },
+      ""killBy"": {
+        ""ERIC"": 202,
+        ""LOUIS"": 226,
+        ""DAVID"": 35,
+        ""BENOIT"": 148
+      }
+    },
+    ""BENOIT"": {
+      ""win"": 8,
+      ""kill"": 528,
+      ""death"": 686,
+      ""self"": 20,
+      ""killFrom"": {
+        ""Arrow"": 521,
+        ""JumpedOn"": 118,
+        ""Explosion"": 26,
+        ""Brambles"": 8,
+        ""Squish"": 5,
+        ""Shock"": 1,
+        ""Lava"": 5,
+        ""SpikeBall"": 2
+      },
+      ""killBy"": {
+        ""DAVID"": 228,
+        ""ERIC"": 236,
+        ""LOUIS"": 196,
+        ""BENOIT"": 20
+      }
+    },
+    ""ERIC"": {
+      ""win"": 29,
+      ""kill"": 678,
+      ""death"": 615,
+      ""self"": 35,
+      ""killFrom"": {
+        ""Arrow"": 446,
+        ""JumpedOn"": 115,
+        ""Squish"": 3,
+        ""Shock"": 1,
+        ""Explosion"": 34,
+        ""Brambles"": 13,
+        ""Miasma"": 1,
+        ""SpikeBall"": 1,
+        ""Lava"": 1
+      },
+      ""killBy"": {
+        ""DAVID"": 190,
+        ""BENOIT"": 181,
+        ""LOUIS"": 204,
+        ""ERIC"": 35
+      }
+    }
+  },
+  ""date"": ""2026-02-25-00""
+}",,
