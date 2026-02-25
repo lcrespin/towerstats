@@ -281,41 +281,96 @@ class SessionStatsManager:
             if SessionDataManager.has_detailed_stats(session):
                 return True
         return False
-    
-    def get_kill_death_stats(self):
-        """Calcule les statistiques de kills et deaths par joueur.
-        
-        Returns:
-            list: Liste de tuples (joueur, kills, deaths, self_kills, kd_ratio) triée par ratio K/D décroissant
+
+    def _get_player_games_played(self, detailed_only: bool = False) -> Dict[str, int]:
+        """Total games played per player (sum of session games where player participated).
+
+        For each session counted:
+        - total_games_in_session = sum of 'today' (wins) over all players in that session
+          (= number of rounds/games in the session, since each game has one winner).
+        - That same number is added to each player present in the session.
+
+        If detailed_only=True, only sessions with combat/detailed stats are counted.
+        So "Parties" in the table = sum of (games in session) for every session that
+        has detailed stats and where the player participated.
         """
+        player_games = defaultdict(int)
+        for session in self.sessions:
+            if detailed_only and not SessionDataManager.has_detailed_stats(session):
+                continue
+            players = SessionDataManager.parse_session_data(session)
+            if not players:
+                continue
+            total_games_in_session = sum(stats['today'] for stats in players.values())
+            for player in players:
+                player_games[player] += total_games_in_session
+        return dict(player_games)
+
+    def _get_kill_death_totals_in_detailed_sessions_only(self):
+        """Kills/deaths/self_kills only from sessions that have detailed stats.
+
+        Uses cumulative deltas: sessions are processed in chronological order;
+        for each session with detailed stats, we add (current_cumulative - previous_cumulative)
+        per player so numerator and denominator (Parties) refer to the same period.
+        """
+        sessions_chrono = sorted(self.sessions, key=lambda s: s.get('date', ''))
         player_kills = defaultdict(int)
         player_deaths = defaultdict(int)
         player_self_kills = defaultdict(int)
-        
-        for session in self.sessions:
+        prev_kill = defaultdict(int)
+        prev_death = defaultdict(int)
+        prev_self = defaultdict(int)
+        for session in sessions_chrono:
+            if not SessionDataManager.has_detailed_stats(session):
+                continue
             players = SessionDataManager.parse_session_data(session)
             for player, stats in players.items():
-                if 'detailed' in stats:
-                    detailed = stats['detailed']
-                    player_kills[player] = max(player_kills[player], detailed.get('kill', 0))
-                    player_deaths[player] = max(player_deaths[player], detailed.get('death', 0))
-                    player_self_kills[player] = max(player_self_kills[player], detailed.get('self', 0))
-        
-        # Calculer les ratios K/D
+                if 'detailed' not in stats:
+                    continue
+                d = stats['detailed']
+                cur_k = d.get('kill', 0)
+                cur_d = d.get('death', 0)
+                cur_s = d.get('self', 0)
+                player_kills[player] += max(0, cur_k - prev_kill[player])
+                player_deaths[player] += max(0, cur_d - prev_death[player])
+                player_self_kills[player] += max(0, cur_s - prev_self[player])
+                prev_kill[player] = cur_k
+                prev_death[player] = cur_d
+                prev_self[player] = cur_s
+        return player_kills, player_deaths, player_self_kills
+
+    def get_kill_death_stats(self):
+        """Calcule les statistiques de kills et deaths par joueur.
+
+        Kills/Deaths/Self = totaux uniquement sur les sessions où les stats détaillées
+        existent (même période que "Parties"). Parties = somme des parties jouées
+        dans ces mêmes sessions (total_games_in_session = somme des victoires du jour
+        de tous les joueurs de la session). Les moyennes = totaux / Parties.
+
+        Returns:
+            list: Liste de tuples (joueur, kills, deaths, self_kills, kd_ratio,
+                  games_played, kills_per_game, deaths_per_game, self_per_game)
+                  triée par ratio K/D décroissant
+        """
+        player_kills, player_deaths, player_self_kills = self._get_kill_death_totals_in_detailed_sessions_only()
+        player_games = self._get_player_games_played(detailed_only=True)
         player_stats = []
         for player in player_kills.keys():
             kills = player_kills[player]
             deaths = player_deaths[player]
             self_kills = player_self_kills[player]
-            
+            games = player_games.get(player, 0) or 1
+            kills_per_game = kills / games
+            deaths_per_game = deaths / games
+            self_per_game = self_kills / games
             if deaths > 0:
                 kd_ratio = kills / deaths
             else:
                 kd_ratio = kills if kills > 0 else 0.0
-            
-            player_stats.append((player, kills, deaths, self_kills, kd_ratio))
-        
-        # Trier par ratio K/D décroissant
+            player_stats.append((
+                player, kills, deaths, self_kills, kd_ratio,
+                player_games.get(player, 0), kills_per_game, deaths_per_game, self_per_game
+            ))
         return sorted(player_stats, key=lambda x: x[4], reverse=True)
     
     def get_kill_sources_stats(self):
@@ -391,23 +446,6 @@ class SessionStatsManager:
         
         return dict(relationships)
     
-    def get_self_kill_stats(self):
-        """Calcule les statistiques sur les auto-éliminations.
-        
-        Returns:
-            list: Liste de tuples (joueur, self_kills) triée par nombre décroissant
-        """
-        player_self_kills = defaultdict(int)
-        
-        for session in self.sessions:
-            players = SessionDataManager.parse_session_data(session)
-            for player, stats in players.items():
-                if 'detailed' in stats:
-                    self_kills = stats['detailed'].get('self', 0)
-                    player_self_kills[player] = max(player_self_kills[player], self_kills)
-        
-        return sorted(player_self_kills.items(), key=lambda x: x[1], reverse=True)
-
     def prepare_template_data(self):
         """Prépare toutes les données nécessaires pour le template HTML."""
         # Calculer les données
@@ -536,6 +574,8 @@ class SessionStatsManager:
         top_killers = []
         top_deaths = []
         top_self_kills = []
+        least_deaths_row = None
+        least_self_kills_row = None
         best_kd_ratio = []
         best_kd_value = 0.0
         
@@ -543,38 +583,35 @@ class SessionStatsManager:
             kill_death_ranking = self.get_kill_death_stats()
             kill_sources_aggregated = self.get_kill_sources_stats()
             kill_relationships = self.get_kill_relationships()
-            self_kill_stats = self.get_self_kill_stats()
-            
+
             # Collecter tous les joueurs uniques pour la matrice (tueurs + victimes)
             all_players_set = set()
-            for player, _, _, _, _ in kill_death_ranking:
+            for player, *_ in kill_death_ranking:
                 all_players_set.add(player)
             for killer in kill_relationships.keys():
                 all_players_set.add(killer)
                 for victim in kill_relationships[killer].keys():
                     all_players_set.add(victim)
             all_players_for_matrix = sorted(list(all_players_set))
-            
-            # Calculer le maximum de kills pour la normalisation de la matrice
-            max_kills_in_matrix = 1  # Minimum 1 pour éviter division par zéro
+
+            # Maximum de kills pour la normalisation de la matrice
+            max_kills_in_matrix = 1
             for killer, victims in kill_relationships.items():
                 for victim, count in victims.items():
                     if count > max_kills_in_matrix:
                         max_kills_in_matrix = count
-            
-            # Top killers (par kills totaux)
+
+            # Top / least depuis kill_death_ranking (une seule source pour cartes et tableau)
             if kill_death_ranking:
-                top_killers = sorted(kill_death_ranking, key=lambda x: x[1], reverse=True)[:5]
-                top_deaths = sorted(kill_death_ranking, key=lambda x: x[2], reverse=True)[:5]
-                top_self_kills = self_kill_stats[:5] if self_kill_stats else []
-                
-                # Meilleur ratio K/D
-                if kill_death_ranking:
-                    best_kd_value = kill_death_ranking[0][4]
-                    best_kd_ratio = [
-                        player for player, _, _, _, kd in kill_death_ranking 
-                        if kd == best_kd_value
-                    ]
+                top_killers = sorted(kill_death_ranking, key=lambda x: x[6], reverse=True)[:5]
+                by_deaths = sorted(kill_death_ranking, key=lambda x: x[7], reverse=True)
+                top_deaths = by_deaths[:5]
+                least_deaths_row = by_deaths[-1]
+                by_self = sorted(kill_death_ranking, key=lambda x: x[8], reverse=True)
+                top_self_kills = [(r[0], r[3], r[8]) for r in by_self[:5]]
+                least_self_kills_row = by_self[-1]
+                best_kd_value = kill_death_ranking[0][4]
+                best_kd_ratio = [row[0] for row in kill_death_ranking if row[4] == best_kd_value]
         
         return {
             'unique_groups': unique_groups,
@@ -613,6 +650,8 @@ class SessionStatsManager:
             'top_killers': top_killers,
             'top_deaths': top_deaths,
             'top_self_kills': top_self_kills,
+            'least_deaths_row': least_deaths_row,
+            'least_self_kills_row': least_self_kills_row,
             'best_kd_ratio': best_kd_ratio,
             'best_kd_value': best_kd_value,
         }

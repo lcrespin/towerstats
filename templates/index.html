@@ -143,17 +143,14 @@
                     <strong>Meilleur % Victoires</strong><br>
                     Le joueur avec le meilleur pourcentage de victoires. Calculé en additionnant toutes ses victoires, puis en divisant par le nombre total de parties auxquelles il a participé.<br><br>
                     
-                    <strong>Meilleur Score dans un groupe</strong><br>
-                    Le score total le plus élevé jamais atteint par un joueur dans n'importe quel groupe.<br><br>
-                    
                     <strong>Joueur avec le meilleur ELO</strong><br>
                     Le joueur ayant le score ELO le plus élevé avec le nouveau calcul ELO (batch par session).<br><br>
                     
-                    <strong>Joueurs Uniques</strong><br>
-                    Nombre de joueurs différents qui ont joué au moins une fois.<br><br>
+                    <strong>Meilleur Score dans un groupe</strong><br>
+                    Le score total le plus élevé jamais atteint par un joueur dans n'importe quel groupe.<br><br>
                     
-                    <strong>Total Sessions</strong><br>
-                    Nombre total de sessions de jeu enregistrées depuis le début.
+                    <strong>Joueurs Uniques / Total Sessions</strong><br>
+                    Nombre de joueurs différents qui ont joué au moins une fois, et nombre total de sessions de jeu enregistrées depuis le début.
                 </div>
             </div>
             <div class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-grid">
@@ -163,17 +160,6 @@
                     <div class="stat-value txt-title-h2">{{ "%.2f" % best_percentage }}%</div>
                     <div class="flex flex-wrap justify-center gap-1.5 mt-1">
                         {% for player in best_percentage_players %}
-                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-                {% if best_players %}
-                <div class="stat-card pad-card">
-                    <div class="stat-label txt-xs">Meilleur Score dans un groupe</div>
-                    <div class="stat-value txt-title-h2">{{ best_score }}</div>
-                    <div class="flex flex-wrap justify-center gap-1.5 mt-1">
-                        {% for player in best_players %}
                         <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
                         {% endfor %}
                     </div>
@@ -190,13 +176,26 @@
                     </div>
                 </div>
                 {% endif %}
+                {% if best_players %}
                 <div class="stat-card pad-card">
-                    <div class="stat-label txt-xs">Joueurs Uniques</div>
-                    <div class="stat-value txt-title-h2">{{ unique_players_count }}</div>
+                    <div class="stat-label txt-xs">Meilleur Score dans un groupe</div>
+                    <div class="stat-value txt-title-h2">{{ best_score }}</div>
+                    <div class="flex flex-wrap justify-center gap-1.5 mt-1">
+                        {% for player in best_players %}
+                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                        {% endfor %}
+                    </div>
                 </div>
-                <div class="stat-card pad-card">
-                    <div class="stat-label txt-xs">Total Sessions</div>
-                    <div class="stat-value txt-title-h2">{{ total_sessions }}</div>
+                {% endif %}
+                <div class="stat-card pad-card flex flex-col gap-0.5 [&_.stat-value]:my-0.5">
+                    <div>
+                        <div class="stat-label txt-xs">Joueurs Uniques</div>
+                        <div class="stat-value txt-title-h2">{{ unique_players_count }}</div>
+                    </div>
+                    <div>
+                        <div class="stat-label txt-xs">Total Sessions</div>
+                        <div class="stat-value txt-title-h2">{{ total_sessions }}</div>
+                    </div>
                 </div>
             </div>
             <div class="stats-dates">
@@ -215,9 +214,8 @@
                 <div class="info-bubble-title">⚔️ Statistiques de Combat</div>
                 <div class="info-bubble-content">
                     <strong>K/D Ratio :</strong> Ratio Kills/Deaths. Plus le ratio est élevé, meilleur est le joueur en combat.<br><br>
-                    <strong>Kills :</strong> Nombre total d'éliminations réalisées.<br><br>
-                    <strong>Deaths :</strong> Nombre total de morts subies.<br><br>
-                    <strong>Self Kills :</strong> Nombre d'auto-éliminations (mort par sa propre faute).
+                    <strong>Plus de Kills / Moins de Deaths / Moins d'Auto-Kills :</strong> Moyennes par partie jouée (total divisé par le nombre de parties).<br><br>
+                    <strong>Nombre de parties (tableau détail) :</strong> Pour chaque joueur, on ne compte que les parties jouées dans les sessions où les stats de combat existent. Par session, le nombre de parties = somme des victoires du jour de tous les joueurs (chaque partie a un vainqueur). Ce même nombre de parties est utilisé pour calculer les moyennes Kills/partie, Deaths/partie et Auto-Kills/partie ; les totaux Kills, Deaths et Self affichés sont aussi limités à ces mêmes sessions (incréments cumulés par session).
                 </div>
             </div>
             <div class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-grid">
@@ -234,49 +232,40 @@
                 {% endif %}
                 {% if top_killers %}
                 <div class="stat-card pad-card">
-                    <div class="stat-label txt-xs">Plus de Kills</div>
-                    <div class="stat-value txt-title-h2">{{ top_killers[0][1] }}</div>
+                    <div class="stat-label txt-xs">Plus de Kills (moy./partie)</div>
+                    <div class="stat-value txt-title-h2">{{ "%.2f" % top_killers[0][6] }}</div>
                     <div class="flex flex-wrap justify-center gap-1.5 mt-1">
-                        {% for player, kills, _, _, _ in top_killers[:1] %}
-                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
-                        {% endfor %}
+                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(top_killers[0][0]) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ top_killers[0][0] }}</span>
                     </div>
                 </div>
                 {% endif %}
-                {% if top_deaths %}
-                {% set least_deaths = top_deaths[-1] %}
+                {% if least_deaths_row %}
                 <div class="stat-card pad-card">
-                    <div class="stat-label txt-xs">Moins de Deaths</div>
-                    <div class="stat-value txt-title-h2">{{ least_deaths[2] }}</div>
+                    <div class="stat-label txt-xs">Moins de Deaths (moy./partie)</div>
+                    <div class="stat-value txt-title-h2">{{ "%.2f" % least_deaths_row[7] }}</div>
                     <div class="flex justify-center mt-1">
                         <span class="stat-label txt-sm px-1 py-0.5 rounded"
-                              style="color: {{ get_player_color(least_deaths[0]) }};
+                              style="color: {{ get_player_color(least_deaths_row[0]) }};
                                      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
                                      background: rgba(0,0,0,0.25);">
-                            {{ least_deaths[0] }}
+                            {{ least_deaths_row[0] }}
                         </span>
                     </div>
                 </div>
                 {% endif %}
-                {% if top_self_kills %}
-                {% set least_self_kills = top_self_kills[-1] %}
+                {% if least_self_kills_row %}
                 <div class="stat-card pad-card">
-                    <div class="stat-label txt-xs">Moins d'Auto-Kills</div>
-                    <!-- valeur -->
-                    <div class="stat-value txt-title-h2">
-                        {{ least_self_kills[1] }}
-                    </div>
-                
-                    <!-- joueur -->
+                    <div class="stat-label txt-xs">Moins d'Auto-Kills (moy./partie)</div>
+                    <div class="stat-value txt-title-h2">{{ "%.2f" % least_self_kills_row[8] }}</div>
                     <div class="flex justify-center mt-1">
                         <span class="stat-label txt-sm px-1 py-0.5 rounded"
-                              style="color: {{ get_player_color(least_self_kills[0]) }};
+                              style="color: {{ get_player_color(least_self_kills_row[0]) }};
                                      text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
                                      background: rgba(0,0,0,0.25);">
-                            {{ least_self_kills[0] }}
+                            {{ least_self_kills_row[0] }}
                         </span>
                     </div>
-                </div>                
+                </div>
                 {% endif %}
                 
             </div>
@@ -284,25 +273,32 @@
                 ▼ Voir le détail des kills
             </button>            
             <div id="ranking-table" class="hidden overflow-x-auto mt-4">
-                <table class="ranking-table w-full txt-xs">
+                <table class="ranking-table w-full txt-xs" id="kill-detail-table">
                     <thead>
                         <tr>
-                            <th class="player-column">Joueur</th>
-                            <th>Kills</th>
-                            <th>Deaths</th>
-                            <th>Self</th>
-                            <th>Ratio K/D</th>
+                            <th class="player-column sortable-th" data-sort-type="text" data-col="0">Joueur <span class="sort-indicator"></span></th>
+                            <th class="sortable-th" data-sort-type="number" data-col="1">Kills <span class="sort-indicator"></span></th>
+                            <th class="sortable-th" data-sort-type="number" data-col="2">Deaths <span class="sort-indicator"></span></th>
+                            <th class="sortable-th" data-sort-type="number" data-col="3">Self <span class="sort-indicator"></span></th>
+                            <th class="sortable-th" data-sort-type="number" data-col="4">Ratio K/D <span class="sort-indicator"></span></th>
+                            <th class="sortable-th" data-sort-type="number" data-col="5">Parties <span class="sort-indicator"></span></th>
+                            <th class="sortable-th" data-sort-type="number" data-col="6">Moy. Kills <span class="sort-indicator"></span></th>
+                            <th class="sortable-th" data-sort-type="number" data-col="7">Moy. Deaths <span class="sort-indicator"></span></th>
+                            <th class="sortable-th" data-sort-type="number" data-col="8">Moy. Auto <span class="sort-indicator"></span></th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for rank, item in kill_death_ranking|enumerate(1) %}
-                        {% set player, kills, deaths, self_kills, kd_ratio = item %}
                         <tr>
-                            <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
-                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ kills }}</td>
-                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ deaths }}</td>
-                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ self_kills }}</td>
-                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f" % kd_ratio }}</td>
+                            <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(item[0]) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ item[0] }}</td>
+                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ item[1] }}</td>
+                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ item[2] }}</td>
+                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ item[3] }}</td>
+                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f" % item[4] }}</td>
+                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ item[5] }}</td>
+                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f" % item[6] }}</td>
+                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f" % item[7] }}</td>
+                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f" % item[8] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>

@@ -48,6 +48,43 @@ function initRankingTable() {
             }
         });
     }
+    initKillDetailTableSort();
+}
+
+function initKillDetailTableSort() {
+    const table = document.getElementById('kill-detail-table');
+    if (!table || !table.tBodies.length) return;
+    const tbody = table.tBodies[0];
+    const headers = table.querySelectorAll('thead th.sortable-th');
+    headers.forEach(function(th) {
+        th.addEventListener('click', function() {
+            const col = parseInt(th.getAttribute('data-col'), 10);
+            const type = th.getAttribute('data-sort-type') || 'number';
+            const prevCol = parseInt(table.getAttribute('data-sort-col'), 10);
+            const prevDir = table.getAttribute('data-sort-dir') || 'asc';
+            const dir = (prevCol === col && prevDir === 'asc') ? 'desc' : 'asc';
+            table.setAttribute('data-sort-col', col);
+            table.setAttribute('data-sort-dir', dir);
+            table.querySelectorAll('thead .sort-indicator').forEach(function(ind) { ind.textContent = ''; });
+            th.querySelector('.sort-indicator').textContent = dir === 'asc' ? '▲' : '▼';
+            var rows = Array.prototype.slice.call(tbody.rows);
+            rows.sort(function(a, b) {
+                var aCell = a.cells[col];
+                var bCell = b.cells[col];
+                if (!aCell || !bCell) return 0;
+                var aVal = (type === 'number') ? parseFloat(aCell.textContent.replace(/\s/g, '').replace(',', '.')) : (aCell.textContent || '').trim();
+                var bVal = (type === 'number') ? parseFloat(bCell.textContent.replace(/\s/g, '').replace(',', '.')) : (bCell.textContent || '').trim();
+                if (type === 'number') {
+                    if (isNaN(aVal)) aVal = -Infinity;
+                    if (isNaN(bVal)) bVal = -Infinity;
+                    return dir === 'asc' ? aVal - bVal : bVal - aVal;
+                }
+                var cmp = (aVal < bVal) ? -1 : (aVal > bVal) ? 1 : 0;
+                return dir === 'asc' ? cmp : -cmp;
+            });
+            rows.forEach(function(row) { tbody.appendChild(row); });
+        });
+    });
 }
 
 // Initialisation du toggle ELO legacy

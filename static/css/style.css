@@ -333,6 +333,20 @@ section h2 {
     overflow-wrap: break-word;
 }
 
+.ranking-table th.sortable-th {
+    cursor: pointer;
+    user-select: none;
+}
+
+.ranking-table th.sortable-th:hover {
+    background: linear-gradient(135deg, #9c5524 0%, #765432 100%);
+}
+
+.ranking-table .sort-indicator {
+    margin-left: 4px;
+    opacity: 0.8;
+}
+
 .ranking-table td {
     /* Tailwind classes handle responsive sizing: text-[5px] sm:text-[6px] md:text-[9px] */
     padding: 10px 12px;
@@ -363,6 +377,12 @@ section h2 {
     .ranking-table .player-column {
         min-width: 180px;
     }
+}
+
+#kill-detail-table .player-column {
+    width: 1%;
+    min-width: 0;
+    white-space: nowrap;
 }
 
 .ranking-table tr:nth-child(even) td {

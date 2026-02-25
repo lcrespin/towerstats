@@ -162,7 +162,8 @@ def test_detailed_stats_and_kill_relationships_from_snapshot():
     # Classement K/D cohérent avec le nombre de joueurs uniques
     kill_death_ranking = ctx["kill_death_ranking"]
     assert len(kill_death_ranking) == ctx["unique_players_count"]
-    for player, kills, deaths, self_kills, kd_ratio in kill_death_ranking:
+    for row in kill_death_ranking:
+        player, kills, deaths, self_kills, kd_ratio = row[0], row[1], row[2], row[3], row[4]
         assert isinstance(player, str)
         assert kills >= 0
         assert deaths >= 0
@@ -193,6 +194,7 @@ EXPECTED_TEMPLATE_KEYS = frozenset({
     "player_colors", "has_detailed_stats", "kill_death_ranking",
     "kill_sources_aggregated", "kill_relationships", "all_players_for_matrix",
     "max_kills_in_matrix", "top_killers", "top_deaths", "top_self_kills",
+    "least_deaths_row", "least_self_kills_row",
     "best_kd_ratio", "best_kd_value",
 })
 
@@ -229,21 +231,25 @@ def test_top_killers_deaths_and_kd_from_snapshot():
     stats = build_stats_from_snapshot()
     ctx = stats.prepare_template_data()
 
+    # Top killers by kills per game (average; period = sessions with detailed stats only)
     top_killers = ctx["top_killers"]
     assert len(top_killers) == 5
-    assert [t[0] for t in top_killers] == ["DAVID", "LOUIS", "ERIC", "BENOIT", "JULIEN"]
+    assert [t[0] for t in top_killers] == ["DAVID", "LOUIS", "ERIC", "MEHDI", "BENOIT"]
 
+    # Top deaths by deaths per game (average); "Moins de Deaths" = last = least
     top_deaths = ctx["top_deaths"]
     assert len(top_deaths) == 5
-    assert [t[0] for t in top_deaths] == ["ERIC", "LOUIS", "DAVID", "BENOIT", "MEHDI"]
+    assert [t[0] for t in top_deaths] == ["MEHDI", "ERIC", "DAVID", "LOUIS", "JULIEN"]
 
+    # Top self-kills: (player, total_self_kills, self_kills_per_game), sorted by per_game desc
     top_self_kills = ctx["top_self_kills"]
-    assert top_self_kills == [
-        ("DAVID", 76), ("LOUIS", 66), ("ERIC", 60), ("MEHDI", 22), ("BENOIT", 20),
-    ]
+    assert len(top_self_kills) == 5
+    assert [t[0] for t in top_self_kills] == ["DAVID", "ERIC", "LOUIS", "MEHDI", "BENOIT"]
+    for row in top_self_kills:
+        assert len(row) == 3
 
     assert ctx["best_kd_ratio"] == ["DAVID"]
-    assert round(ctx["best_kd_value"], 4) == 1.0721
+    assert round(ctx["best_kd_value"], 4) == 1.0161
     assert ctx["max_kills_in_matrix"] > 1
     assert len(ctx["all_players_for_matrix"]) == 6
 
@@ -263,3 +269,28 @@ def test_date_filtering_reduces_sessions():
     assert filtered_ctx["total_sessions"] < 37
     assert filtered_ctx["date_debut_raw"] >= "2026-01-01"
     assert filtered_ctx["date_fin_raw"] <= "2026-02-25"
+
+
+def test_normalize_session_players_adds_zero_win_players_to_today_win():
+    """Players in today but missing from todayWin (e.g. 0 wins) are added to todayWin with correct value."""
+    session = {
+        "data": {
+            "todayWin": {"ALICE": 2},
+            "totalWin": {"ALICE": 2},
+            "today": {
+                "ALICE": {"win": 2, "kill": 5, "death": 1},
+                "BOB": {"win": 0, "kill": 1, "death": 5},
+            },
+            "total": {
+                "ALICE": {"win": 2, "kill": 5, "death": 1},
+                "BOB": {"win": 0, "kill": 1, "death": 5},
+            },
+            "date": "2025-12-08-12",
+        }
+    }
+    SessionDataManager.normalize_session_players(session)
+    data = session["data"]
+    assert "todayWin" in data
+    assert data["todayWin"].get("ALICE") == 2
+    assert data["todayWin"].get("BOB") == 0
+    assert data["totalWin"].get("BOB") == 0

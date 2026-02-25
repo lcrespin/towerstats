@@ -272,9 +272,15 @@ class SessionDataManager:
             if SessionDataManager.should_ignore_player(player):
                 continue
             
-            # Si le joueur n'est pas dans todayWin, l'ajouter avec 0
             if player not in data['todayWin']:
-                data['todayWin'][player] = 0
+                today_val = data['today'].get(player)
+                if isinstance(today_val, dict):
+                    today_wins = today_val.get('win', 0)
+                elif isinstance(today_val, (int, float)):
+                    today_wins = int(today_val)
+                else:
+                    today_wins = 0
+                data['todayWin'][player] = today_wins
             
             # Si le joueur n'est pas dans totalWin, récupérer depuis total ou mettre 0
             if player not in data['totalWin']:
