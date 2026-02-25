@@ -464,12 +464,16 @@ function initSessionsPagination() {
     }
 }
 
-// Smooth scroll pour le menu
+// Smooth scroll pour le menu (in-page anchors only)
 function initSmoothScroll() {
     document.querySelectorAll('nav a').forEach(function(anchor) {
         anchor.addEventListener('click', function (e) {
+            const href = this.getAttribute('href') || '';
+            if (href.indexOf('#') !== 0) {
+                return;
+            }
             e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
+            const target = document.querySelector(href);
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
@@ -1075,10 +1079,34 @@ function initDatePickerToggle() {
     });
 }
 
+function initMobileMenu() {
+    const toggle = document.getElementById('mobile-menu-toggle');
+    const menu = document.getElementById('mobile-menu');
+    const links = menu && menu.querySelectorAll('.mobile-menu-link');
+    if (!toggle || !menu) return;
+
+    toggle.addEventListener('click', function() {
+        const isOpen = menu.classList.toggle('mobile-menu-open');
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        menu.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+    });
+
+    if (links) {
+        links.forEach(function(link) {
+            link.addEventListener('click', function() {
+                menu.classList.remove('mobile-menu-open');
+                toggle.setAttribute('aria-expanded', 'false');
+                menu.setAttribute('aria-hidden', 'true');
+            });
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initRankingTable();
     initEloLegacyToggle();
     initDatePickerToggle();
+    initMobileMenu();
     initGroupSelector();
     initSessionsPagination();
     initSmoothScroll();

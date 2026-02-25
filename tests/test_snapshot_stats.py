@@ -185,6 +185,7 @@ def test_detailed_stats_and_kill_relationships_from_snapshot():
 EXPECTED_TEMPLATE_KEYS = frozenset({
     "unique_groups", "sorted_groups", "default_group", "rankings_by_group",
     "default_ranking", "date_debut", "date_fin", "date_debut_raw", "date_fin_raw",
+    "date_debut_detailed", "date_debut_detailed_raw",
     "total_sessions", "unique_players_count", "best_players", "best_score",
     "best_percentage_players", "best_percentage", "win_percentage_ranking",
     "elo_ranking", "best_elo_players", "best_elo",

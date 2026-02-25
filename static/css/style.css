@@ -130,6 +130,16 @@ nav {
     flex-wrap: wrap;
 }
 
+@media (max-width: 639px) {
+    nav {
+        padding: 6px 10px;
+        border-bottom-width: 2px;
+    }
+    nav > div {
+        gap: 6px;
+    }
+}
+
 nav > div {
     width: 100%;
     display: flex;
@@ -139,6 +149,12 @@ nav > div {
     max-width: 800px;
     margin-left: auto;
     margin-right: auto;
+}
+
+@media (min-width: 1024px) {
+    nav > div {
+        max-width: 1050px;
+    }
 }
 
 .global-info-button {
@@ -162,20 +178,63 @@ nav > div {
 }
 
 nav ul {
-    /* Tailwind classes handle this: flex flex-wrap justify-center gap-4 sm:gap-5 w-full */
     list-style: none;
     margin: 0;
     padding: 0;
 }
 
 nav ul li a {
-    /* Tailwind classes handle this: block text-center */
     box-sizing: border-box;
     max-width: 200px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     padding: 8px 4px;
+}
+
+.mobile-menu {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-height: 0;
+    padding: 0;
+    margin: 0;
+    border: none;
+    overflow: hidden;
+    visibility: hidden;
+    transition: max-height 0.25s ease-out;
+}
+
+.mobile-menu.mobile-menu-open {
+    max-height: 80vh;
+    padding: 12px 0;
+    margin: 0;
+    overflow-y: auto;
+    visibility: visible;
+    background: linear-gradient(180deg, #3d2817 0%, #2d1b0d 100%);
+    border-bottom: 3px solid #8b4513;
+}
+
+.mobile-menu-link {
+    display: block;
+    padding: 14px 20px;
+    color: #ffd700;
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    font-size: 11px;
+    font-family: 'Press Start 2P', cursive;
+    text-align: left;
+    border-bottom: 1px solid rgba(139, 69, 19, 0.4);
+    transition: background 0.2s;
+}
+
+.mobile-menu-link:hover {
+    background: rgba(139, 69, 19, 0.3);
+}
+
+.mobile-menu-link:last-child {
+    border-bottom: none;
 }
 
 .stats-dates {
@@ -189,6 +248,10 @@ nav ul li a {
     text-align: center;
     word-wrap: break-word;
     overflow-wrap: break-word;
+}
+
+#combat-stats .stats-dates {
+    margin-top: 0;
 }
 
 nav a {
@@ -383,6 +446,19 @@ section h2 {
     width: 1%;
     min-width: 0;
     white-space: nowrap;
+}
+
+/* Mobile: smaller font for kill detail table */
+@media (max-width: 639px) {
+    .kill-detail-table-mobile,
+    .kill-detail-table-mobile th,
+    .kill-detail-table-mobile td {
+        font-size: 7px;
+    }
+    .kill-detail-table-mobile th,
+    .kill-detail-table-mobile td {
+        padding: 6px 4px;
+    }
 }
 
 .ranking-table tr:nth-child(even) td {
@@ -723,6 +799,22 @@ section h2 {
 
 .date-picker-popover.active {
     display: block;
+}
+
+.date-picker-popover .date-picker-clear {
+    position: absolute;
+    top: 6px;
+    left: 8px;
+    color: #ffd700;
+    font-size: 16px;
+    line-height: 1;
+    text-decoration: none;
+    padding: 2px;
+    opacity: 0.9;
+}
+
+.date-picker-popover .date-picker-clear:hover {
+    opacity: 1;
 }
 
 .date-picker-popover .date-picker-close {

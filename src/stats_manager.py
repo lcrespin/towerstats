@@ -585,7 +585,8 @@ class SessionStatsManager:
         least_self_kills_row = None
         best_kd_ratio = []
         best_kd_value = 0.0
-        
+        max_kills_in_matrix = 1
+
         if has_detailed:
             kill_death_ranking = self.get_kill_death_stats()
             kill_sources_aggregated = self.get_kill_sources_stats()
@@ -602,7 +603,6 @@ class SessionStatsManager:
             all_players_for_matrix = sorted(list(all_players_set))
 
             # Maximum de kills pour la normalisation de la matrice
-            max_kills_in_matrix = 1
             for killer, victims in kill_relationships.items():
                 for victim, count in victims.items():
                     if count > max_kills_in_matrix:
