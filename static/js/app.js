@@ -985,7 +985,7 @@ function initKillSourcesCharts() {
                         beginAtZero: true,
                         title: {
                             display: true,
-                            text: 'Nombre de Kills',
+                            text: 'Kills (moy. par partie)',
                             color: '#ffd700',
                             font: {
                                 family: 'Press Start 2P',
@@ -1034,7 +1034,14 @@ function initKillSourcesCharts() {
                         },
                         padding: 10,
                         mode: 'index',
-                        intersect: false
+                        intersect: false,
+                        callbacks: {
+                            label: function(context) {
+                                const v = context.raw;
+                                if (v == null || v === 0) return null;
+                                return context.dataset.label + ': ' + Number(v).toFixed(2) + ' (moy. part.)';
+                            }
+                        }
                     }
                 }
             }

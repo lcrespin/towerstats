@@ -374,15 +374,16 @@ class SessionStatsManager:
         return sorted(player_stats, key=lambda x: x[4], reverse=True)
     
     def get_kill_sources_stats(self):
-        """Agrège les sources de kills (Arrow, Explosion, etc.) par joueur et globalement.
+        """Agrège les sources de kills (Arrow, Explosion, etc.) par joueur (moyenne par partie)
+        et globalement (totaux).
         
         Returns:
             dict: {
-                'by_player': {player: {source: count}},
+                'by_player': {player: {source: avg_per_game}},
                 'global': {source: total_count}
             }
         """
-        by_player = defaultdict(lambda: defaultdict(int))
+        by_player_totals = defaultdict(lambda: defaultdict(int))
         global_sources = defaultdict(int)
         
         for session in self.sessions:
@@ -391,11 +392,20 @@ class SessionStatsManager:
                 if 'detailed' in stats:
                     kill_from = stats['detailed'].get('killFrom', {})
                     for source, count in kill_from.items():
-                        by_player[player][source] = max(by_player[player][source], count)
-                        global_sources[source] = max(global_sources[source], count)
+                        by_player_totals[player][source] += count
+                        global_sources[source] += count
+        
+        player_games = self._get_player_games_played(detailed_only=True)
+        by_player = {}
+        for player, sources in by_player_totals.items():
+            games = player_games.get(player, 0) or 1
+            by_player[player] = {
+                source: round(total / games, 2)
+                for source, total in sources.items()
+            }
         
         return {
-            'by_player': dict(by_player),
+            'by_player': by_player,
             'global': dict(global_sources)
         }
     
