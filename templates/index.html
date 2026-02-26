@@ -731,6 +731,18 @@
         </section>
         {% endif %}
 
+        <section id="elo-evolution-chart" class="margin-bottom-section pad-section overflow-x-auto">
+            <div class="section-header">
+                <h2 class="txt-heading break-words">📈 Évolution ELO par session</h2>
+            </div>
+            <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
+                <canvas id="elo-evolution-chart-canvas"></canvas>
+            </div>
+            <div class="stats-dates">
+                <div>Depuis le {{ date_debut }}</div>
+            </div>
+        </section>
+
     </div>
 
     
@@ -743,6 +755,7 @@
         const allSessions = {{ all_sessions_data|tojson }};
         const hasDetailedStats = {{ has_detailed_stats|tojson }};
         const killSourcesAggregated = {{ kill_sources_aggregated|tojson }};
+        const eloEvolutionData = {{ elo_evolution|tojson }};
         let currentPage = 1;
         const sessionsPerPage = 10;
         // Initialiser filteredSessions avec toutes les sessions au chargement

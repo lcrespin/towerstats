@@ -754,6 +754,60 @@ function updateEvolutionChart(groupId, isCumul) {
     });
 }
 
+// Graphique d'évolution ELO par session
+let eloEvolutionChart = null;
+
+function initEloEvolutionChart() {
+    if (typeof eloEvolutionData === 'undefined' || eloEvolutionData.length === 0) {
+        return;
+    }
+    const labels = eloEvolutionData.map(function(point) { return point.formatted_date; });
+    const allPlayers = new Set();
+    eloEvolutionData.forEach(function(point) {
+        Object.keys(point.elo_by_player || {}).forEach(function(p) { allPlayers.add(p); });
+    });
+    const sortedPlayers = Array.from(allPlayers).sort();
+    const datasets = sortedPlayers.map(function(player) {
+        const data = eloEvolutionData.map(function(point) {
+            const elo = point.elo_by_player && point.elo_by_player[player];
+            return elo != null ? elo : null;
+        });
+        return {
+            label: player,
+            data: data,
+            borderColor: getPlayerColor(player),
+            backgroundColor: getPlayerColor(player) + '33',
+            borderWidth: 2,
+            fill: false,
+            spanGaps: false
+        };
+    });
+    const canvas = document.getElementById('elo-evolution-chart-canvas');
+    if (!canvas) { return; }
+    if (eloEvolutionChart) { eloEvolutionChart.destroy(); }
+    eloEvolutionChart = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: { labels: labels, datasets: datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: { display: true, text: 'Session', color: '#ffd700' },
+                    ticks: { color: '#ffd700', maxRotation: 45 }
+                },
+                y: {
+                    title: { display: true, text: 'ELO', color: '#ffd700' },
+                    ticks: { color: '#ffd700' }
+                }
+            },
+            plugins: {
+                legend: { labels: { color: '#ffd700' } }
+            }
+        }
+    });
+}
+
 // Initialisation des info-bulles
 function initInfoBubbles() {
     const infoButtons = document.querySelectorAll('.info-button');
@@ -1158,6 +1212,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initSortableTables();
     initSmoothScroll();
     initEvolutionChart();
+    initEloEvolutionChart();
     initInfoBubbles();
     if (hasDetailedStats) {
         initKillSourcesCharts();

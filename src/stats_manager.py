@@ -274,7 +274,56 @@ class SessionStatsManager:
         """Retourne le classement ELO legacy des joueurs."""
         elo_ratings = self.calculate_elo_legacy_ratings(initial_elo, k_factor)
         return list(elo_ratings.items())
-    
+
+    def get_elo_evolution(self, initial_elo=1500, k_factor=32) -> List[Dict[str, Any]]:
+        """Returns ELO after each session for chart: list of {date, formatted_date, elo_by_player}."""
+        elo_ratings = defaultdict(lambda: initial_elo)
+        sorted_sessions = sorted(self.sessions, key=lambda x: x.get('date', ''))
+        evolution = []
+
+        for session in sorted_sessions:
+            players = SessionDataManager.parse_session_data(session)
+            if not players or len(players) < 2:
+                continue
+
+            sorted_players = sorted(
+                players.items(),
+                key=lambda x: x[1]['today'],
+                reverse=True
+            )
+            player_ranks = {player: rank for rank, (player, _) in enumerate(sorted_players, start=1)}
+            player_names = sorted(players.keys())
+            session_deltas = defaultdict(float)
+
+            for i, player_a in enumerate(player_names):
+                for player_b in player_names[i + 1:]:
+                    rank_a = player_ranks[player_a]
+                    rank_b = player_ranks[player_b]
+                    elo_a = elo_ratings[player_a]
+                    elo_b = elo_ratings[player_b]
+                    expected_score_a = 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
+                    if rank_a < rank_b:
+                        actual_score_a = 1.0
+                    elif rank_a == rank_b:
+                        actual_score_a = 0.5
+                    else:
+                        actual_score_a = 0.0
+                    elo_change = k_factor * (actual_score_a - expected_score_a)
+                    session_deltas[player_a] += elo_change
+                    session_deltas[player_b] -= elo_change
+
+            for player, delta in session_deltas.items():
+                elo_ratings[player] += delta
+
+            date_str = self._session_date_str(session)
+            evolution.append({
+                'date': date_str,
+                'formatted_date': self.format_date(date_str),
+                'elo_by_player': dict(elo_ratings),
+            })
+
+        return evolution
+
     def has_detailed_stats(self) -> bool:
         """Vérifie si au moins une session contient des statistiques détaillées."""
         for session in self.sessions:
@@ -533,6 +582,12 @@ class SessionStatsManager:
             # En cas d'erreur, retourner une liste vide
             elo_ranking = []
 
+        # Évolution ELO après chaque session (pour le graphique)
+        try:
+            elo_evolution = self.get_elo_evolution()
+        except Exception:
+            elo_evolution = []
+
         # Classement ELO legacy
         try:
             elo_legacy_ranking = self.get_elo_legacy_ranking()
@@ -650,6 +705,7 @@ class SessionStatsManager:
             'best_percentage': best_percentage,
             'win_percentage_ranking': win_percentage_ranking,
             'elo_ranking': elo_ranking,
+            'elo_evolution': elo_evolution,
             'best_elo_players': best_elo_players,
             'best_elo': best_elo,
             'elo_legacy_ranking': elo_legacy_ranking,
