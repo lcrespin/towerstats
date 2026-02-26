@@ -782,6 +782,16 @@ function initWinRateEvolutionChart() {
             spanGaps: false
         };
     });
+    let dataMax = 0;
+    winRateEvolutionData.forEach(function(point) {
+        const rates = point.win_rate_by_player || {};
+        Object.keys(rates).forEach(function(p) {
+            const v = rates[p];
+            if (v != null && v > dataMax) { dataMax = v; }
+        });
+    });
+    const yMax = dataMax > 0 ? Math.min(1, dataMax * 1.10) : 0.1;
+
     const canvas = document.getElementById('win-rate-evolution-chart-canvas');
     if (!canvas) { return; }
     if (winRateEvolutionChart) { winRateEvolutionChart.destroy(); }
@@ -800,7 +810,7 @@ function initWinRateEvolutionChart() {
                     title: { display: true, text: 'Taux de victoires', color: '#ffd700' },
                     ticks: { color: '#ffd700', callback: function(value) { return (value * 100).toFixed(0) + '%'; } },
                     min: 0,
-                    max: 1
+                    max: yMax
                 }
             },
             plugins: {
