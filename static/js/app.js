@@ -63,8 +63,8 @@ function makeTableSortable(table) {
             const col = parseInt(th.getAttribute('data-col'), 10);
             const type = th.getAttribute('data-sort-type') || 'number';
             const prevCol = parseInt(table.getAttribute('data-sort-col'), 10);
-            const prevDir = table.getAttribute('data-sort-dir') || 'asc';
-            const dir = (prevCol === col && prevDir === 'asc') ? 'desc' : 'asc';
+            const prevDir = table.getAttribute('data-sort-dir') || 'desc';
+            const dir = (prevCol === col && prevDir === 'desc') ? 'asc' : 'desc';
             table.setAttribute('data-sort-col', col);
             table.setAttribute('data-sort-dir', dir);
             table.querySelectorAll('thead .sort-indicator').forEach(function(ind) { ind.textContent = ''; });
