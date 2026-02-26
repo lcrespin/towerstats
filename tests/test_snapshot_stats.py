@@ -188,7 +188,7 @@ EXPECTED_TEMPLATE_KEYS = frozenset({
     "date_debut_detailed", "date_debut_detailed_raw",
     "total_sessions", "unique_players_count", "best_players", "best_score",
     "best_percentage_players", "best_percentage", "win_percentage_ranking",
-    "elo_ranking", "elo_evolution", "best_elo_players", "best_elo",
+    "elo_ranking", "elo_evolution", "win_rate_evolution", "best_elo_players", "best_elo",
     "elo_legacy_ranking", "best_elo_legacy_players", "best_elo_legacy",
     "latest_date",
     "latest_sessions_parsed", "sessions_by_date", "all_sessions_data",

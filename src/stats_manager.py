@@ -324,6 +324,38 @@ class SessionStatsManager:
 
         return evolution
 
+    def get_win_rate_evolution(self) -> List[Dict[str, Any]]:
+        """Returns win rate (cumulative wins/games) after each session for chart."""
+        cumulative_wins = defaultdict(int)
+        cumulative_games = defaultdict(int)
+        sorted_sessions = sorted(self.sessions, key=lambda x: x.get('date', ''))
+        evolution = []
+
+        for session in sorted_sessions:
+            players = SessionDataManager.parse_session_data(session)
+            if not players:
+                continue
+            total_games = sum(stats['today'] for stats in players.values())
+            if total_games <= 0:
+                continue
+            for player, stats in players.items():
+                cumulative_wins[player] += stats['today']
+                cumulative_games[player] += total_games
+
+            win_rate_by_player = {}
+            for player in cumulative_games:
+                g = cumulative_games[player]
+                win_rate_by_player[player] = cumulative_wins[player] / g if g else 0.0
+
+            date_str = self._session_date_str(session)
+            evolution.append({
+                'date': date_str,
+                'formatted_date': self.format_date(date_str),
+                'win_rate_by_player': win_rate_by_player,
+            })
+
+        return evolution
+
     def has_detailed_stats(self) -> bool:
         """Vérifie si au moins une session contient des statistiques détaillées."""
         for session in self.sessions:
@@ -588,6 +620,12 @@ class SessionStatsManager:
         except Exception:
             elo_evolution = []
 
+        # Évolution moyenne de victoires après chaque session (pour le graphique)
+        try:
+            win_rate_evolution = self.get_win_rate_evolution()
+        except Exception:
+            win_rate_evolution = []
+
         # Classement ELO legacy
         try:
             elo_legacy_ranking = self.get_elo_legacy_ranking()
@@ -706,6 +744,7 @@ class SessionStatsManager:
             'win_percentage_ranking': win_percentage_ranking,
             'elo_ranking': elo_ranking,
             'elo_evolution': elo_evolution,
+            'win_rate_evolution': win_rate_evolution,
             'best_elo_players': best_elo_players,
             'best_elo': best_elo,
             'elo_legacy_ranking': elo_legacy_ranking,

@@ -754,6 +754,70 @@ function updateEvolutionChart(groupId, isCumul) {
     });
 }
 
+// Graphique d'évolution moyenne de victoires par session
+let winRateEvolutionChart = null;
+
+function initWinRateEvolutionChart() {
+    if (typeof winRateEvolutionData === 'undefined' || winRateEvolutionData.length === 0) {
+        return;
+    }
+    const labels = winRateEvolutionData.map(function(point) { return point.formatted_date; });
+    const allPlayers = new Set();
+    winRateEvolutionData.forEach(function(point) {
+        Object.keys(point.win_rate_by_player || {}).forEach(function(p) { allPlayers.add(p); });
+    });
+    const sortedPlayers = Array.from(allPlayers).sort();
+    const datasets = sortedPlayers.map(function(player) {
+        const data = winRateEvolutionData.map(function(point) {
+            const rate = point.win_rate_by_player && point.win_rate_by_player[player];
+            return rate != null ? rate : null;
+        });
+        return {
+            label: player,
+            data: data,
+            borderColor: getPlayerColor(player),
+            backgroundColor: getPlayerColor(player) + '33',
+            borderWidth: 2,
+            fill: false,
+            spanGaps: false
+        };
+    });
+    const canvas = document.getElementById('win-rate-evolution-chart-canvas');
+    if (!canvas) { return; }
+    if (winRateEvolutionChart) { winRateEvolutionChart.destroy(); }
+    winRateEvolutionChart = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: { labels: labels, datasets: datasets },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    title: { display: true, text: 'Session', color: '#ffd700' },
+                    ticks: { color: '#ffd700', maxRotation: 45 }
+                },
+                y: {
+                    title: { display: true, text: 'Taux de victoires', color: '#ffd700' },
+                    ticks: { color: '#ffd700', callback: function(value) { return (value * 100).toFixed(0) + '%'; } },
+                    min: 0,
+                    max: 1
+                }
+            },
+            plugins: {
+                legend: { labels: { color: '#ffd700' } },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const v = context.parsed.y;
+                            return v != null ? (v * 100).toFixed(1) + '%' : '';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
 // Graphique d'évolution ELO par session
 let eloEvolutionChart = null;
 
@@ -1212,6 +1276,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initSortableTables();
     initSmoothScroll();
     initEvolutionChart();
+    initWinRateEvolutionChart();
     initEloEvolutionChart();
     initInfoBubbles();
     if (hasDetailedStats) {
