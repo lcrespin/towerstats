@@ -32,29 +32,31 @@ function updateRanking(groupId) {
     });
 }
 
-// Initialisation du tableau de kills
-function initRankingTable() {
-    const toggleRankingTable = document.getElementById('toggle-ranking-table');
-    if (toggleRankingTable) {
-        toggleRankingTable.addEventListener('click', function() {
-            const rankingTable = document.getElementById('ranking-table');
-            if (rankingTable) {
-                rankingTable.classList.toggle('hidden');
-            }
-            if (rankingTable.classList.contains('hidden')) {
-                toggleRankingTable.textContent = '▼ Voir le détail des kills';
-            } else {
-                toggleRankingTable.textContent = '▲ Masquer le détail des kills';
-            }
-        });
-    }
-    initKillDetailTableSort();
-}
+// Make a single table sortable by column (for tables with 3+ columns)
+function makeTableSortable(table) {
+    const thead = table.querySelector('thead');
+    if (!thead) return;
+    const ths = thead.querySelectorAll('th');
+    if (ths.length < 3) return;
+    if (table.getAttribute('data-sortable-inited') === '1') return;
 
-function initKillDetailTableSort() {
-    const table = document.getElementById('kill-detail-table');
-    if (!table || !table.tBodies.length) return;
+    table.setAttribute('data-sortable-inited', '1');
     const tbody = table.tBodies[0];
+    if (!tbody) return;
+
+    ths.forEach(function(th, i) {
+        th.classList.add('sortable-th');
+        th.setAttribute('data-col', String(i));
+        if (!th.hasAttribute('data-sort-type')) {
+            th.setAttribute('data-sort-type', i === 0 ? 'text' : 'number');
+        }
+        if (!th.querySelector('.sort-indicator')) {
+            const span = document.createElement('span');
+            span.className = 'sort-indicator';
+            th.appendChild(span);
+        }
+    });
+
     const headers = table.querySelectorAll('thead th.sortable-th');
     headers.forEach(function(th) {
         th.addEventListener('click', function() {
@@ -66,14 +68,15 @@ function initKillDetailTableSort() {
             table.setAttribute('data-sort-col', col);
             table.setAttribute('data-sort-dir', dir);
             table.querySelectorAll('thead .sort-indicator').forEach(function(ind) { ind.textContent = ''; });
-            th.querySelector('.sort-indicator').textContent = dir === 'asc' ? '▲' : '▼';
+            var ind = th.querySelector('.sort-indicator');
+            if (ind) ind.textContent = dir === 'asc' ? '▲' : '▼';
             var rows = Array.prototype.slice.call(tbody.rows);
             rows.sort(function(a, b) {
                 var aCell = a.cells[col];
                 var bCell = b.cells[col];
                 if (!aCell || !bCell) return 0;
-                var aVal = (type === 'number') ? parseFloat(aCell.textContent.replace(/\s/g, '').replace(',', '.')) : (aCell.textContent || '').trim();
-                var bVal = (type === 'number') ? parseFloat(bCell.textContent.replace(/\s/g, '').replace(',', '.')) : (bCell.textContent || '').trim();
+                var aVal = (type === 'number') ? parseFloat(String(aCell.textContent).replace(/\s/g, '').replace(',', '.')) : (aCell.textContent || '').trim();
+                var bVal = (type === 'number') ? parseFloat(String(bCell.textContent).replace(/\s/g, '').replace(',', '.')) : (bCell.textContent || '').trim();
                 if (type === 'number') {
                     if (isNaN(aVal)) aVal = -Infinity;
                     if (isNaN(bVal)) bVal = -Infinity;
@@ -85,6 +88,33 @@ function initKillDetailTableSort() {
             rows.forEach(function(row) { tbody.appendChild(row); });
         });
     });
+}
+
+// Init sortable for all tables with 3+ columns
+function initSortableTables() {
+    document.querySelectorAll('table').forEach(function(table) {
+        var ths = table.querySelectorAll('thead th');
+        if (ths.length >= 3) makeTableSortable(table);
+    });
+}
+
+// Initialisation du tableau de kills
+function initRankingTable() {
+    const toggleRankingTable = document.getElementById('toggle-ranking-table');
+    if (toggleRankingTable) {
+        const killDetailTable = document.getElementById('kill-detail-table');
+        toggleRankingTable.addEventListener('click', function() {
+            if (killDetailTable) {
+                killDetailTable.closest('.overflow-x-auto').classList.toggle('hidden');
+            }
+            var wrapper = killDetailTable && killDetailTable.closest('.overflow-x-auto');
+            if (wrapper && wrapper.classList.contains('hidden')) {
+                toggleRankingTable.textContent = '▼ Voir le détail des kills';
+            } else {
+                toggleRankingTable.textContent = '▲ Masquer le détail des kills';
+            }
+        });
+    }
 }
 
 // Initialisation du toggle ELO legacy
@@ -226,6 +256,8 @@ function renderSessions() {
         });
         sessionCard.innerHTML = '<div class="text-[7px] sm:text-[8px] md:text-[10px] mb-3 sm:mb-4" style="color: #ffd700;">Session: ' + session.id + ' - ' + (session.formatted_date || session.date) + '</div><div class="overflow-x-auto"><table class="ranking-table w-full text-[5px] sm:text-[6px] md:text-[9px]"><thead><tr><th>Joueur</th><th>Session</th><th>Total</th></tr></thead><tbody>' + tableRows + '</tbody></table></div>';
         container.appendChild(sessionCard);
+        var tbl = sessionCard.querySelector('table');
+        if (tbl && tbl.querySelectorAll('thead th').length >= 3) makeTableSortable(tbl);
     });
     
     updatePaginationControls();
@@ -897,156 +929,148 @@ function initKillSourcesCharts() {
     }
     
     // Graphique par joueur (barres empilées)
+    updateKillSourcesByPlayerChart();
+    updateKillSourcesPercentLabel();
+    const percentToggle = document.getElementById('kill-sources-percent-toggle');
+    if (percentToggle) {
+        percentToggle.addEventListener('change', function() {
+            updateKillSourcesPercentLabel();
+            updateKillSourcesByPlayerChart();
+        });
+    }
+}
+
+function updateKillSourcesPercentLabel() {
+    const check = document.getElementById('kill-sources-percent-toggle');
+    const label = document.getElementById('kill-sources-percent-toggle-label');
+    if (!check || !label) return;
+    label.textContent = check.checked ? 'Moyennes' : 'Pourcentages';
+}
+
+function updateKillSourcesByPlayerChart() {
     const byPlayerCanvas = document.getElementById('kill-sources-by-player-chart');
-    if (byPlayerCanvas) {
-        const byPlayer = killSourcesAggregated.by_player || {};
-        const players = Object.keys(byPlayer);
-        const allSources = new Set();
-        
-        // Collecter toutes les sources uniques
-        players.forEach(function(player) {
-            Object.keys(byPlayer[player]).forEach(function(source) {
-                allSources.add(source);
-            });
+    if (!byPlayerCanvas || !killSourcesAggregated) return;
+    const usePercent = document.getElementById('kill-sources-percent-toggle') && document.getElementById('kill-sources-percent-toggle').checked;
+    const byPlayer = killSourcesAggregated.by_player || {};
+    const players = Object.keys(byPlayer);
+    const allSources = new Set();
+    players.forEach(function(player) {
+        Object.keys(byPlayer[player]).forEach(function(source) {
+            allSources.add(source);
         });
-        
-        const sources = Array.from(allSources).sort();
-        
-        // Couleurs pour chaque source
-        const sourceColors = {
-            'Arrow': 'rgba(255, 99, 132, 0.8)',
-            'JumpedOn': 'rgba(54, 162, 235, 0.8)',
-            'Explosion': 'rgba(255, 206, 86, 0.8)',
-            'Lava': 'rgba(255, 99, 99, 0.8)',
-            'Brambles': 'rgba(75, 192, 192, 0.8)',
-            'FallingObject': 'rgba(153, 102, 255, 0.8)',
-            'Shock': 'rgba(255, 159, 64, 0.8)',
-            'Squish': 'rgba(199, 199, 199, 0.8)',
-            'SpikeBall': 'rgba(83, 102, 255, 0.8)',
-            'Miasma': 'rgba(255, 99, 255, 0.8)'
-        };
-        
-        // Créer les datasets pour chaque source
-        const datasets = sources.map(function(source) {
-            const data = players.map(function(player) {
-                return byPlayer[player][source] || 0;
-            });
-            return {
-                label: source,
-                data: data,
-                backgroundColor: sourceColors[source] || 'rgba(128, 128, 128, 0.8)',
-                borderColor: '#8b4513',
-                borderWidth: 1
-            };
+    });
+    const sources = Array.from(allSources).sort();
+    const sourceColors = {
+        'Arrow': 'rgba(255, 99, 132, 0.8)',
+        'JumpedOn': 'rgba(54, 162, 235, 0.8)',
+        'Explosion': 'rgba(255, 206, 86, 0.8)',
+        'Lava': 'rgba(255, 99, 99, 0.8)',
+        'Brambles': 'rgba(75, 192, 192, 0.8)',
+        'FallingObject': 'rgba(153, 102, 255, 0.8)',
+        'Shock': 'rgba(255, 159, 64, 0.8)',
+        'Squish': 'rgba(199, 199, 199, 0.8)',
+        'SpikeBall': 'rgba(83, 102, 255, 0.8)',
+        'Miasma': 'rgba(255, 99, 255, 0.8)'
+    };
+    const datasets = sources.map(function(source) {
+        let data = players.map(function(player) {
+            return byPlayer[player][source] || 0;
         });
-        
-        const ctx = byPlayerCanvas.getContext('2d');
-        
-        if (killSourcesByPlayerChart) {
-            killSourcesByPlayerChart.destroy();
+        if (usePercent) {
+            const totals = players.map(function(player) {
+                return Object.values(byPlayer[player]).reduce(function(a, b) { return a + b; }, 0);
+            });
+            data = data.map(function(val, i) {
+                return totals[i] > 0 ? (val / totals[i]) * 100 : 0;
+            });
         }
-        
-        killSourcesByPlayerChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: players.map(function(p) {
-                    return p;
-                }),
-                datasets: datasets
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    x: {
-                        stacked: true,
-                        title: {
-                            display: true,
-                            text: 'Joueurs',
-                            color: '#ffd700',
-                            font: {
-                                family: 'Press Start 2P',
-                                size: 8
-                            }
-                        },
-                        ticks: {
-                            color: '#ffd700',
-                            font: {
-                                family: 'Press Start 2P',
-                                size: 6
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(139, 69, 19, 0.3)'
-                        }
+        return {
+            label: source,
+            data: data,
+            backgroundColor: sourceColors[source] || 'rgba(128, 128, 128, 0.8)',
+            borderColor: '#8b4513',
+            borderWidth: 1
+        };
+    });
+    const ctx = byPlayerCanvas.getContext('2d');
+    if (killSourcesByPlayerChart) {
+        killSourcesByPlayerChart.destroy();
+    }
+    killSourcesByPlayerChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: players.map(function(p) { return p; }),
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    stacked: true,
+                    title: {
+                        display: true,
+                        text: 'Joueurs',
+                        color: '#ffd700',
+                        font: { family: 'Press Start 2P', size: 8 }
                     },
-                    y: {
-                        stacked: true,
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Kills (moy. par partie)',
-                            color: '#ffd700',
-                            font: {
-                                family: 'Press Start 2P',
-                                size: 8
-                            }
-                        },
-                        ticks: {
-                            color: '#ffd700',
-                            font: {
-                                family: 'Press Start 2P',
-                                size: 6
-                            }
-                        },
-                        grid: {
-                            color: 'rgba(139, 69, 19, 0.3)'
-                        }
+                    ticks: { color: '#ffd700', font: { family: 'Press Start 2P', size: 6 } },
+                    grid: { color: 'rgba(139, 69, 19, 0.3)' }
+                },
+                y: {
+                    stacked: true,
+                    beginAtZero: true,
+                    max: usePercent ? 100 : undefined,
+                    title: {
+                        display: true,
+                        text: usePercent ? '%' : 'Kills (moy. par partie)',
+                        color: '#ffd700',
+                        font: { family: 'Press Start 2P', size: 8 }
+                    },
+                    ticks: {
+                        color: '#ffd700',
+                        font: { family: 'Press Start 2P', size: 6 },
+                        callback: usePercent ? function(value) { return value + '%'; } : undefined
+                    },
+                    grid: { color: 'rgba(139, 69, 19, 0.3)' }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        color: '#ffd700',
+                        font: { family: 'Press Start 2P', size: 6 },
+                        usePointStyle: true,
+                        padding: 10
                     }
                 },
-                plugins: {
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            color: '#ffd700',
-                            font: {
-                                family: 'Press Start 2P',
-                                size: 6
-                            },
-                            usePointStyle: true,
-                            padding: 10
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: 'rgba(45, 27, 61, 0.9)',
-                        titleColor: '#ffd700',
-                        bodyColor: '#ffd700',
-                        borderColor: '#8b4513',
-                        borderWidth: 2,
-                        titleFont: {
-                            family: 'Press Start 2P',
-                            size: 8
-                        },
-                        bodyFont: {
-                            family: 'Press Start 2P',
-                            size: 7
-                        },
-                        padding: 10,
-                        mode: 'index',
-                        intersect: false,
-                        callbacks: {
-                            label: function(context) {
-                                const v = context.raw;
-                                if (v == null || v === 0) return null;
-                                return context.dataset.label + ': ' + Number(v).toFixed(2) + ' (moy. part.)';
+                tooltip: {
+                    backgroundColor: 'rgba(45, 27, 61, 0.9)',
+                    titleColor: '#ffd700',
+                    bodyColor: '#ffd700',
+                    borderColor: '#8b4513',
+                    borderWidth: 2,
+                    titleFont: { family: 'Press Start 2P', size: 8 },
+                    bodyFont: { family: 'Press Start 2P', size: 7 },
+                    padding: 10,
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        label: function(context) {
+                            const v = context.raw;
+                            if (v == null || v === 0) return null;
+                            if (usePercent) {
+                                return context.dataset.label + ': ' + Number(v).toFixed(1) + '%';
                             }
+                            return context.dataset.label + ': ' + Number(v).toFixed(2) + ' (moy. part.)';
                         }
                     }
                 }
             }
-        });
-    }
+        }
+    });
 }
 
 // Initialisation globale quand le DOM est prêt
@@ -1116,6 +1140,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initMobileMenu();
     initGroupSelector();
     initSessionsPagination();
+    initSortableTables();
     initSmoothScroll();
     initEvolutionChart();
     initInfoBubbles();

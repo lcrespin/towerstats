@@ -696,8 +696,12 @@
                 </div>
             </div>
             <div class="mb-3 sm:mb-4 md:mb-5">
-                <div class="text-center mb-3 sm:mb-4" style="color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-                    <p class="text-[6px] sm:text-[7px] md:text-[9px] lg:text-[10px]">Top Sources de Kills par Joueur (moy. par partie)</p>
+                <div class="flex flex-row items-center justify-between gap-3 mb-3 sm:mb-4" style="color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="kill-sources-percent-toggle" class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: #8b4513;">
+                        <label id="kill-sources-percent-toggle-label" for="kill-sources-percent-toggle" class="text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px] cursor-pointer" style="color: #ffd700;">Pourcentages</label>
+                    </div>
+                    <p class="text-[6px] sm:text-[7px] md:text-[9px] lg:text-[10px] flex-1 text-center">Top Sources de Kills par Joueur</p>
                 </div>
                 <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
                     <canvas id="kill-sources-by-player-chart"></canvas>
