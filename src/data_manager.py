@@ -170,6 +170,21 @@ class SessionDataManager:
         """Renvoie la liste finale des sessions prêtes pour stats/affichage."""
         return self.sessions
 
+    @staticmethod
+    def filter_sessions_by_session_id(
+        sessions: List[Dict[str, Any]], session_id: str | None
+    ) -> List[Dict[str, Any]]:
+        """Filter sessions by session_id (format 'date|id'). Returns only matching session(s)."""
+        if not session_id or not session_id.strip():
+            return sessions
+        parts = session_id.split('|', 1)
+        if len(parts) != 2:
+            return sessions
+        date_str, sid = parts[0].strip(), parts[1].strip()
+        if not date_str or not sid:
+            return sessions
+        return [s for s in sessions if s.get('date') == date_str and s.get('id') == sid]
+
     # ---- Static helpers (date, ID, etc) ----
     @staticmethod
     def extract_date_str(date_str: str) -> str:

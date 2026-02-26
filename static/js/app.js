@@ -1073,12 +1073,27 @@ function updateKillSourcesByPlayerChart() {
     });
 }
 
-// Initialisation globale quand le DOM est prêt
+function syncDateInputsWithSessionSelect() {
+    const sessionSelect = document.getElementById('session-select');
+    const dateStart = document.getElementById('dateStart');
+    const dateEnd = document.getElementById('dateEnd');
+    if (!sessionSelect || !dateStart || !dateEnd) return;
+    var hasSession = sessionSelect.value !== '';
+    dateStart.disabled = hasSession;
+    dateEnd.disabled = hasSession;
+}
+
 function initDatePickerToggle() {
     const toggleBtn = document.getElementById('toggle-date-picker');
     const popover = document.getElementById('date-picker-popover');
     const closeBtn = popover && popover.querySelector('.date-picker-close');
+    const sessionSelect = document.getElementById('session-select');
     if (!toggleBtn || !popover) return;
+
+    syncDateInputsWithSessionSelect();
+    if (sessionSelect) {
+        sessionSelect.addEventListener('change', syncDateInputsWithSessionSelect);
+    }
 
     function openPopover() {
         popover.classList.add('active');

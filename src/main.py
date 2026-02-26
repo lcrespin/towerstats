@@ -9,6 +9,11 @@ from .data_manager import SessionDataManager
 from .stats_manager import SessionStatsManager
 from .config import get_player_color
 
+
+def _filter_sessions_by_session_id(sessions, session_id):
+    """Filter sessions by session_id using data_manager helper."""
+    return SessionDataManager.filter_sessions_by_session_id(sessions, session_id)
+
 # Chemin vers la racine du projet (un niveau au-dessus de src/)
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -47,16 +52,24 @@ def flask_display_stats(path):
         # Erreur lors de la récupération
         return render_template('error.html', error_message=str(e)), 500
     
-    # Récupérer les filtres de dates depuis l'URL (format YYYY-MM-DD)
     date_start = request.args.get('dateStart') or None
     date_end = request.args.get('dateEnd') or None
-    
-    # Préparer les données pour le template avec filtre de dates éventuel
+    session_id = request.args.get('sessionId') or None
+
+    if session_id:
+        sessions = _filter_sessions_by_session_id(sessions, session_id)
+        date_start = None
+        date_end = None
     stats_manager = SessionStatsManager(sessions, date_start=date_start, date_end=date_end)
     template_data = stats_manager.prepare_template_data()
-    # Exposer aussi les valeurs sélectionnées pour pré-remplir le datepicker
     template_data['selected_date_start'] = date_start
     template_data['selected_date_end'] = date_end
+    template_data['selected_session_id'] = session_id
+
+    if session_id:
+        full_stats = SessionStatsManager(data_manager.get_sessions(), date_start=None, date_end=None)
+        full_data = full_stats.prepare_template_data()
+        template_data['all_sessions_data'] = full_data['all_sessions_data']
     
     # Charger les fichiers statiques
     def load_static_file(filename):

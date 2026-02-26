@@ -82,20 +82,36 @@
             </div>
         </div>
         <div id="date-picker-popover" class="date-picker-popover" aria-hidden="true">
-            <a href="/" class="date-picker-clear" aria-label="Supprimer le filtre de dates" title="Supprimer le filtre de dates">&#128465;</a>
+            <a href="/" class="date-picker-clear" aria-label="Tout remettre par défaut (aucune date, toutes les sessions)" title="Tout remettre par défaut (aucune date, toutes les sessions)">&#128465;</a>
             <button type="button" class="date-picker-close" aria-label="Fermer">×</button>
-            <form method="get" class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            <form method="get" class="flex flex-col gap-2 sm:gap-3">
                 {% set current_start = selected_date_start or date_debut_raw %}
                 {% set current_end = selected_date_end or date_fin_raw %}
-                <div class="flex items-center gap-1 sm:gap-1.5">
-                    <label for="dateStart" class="text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">Depuis :</label>
-                    <input type="date" id="dateStart" name="dateStart" value="{{ current_start }}" class="bg-black/40 border border-yellow-700 rounded px-1 py-0.5 text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] text-yellow-100">
+                <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+                    <div class="flex items-center gap-1 sm:gap-1.5">
+                        <label for="dateStart" class="text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">Depuis :</label>
+                        <input type="date" id="dateStart" name="dateStart" value="{{ current_start }}" class="bg-black/40 border border-yellow-700 rounded px-1 py-0.5 text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] text-yellow-100" {% if selected_session_id %}disabled{% endif %}>
+                    </div>
+                    <div class="flex items-center gap-1 sm:gap-1.5">
+                        <label for="dateEnd" class="text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">Jusqu'à :</label>
+                        <input type="date" id="dateEnd" name="dateEnd" value="{{ current_end }}" class="bg-black/40 border border-yellow-700 rounded px-1 py-0.5 text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] text-yellow-100" {% if selected_session_id %}disabled{% endif %}>
+                    </div>
                 </div>
-                <div class="flex items-center gap-1 sm:gap-1.5">
-                    <label for="dateEnd" class="text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">Jusqu'à :</label>
-                    <input type="date" id="dateEnd" name="dateEnd" value="{{ current_end }}" class="bg-black/40 border border-yellow-700 rounded px-1 py-0.5 text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] text-yellow-100">
+                <div class="flex flex-col items-center">
+                    <label for="session-select" class="block mb-1 text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">Choisir une session</label>
+                    <div class="select-wrapper relative w-auto max-w-full">
+                        <select id="session-select" name="sessionId" class="group-select w-auto min-w-[12rem] max-w-full p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px] bg-black/40 border border-yellow-700 rounded text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] text-yellow-100">
+                            <option value="">Toutes les sessions</option>
+                            {% for session in all_sessions_data %}
+                            <option value="{{ session.date }}|{{ session.id }}" {% if selected_session_id == session.date ~ '|' ~ session.id %}selected{% endif %}>{{ session.formatted_date }} ({{ session.players|map(attribute='name')|join(', ') }})</option>
+                            {% endfor %}
+                        </select>
+                        <span class="select-arrow">▼</span>
+                    </div>
                 </div>
-                <button type="submit" class="toggle-button text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] px-2 py-1 sm:px-3 sm:py-1.5">Appliquer</button>
+                <div class="flex justify-center">
+                    <button type="submit" class="toggle-button text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] px-2 py-1 sm:px-3 sm:py-1.5">Appliquer</button>
+                </div>
             </form>
         </div>
         <div id="global-data-info" class="info-bubble">
@@ -499,6 +515,7 @@
 
         <section id="derniere-soiree" class="margin-bottom-section pad-section">
             <h2 class="txt-heading break-words">📅 Dernière Session de Jeu</h2>
+            <div id="derniere-soiree-content">
             {% if latest_date and latest_sessions_parsed %}
             <div class="session-date">Date: {{ stats_manager.format_date(latest_date) }}</div>
             {% for session_data in latest_sessions_parsed %}
@@ -532,6 +549,7 @@
                 </div>
             {% endfor %}
             {% endif %}
+            </div>
             <button id="toggle-all-sessions" class="toggle-button w-full sm:w-auto text-[6px] sm:text-[7px] md:text-[9px] p-2 sm:p-2.5 md:p-3 lg:p-[12px] lg:px-5">
                 ▼ Voir toutes les sessions
             </button>
