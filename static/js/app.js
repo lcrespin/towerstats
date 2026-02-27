@@ -496,7 +496,31 @@ function initSessionsPagination() {
     }
 }
 
-// Smooth scroll pour le menu (in-page anchors only)
+// Short hash names -> section ids (for clean URLs like /#sessions or /#evolution)
+var ANCHOR_HASH_MAP = {
+    'leaderboards': 'statistiques',
+    'classements': 'pourcentage-victoires',
+    'sessions': 'derniere-soiree',
+    'kills': 'kill-relationships',
+    'evolution': 'win-rate-evolution-chart'
+};
+
+function scrollToAnchor() {
+    var hash = (window.location.hash || '').replace(/^#/, '').toLowerCase();
+    if (!hash) { return; }
+    var sectionId = ANCHOR_HASH_MAP[hash] || hash;
+    var el = document.getElementById(sectionId);
+    if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+}
+
+function initAnchorOnLoad() {
+    if (!window.location.hash) { return; }
+    setTimeout(scrollToAnchor, 150);
+}
+
+// Smooth scroll pour le menu (resolve short hashes via ANCHOR_HASH_MAP, then scroll)
 function initSmoothScroll() {
     document.querySelectorAll('nav a').forEach(function(anchor) {
         anchor.addEventListener('click', function (e) {
@@ -505,9 +529,12 @@ function initSmoothScroll() {
                 return;
             }
             e.preventDefault();
-            const target = document.querySelector(href);
+            const hash = href.replace(/^#/, '').toLowerCase();
+            const sectionId = ANCHOR_HASH_MAP[hash] || hash;
+            const target = document.getElementById(sectionId);
             if (target) {
                 target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                window.location.hash = hash;
             }
         });
     });
@@ -1292,5 +1319,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (hasDetailedStats) {
         initKillSourcesCharts();
     }
+    initAnchorOnLoad();
 });
+
+window.addEventListener('hashchange', scrollToAnchor);
 

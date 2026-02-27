@@ -47,38 +47,22 @@
                 </div>
                 <button type="button" id="mobile-menu-toggle" class="info-button global-info-button txt-xs sm:hidden" aria-label="Menu" aria-expanded="false">☰</button>
                 <ul class="hidden sm:flex flex-wrap justify-center gap-grid flex-1 min-w-0">
-                    <li class="flex-1 min-w-0"><a href="#statistiques" class="block text-center">Stats</a></li>
-                    {% if has_detailed_stats %}
-                    <li class="flex-1 min-w-0"><a href="#combat-stats" class="block text-center">Combats</a></li>
-                    {% endif %}
-                    <li class="flex-1 min-w-0"><a href="#pourcentage-victoires" class="block text-center">Victoires</a></li>
-                    <li class="flex-1 min-w-0"><a href="#elo-ranking" class="block text-center">ELO</a></li>
-                    <li class="flex-1 min-w-0"><a href="#classement" class="block text-center">Groupes</a></li>
-                    <li class="flex-1 min-w-0"><a href="#derniere-soiree" class="block text-center">Hist</a></li>
-                    <li class="flex-1 min-w-0"><a href="#evolution-scores" class="block text-center">Évolution</a></li>
-                    {% if has_detailed_stats %}
-                    <li class="flex-1 min-w-0"><a href="#kill-relationships" class="block text-center">Relations</a></li>
-                    <li class="flex-1 min-w-0"><a href="#kill-analysis" class="block text-center">Kills</a></li>
-                    {% endif %}
+                    <li class="flex-1 min-w-0"><a href="#leaderboards" class="block text-center">Leaderboards</a></li>
+                    <li class="flex-1 min-w-0"><a href="#classements" class="block text-center">Classements</a></li>
+                    <li class="flex-1 min-w-0"><a href="#sessions" class="block text-center">Sessions</a></li>
+                    <li class="flex-1 min-w-0"><a href="#kills" class="block text-center">Kills</a></li>
+                    <li class="flex-1 min-w-0"><a href="#evolution" class="block text-center">Évolution</a></li>
                 </ul>
                 <div class="shrink-0 flex items-center justify-end">
                     <button class="info-button global-info-button txt-xs" data-info="global-data-info">?</button>
                 </div>
             </div>
             <div id="mobile-menu" class="mobile-menu sm:hidden" aria-hidden="true">
-                <a href="#statistiques" class="mobile-menu-link">Statistiques</a>
-                {% if has_detailed_stats %}
-                <a href="#combat-stats" class="mobile-menu-link">Combat</a>
-                {% endif %}
-                <a href="#pourcentage-victoires" class="mobile-menu-link">% Victoires</a>
-                <a href="#elo-ranking" class="mobile-menu-link">ELO</a>
-                <a href="#classement" class="mobile-menu-link">Groupes</a>
-                <a href="#derniere-soiree" class="mobile-menu-link">Sessions</a>
-                <a href="#evolution-scores" class="mobile-menu-link">Évolution</a>
-                {% if has_detailed_stats %}
-                <a href="#kill-relationships" class="mobile-menu-link">Relations</a>
-                <a href="#kill-analysis" class="mobile-menu-link">Kills</a>
-                {% endif %}
+                <a href="#leaderboards" class="mobile-menu-link">Leaderboards</a>
+                <a href="#classements" class="mobile-menu-link">Classements</a>
+                <a href="#sessions" class="mobile-menu-link">Sessions</a>
+                <a href="#kills" class="mobile-menu-link">Kills</a>
+                <a href="#evolution" class="mobile-menu-link">Évolution</a>
             </div>
         </div>
         <div id="date-picker-popover" class="date-picker-popover" aria-hidden="true">
