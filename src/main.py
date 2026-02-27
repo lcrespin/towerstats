@@ -4,10 +4,12 @@ import functions_framework  # type: ignore
 from flask import Flask, send_from_directory, render_template, request  # type: ignore
 import io
 import os
+import random
 
 from .data_manager import SessionDataManager
 from .stats_manager import SessionStatsManager
 from .config import get_player_color
+from .messages_loader import load_win_messages
 
 
 def _filter_sessions_by_session_id(sessions, session_id):
@@ -30,6 +32,22 @@ app.jinja_env.globals['get_player_color'] = get_player_color
 def enumerate_filter(iterable, start=0):
     """Filtre Jinja2 pour enumerate."""
     return enumerate(iterable, start)
+
+
+@app.template_filter('random_choice')
+def random_choice_filter(seq):
+    """Return a random item from the sequence, or '' if empty/missing."""
+    if not seq:
+        return ''
+    return random.choice(seq)
+
+
+@app.template_filter('capitalize_first')
+def capitalize_first_filter(s):
+    """Capitalize the first character of the string; leave the rest unchanged."""
+    if not s:
+        return ''
+    return s[0].upper() + s[1:]
 
 
 @app.route('/images/<filename>')
@@ -65,6 +83,7 @@ def flask_display_stats(path):
     template_data['selected_date_start'] = date_start
     template_data['selected_date_end'] = date_end
     template_data['selected_session_id'] = session_id
+    template_data['win_messages_by_player'] = load_win_messages()
 
     if session_id:
         full_stats = SessionStatsManager(data_manager.get_sessions(), date_start=None, date_end=None)

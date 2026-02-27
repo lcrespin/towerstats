@@ -162,9 +162,14 @@
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Meilleur % Victoires</div>
                     <div class="stat-value txt-title-h2">{{ "%.2f" % best_percentage }}%</div>
-                    <div class="flex flex-wrap justify-center gap-1.5 mt-1">
+                    <div class="flex flex-wrap justify-center gap-1.5 mt-1 pb-[2px]">
                         {% for player in best_percentage_players %}
-                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                        <div class="inline-flex flex-col items-center">
+                            <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                            {% if win_messages_by_player.get(player, []) %}
+                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
+                            {% endif %}
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -173,9 +178,14 @@
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Meilleur ELO</div>
                     <div class="stat-value txt-title-h2">{{ "%.0f" % best_elo }}</div>
-                    <div class="flex flex-wrap justify-center gap-1.5 mt-1">
+                    <div class="flex flex-wrap justify-center gap-1.5 mt-1 pb-[2px]">
                         {% for player in best_elo_players %}
-                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                        <div class="inline-flex flex-col items-center">
+                            <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                            {% if win_messages_by_player.get(player, []) %}
+                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
+                            {% endif %}
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -184,9 +194,14 @@
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Meilleur Score dans un groupe</div>
                     <div class="stat-value txt-title-h2">{{ best_score }}</div>
-                    <div class="flex flex-wrap justify-center gap-1.5 mt-1">
+                    <div class="flex flex-wrap justify-center gap-1.5 mt-1 pb-[2px]">
                         {% for player in best_players %}
-                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                        <div class="inline-flex flex-col items-center">
+                            <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                            {% if win_messages_by_player.get(player, []) %}
+                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
+                            {% endif %}
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -227,9 +242,14 @@
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Meilleur Ratio K/D</div>
                     <div class="stat-value txt-title-h2">{{ "%.2f" % best_kd_value }}</div>
-                    <div class="flex flex-wrap justify-center gap-1.5 mt-1">
+                    <div class="flex flex-wrap justify-center gap-1.5 mt-1 pb-[2px]">
                         {% for player in best_kd_ratio %}
-                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                        <div class="inline-flex flex-col items-center">
+                            <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                            {% if win_messages_by_player.get(player, []) %}
+                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
+                            {% endif %}
+                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -238,8 +258,13 @@
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Plus de Kills (moy./partie)</div>
                     <div class="stat-value txt-title-h2">{{ "%.2f" % top_killers[0][6] }}</div>
-                    <div class="flex flex-wrap justify-center gap-1.5 mt-1">
-                        <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(top_killers[0][0]) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ top_killers[0][0] }}</span>
+                    <div class="flex flex-wrap justify-center gap-1.5 mt-1 pb-[2px]">
+                        <div class="inline-flex flex-col items-center">
+                            <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(top_killers[0][0]) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ top_killers[0][0] }}</span>
+                            {% if win_messages_by_player.get(top_killers[0][0], []) %}
+                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(top_killers[0][0], []) | random_choice | capitalize_first) }}</div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                 {% endif %}
@@ -247,13 +272,18 @@
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Moins de Deaths (moy./partie)</div>
                     <div class="stat-value txt-title-h2">{{ "%.2f" % least_deaths_row[7] }}</div>
-                    <div class="flex justify-center mt-1">
-                        <span class="stat-label txt-sm px-1 py-0.5 rounded"
-                              style="color: {{ get_player_color(least_deaths_row[0]) }};
-                                     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-                                     background: rgba(0,0,0,0.25);">
-                            {{ least_deaths_row[0] }}
-                        </span>
+                    <div class="flex justify-center mt-1 pb-[2px]">
+                        <div class="inline-flex flex-col items-center">
+                            <span class="stat-label txt-sm px-1 py-0.5 rounded"
+                                  style="color: {{ get_player_color(least_deaths_row[0]) }};
+                                         text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+                                         background: rgba(0,0,0,0.25);">
+                                {{ least_deaths_row[0] }}
+                            </span>
+                            {% if win_messages_by_player.get(least_deaths_row[0], []) %}
+                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(least_deaths_row[0], []) | random_choice | capitalize_first) }}</div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                 {% endif %}
@@ -261,13 +291,18 @@
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Moins d'Auto-Kills (moy./partie)</div>
                     <div class="stat-value txt-title-h2">{{ "%.2f" % least_self_kills_row[8] }}</div>
-                    <div class="flex justify-center mt-1">
-                        <span class="stat-label txt-sm px-1 py-0.5 rounded"
-                              style="color: {{ get_player_color(least_self_kills_row[0]) }};
-                                     text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-                                     background: rgba(0,0,0,0.25);">
-                            {{ least_self_kills_row[0] }}
-                        </span>
+                    <div class="flex justify-center mt-1 pb-[2px]">
+                        <div class="inline-flex flex-col items-center">
+                            <span class="stat-label txt-sm px-1 py-0.5 rounded"
+                                  style="color: {{ get_player_color(least_self_kills_row[0]) }};
+                                         text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+                                         background: rgba(0,0,0,0.25);">
+                                {{ least_self_kills_row[0] }}
+                            </span>
+                            {% if win_messages_by_player.get(least_self_kills_row[0], []) %}
+                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(least_self_kills_row[0], []) | random_choice | capitalize_first) }}</div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                 {% endif %}
