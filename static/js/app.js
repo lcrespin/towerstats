@@ -505,13 +505,20 @@ var ANCHOR_HASH_MAP = {
     'evolution': 'evolution-scores'
 };
 
+function getScrollOffsetTop() {
+    var nav = document.querySelector('nav');
+    return nav ? nav.offsetHeight + 8 : 80;
+}
+
 function scrollToAnchor() {
     var hash = (window.location.hash || '').replace(/^#/, '').toLowerCase();
     if (!hash) { return; }
     var sectionId = ANCHOR_HASH_MAP[hash] || hash;
     var el = document.getElementById(sectionId);
     if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        var offset = getScrollOffsetTop();
+        var top = el.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
     }
 }
 
@@ -533,7 +540,9 @@ function initSmoothScroll() {
             const sectionId = ANCHOR_HASH_MAP[hash] || hash;
             const target = document.getElementById(sectionId);
             if (target) {
-                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                const offset = getScrollOffsetTop();
+                const top = target.getBoundingClientRect().top + window.scrollY - offset;
+                window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
                 window.location.hash = hash;
             }
         });
