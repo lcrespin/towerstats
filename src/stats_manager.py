@@ -1,6 +1,6 @@
 """Gestion des statistiques et calculs à partir des sessions filtrées."""
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from collections import defaultdict
 from typing import List, Dict, Any
 
@@ -281,10 +281,51 @@ class SessionStatsManager:
         sorted_sessions = sorted(self.sessions, key=lambda x: x.get('date', ''))
         evolution = []
 
+        first_session_with_players = None
+        first_session_date_str = None
+        for session in sorted_sessions:
+            players = SessionDataManager.parse_session_data(session)
+            if players and len(players) >= 2:
+                first_session_with_players = session
+                first_session_date_str = self._session_date_str(session)
+                break
+        if first_session_with_players and first_session_date_str:
+            try:
+                first_dt = datetime.strptime(first_session_date_str[:10], '%Y-%m-%d')
+                day_before_dt = first_dt - timedelta(days=1)
+                day_before_str = day_before_dt.strftime('%Y-%m-%d')
+                first_players = sorted(SessionDataManager.parse_session_data(first_session_with_players).keys())
+                evolution.append({
+                    'date': day_before_str,
+                    'formatted_date': self.format_date(day_before_str),
+                    'elo_by_player': {p: initial_elo for p in first_players},
+                })
+            except (ValueError, TypeError):
+                pass
+
         for session in sorted_sessions:
             players = SessionDataManager.parse_session_data(session)
             if not players or len(players) < 2:
                 continue
+
+            player_names = sorted(players.keys())
+            new_players = [p for p in player_names if p not in elo_ratings]
+            if new_players and session is not first_session_with_players:
+                date_str_cur = self._session_date_str(session)
+                try:
+                    cur_dt = datetime.strptime(date_str_cur[:10], '%Y-%m-%d')
+                    day_before_dt = cur_dt - timedelta(days=1)
+                    day_before_str = day_before_dt.strftime('%Y-%m-%d')
+                    pre_elo = dict(elo_ratings)
+                    for p in new_players:
+                        pre_elo[p] = initial_elo
+                    evolution.append({
+                        'date': day_before_str,
+                        'formatted_date': self.format_date(day_before_str),
+                        'elo_by_player': pre_elo,
+                    })
+                except (ValueError, TypeError):
+                    pass
 
             sorted_players = sorted(
                 players.items(),
@@ -292,7 +333,6 @@ class SessionStatsManager:
                 reverse=True
             )
             player_ranks = {player: rank for rank, (player, _) in enumerate(sorted_players, start=1)}
-            player_names = sorted(players.keys())
             session_deltas = defaultdict(float)
 
             for i, player_a in enumerate(player_names):
@@ -322,6 +362,7 @@ class SessionStatsManager:
                 'elo_by_player': dict(elo_ratings),
             })
 
+        evolution.sort(key=lambda x: x['date'])
         return evolution
 
     def get_win_rate_evolution(self) -> List[Dict[str, Any]]:
