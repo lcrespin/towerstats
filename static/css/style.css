@@ -518,6 +518,23 @@ section h2 {
     z-index: 1;
 }
 
+.stat-card-align {
+    display: flex;
+    flex-direction: column;
+    min-height: 120px;
+}
+
+.stat-card-align .stat-value {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-card-align .stat-value + div {
+    margin-top: auto;
+}
+
 .stat-value {
     /* Tailwind classes handle responsive sizing: text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px] */
     color: #ffd700;
