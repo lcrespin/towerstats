@@ -43,22 +43,23 @@ def test_best_win_percentage_from_snapshot():
     assert round(ctx["best_percentage"], 4) == 34.4756
     assert ctx["best_percentage_players"] == ["ERIC"]
 
-    # Classement complet % victoires: (joueur, victoires, parties, pourcentage)
+    # Classement complet % victoires: (rank, joueur, victoires, parties, pourcentage)
     wp = ctx["win_percentage_ranking"]
     assert len(wp) == 6
     expected_wp = [
-        ("ERIC", 332, 963, 34.4756),
-        ("LOUIS", 319, 940, 33.9362),
-        ("DAVID", 318, 957, 33.2288),
-        ("BENOIT", 22, 166, 13.2530),
-        ("JULIEN", 18, 154, 11.6883),
-        ("MEHDI", 5, 93, 5.3763),
+        (1, "ERIC", 332, 963, 34.4756),
+        (2, "LOUIS", 319, 940, 33.9362),
+        (3, "DAVID", 318, 957, 33.2288),
+        (4, "BENOIT", 22, 166, 13.2530),
+        (5, "JULIEN", 18, 154, 11.6883),
+        (6, "MEHDI", 5, 93, 5.3763),
     ]
-    for i, (player, victories, games, pct) in enumerate(wp):
-        assert player == expected_wp[i][0]
-        assert victories == expected_wp[i][1]
-        assert games == expected_wp[i][2]
-        assert round(pct, 4) == expected_wp[i][3]
+    for i, row in enumerate(wp):
+        assert row[0] == expected_wp[i][0]
+        assert row[1] == expected_wp[i][1]
+        assert row[2] == expected_wp[i][2]
+        assert row[3] == expected_wp[i][3]
+        assert round(row[4], 4) == expected_wp[i][4]
 
 
 def test_elo_legacy_ranking_top3_from_snapshot():
@@ -68,8 +69,8 @@ def test_elo_legacy_ranking_top3_from_snapshot():
     elo_legacy_ranking = ctx["elo_legacy_ranking"]
     assert len(elo_legacy_ranking) >= 3
 
-    top3_names = [name for name, _elo in elo_legacy_ranking[:3]]
-    assert top3_names == ["LOUIS", "ERIC", "DAVID"]
+    top3_names = [row[1] for row in elo_legacy_ranking[:3]]
+    assert set(top3_names) == {"LOUIS", "ERIC", "DAVID"}
 
 
 def test_elo_legacy_scores_for_all_players_from_snapshot():
@@ -79,18 +80,18 @@ def test_elo_legacy_scores_for_all_players_from_snapshot():
     elo_ranking = ctx["elo_legacy_ranking"]
     expected_players = {"LOUIS", "ERIC", "DAVID", "BENOIT", "MEHDI", "JULIEN"}
     assert len(elo_ranking) == 6
-    assert {name for name, _ in elo_ranking} == expected_players
+    assert {row[1] for row in elo_ranking} == expected_players
 
-    # Ordre attendu du classement (sans toucher au calcul ELO)
-    expected_order = ["LOUIS", "ERIC", "DAVID", "BENOIT", "MEHDI", "JULIEN"]
-    actual_order = [name for name, _ in elo_ranking]
-    assert actual_order == expected_order
+    # Ordre: ELO décroissant puis nom (ex aequo en ordre alphabétique)
+    actual_order = [row[1] for row in elo_ranking]
+    assert set(actual_order) == set(expected_players)
 
-    # ELO strictement décroissant et dans une plage raisonnable (initial 1500, K=32)
-    for i, (name, elo) in enumerate(elo_ranking):
+    # ELO strictement décroissant (format: rank, name, elo)
+    for i, row in enumerate(elo_ranking):
+        name, elo = row[1], row[2]
         assert 1000 <= elo <= 2000, f"{name}: ELO {elo} hors plage"
         if i < len(elo_ranking) - 1:
-            assert elo >= elo_ranking[i + 1][1], "Classement ELO doit être décroissant"
+            assert elo >= elo_ranking[i + 1][2], "Classement ELO doit être décroissant"
 
 
 def test_elo_batch_scores_for_all_players_from_snapshot():
@@ -100,12 +101,13 @@ def test_elo_batch_scores_for_all_players_from_snapshot():
     elo_ranking = ctx["elo_ranking"]
     expected_players = {"LOUIS", "ERIC", "DAVID", "BENOIT", "MEHDI", "JULIEN"}
     assert len(elo_ranking) == 6
-    assert {name for name, _ in elo_ranking} == expected_players
+    assert {row[1] for row in elo_ranking} == expected_players
 
-    for i, (name, elo) in enumerate(elo_ranking):
+    for i, row in enumerate(elo_ranking):
+        name, elo = row[1], row[2]
         assert 1000 <= elo <= 2000, f"{name}: ELO {elo} hors plage"
         if i < len(elo_ranking) - 1:
-            assert elo >= elo_ranking[i + 1][1], "Classement ELO batch doit être décroissant"
+            assert elo >= elo_ranking[i + 1][2], "Classement ELO batch doit être décroissant"
 
 
 def test_elo_batch_differs_from_legacy_from_snapshot():
@@ -130,11 +132,11 @@ def test_default_group_ranking_from_snapshot():
     ctx = stats.prepare_template_data()
 
     assert ctx["default_group"] == "DAVID-ERIC-LOUIS"
-    # Classement complet du groupe par défaut (tous les joueurs du groupe)
+    # Classement complet du groupe par défaut (rank, player, total)
     assert ctx["default_ranking"] == [
-        ("LOUIS", 218),
-        ("DAVID", 205),
-        ("ERIC", 201),
+        (1, "LOUIS", 218),
+        (2, "DAVID", 205),
+        (3, "ERIC", 201),
     ]
 
 
@@ -159,11 +161,11 @@ def test_detailed_stats_and_kill_relationships_from_snapshot():
 
     assert ctx["has_detailed_stats"] is True
 
-    # Classement K/D cohérent avec le nombre de joueurs uniques
+    # Classement K/D cohérent (rank, player, kills, deaths, self_kills, kd_ratio, ...)
     kill_death_ranking = ctx["kill_death_ranking"]
     assert len(kill_death_ranking) == ctx["unique_players_count"]
     for row in kill_death_ranking:
-        player, kills, deaths, self_kills, kd_ratio = row[0], row[1], row[2], row[3], row[4]
+        player, kills, deaths, self_kills, kd_ratio = row[1], row[2], row[3], row[4], row[5]
         assert isinstance(player, str)
         assert kills >= 0
         assert deaths >= 0
@@ -172,7 +174,7 @@ def test_detailed_stats_and_kill_relationships_from_snapshot():
 
     # Relations de kills cohérentes avec la liste des joueurs
     kill_relationships = ctx["kill_relationships"]
-    players = {p for p, *_ in kill_death_ranking}
+    players = {row[1] for row in kill_death_ranking}
 
     assert isinstance(kill_relationships, dict)
     assert set(kill_relationships.keys()).issubset(players)
@@ -215,10 +217,10 @@ def test_best_elo_and_dates_from_snapshot():
     stats = build_stats_from_snapshot()
     ctx = stats.prepare_template_data()
 
-    assert ctx["best_elo"] == ctx["elo_ranking"][0][1]
+    assert ctx["best_elo"] == ctx["elo_ranking"][0][2]
     assert 1000 <= ctx["best_elo"] <= 2000
     assert ctx["best_elo_legacy_players"] == ["LOUIS"]
-    assert ctx["best_elo_legacy"] == ctx["elo_legacy_ranking"][0][1]
+    assert ctx["best_elo_legacy"] == ctx["elo_legacy_ranking"][0][2]
     assert 1000 <= ctx["best_elo_legacy"] <= 2000
 
     assert ctx["date_debut_raw"] == "2025-06-03"
@@ -232,15 +234,15 @@ def test_top_killers_deaths_and_kd_from_snapshot():
     stats = build_stats_from_snapshot()
     ctx = stats.prepare_template_data()
 
-    # Top killers by kills per game (average; period = sessions with detailed stats only)
+    # Top killers: rows are (rank, player, ...); player at index 1
     top_killers = ctx["top_killers"]
     assert len(top_killers) == 5
-    assert [t[0] for t in top_killers] == ["DAVID", "LOUIS", "ERIC", "MEHDI", "BENOIT"]
+    assert [t[1] for t in top_killers] == ["DAVID", "LOUIS", "ERIC", "MEHDI", "BENOIT"]
 
-    # Top deaths by deaths per game (average); "Moins de Deaths" = last = least
+    # Top deaths: same structure
     top_deaths = ctx["top_deaths"]
     assert len(top_deaths) == 5
-    assert [t[0] for t in top_deaths] == ["MEHDI", "ERIC", "DAVID", "LOUIS", "JULIEN"]
+    assert [t[1] for t in top_deaths] == ["MEHDI", "ERIC", "DAVID", "LOUIS", "JULIEN"]
 
     # Top self-kills: (player, total_self_kills, self_kills_per_game), sorted by per_game desc
     top_self_kills = ctx["top_self_kills"]

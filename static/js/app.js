@@ -17,16 +17,16 @@ function updateRanking(groupId) {
     
     tbody.innerHTML = '';
     
-    ranking.forEach((playerData, index) => {
-        const rank = index + 1;
+    ranking.forEach((playerData) => {
+        const rank = playerData[0];
         const rankClass = rank <= 3 ? `rank-${rank}` : '';
-        const playerName = playerData[0];
+        const playerName = playerData[1];
         const playerColor = getPlayerColor(playerName);
         const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
         const row = document.createElement('tr');
         row.innerHTML = `
             <td class="${rankClass}" style="color: ${playerColor}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${medal} ${playerName}</td>
-            <td class="${rankClass}">${playerData[1]}</td>
+            <td class="${rankClass}">${playerData[2]}</td>
         `;
         tbody.appendChild(row);
     });
@@ -247,8 +247,8 @@ function renderSessions() {
         const sessionCard = document.createElement('div');
         sessionCard.className = 'session-card p-2 sm:p-4 md:p-[15px]';
         var tableRows = '';
-        session.players.forEach(function(p, index) {
-            var rank = index + 1;
+        session.players.forEach(function(p) {
+            var rank = p.rank != null ? p.rank : 0;
             var rankClass = rank <= 3 ? 'rank-' + rank : '';
             var color = getPlayerColor(p.name);
             var medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';

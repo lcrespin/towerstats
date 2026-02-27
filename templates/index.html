@@ -257,12 +257,12 @@
                 {% if top_killers %}
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Plus de Kills (moy./partie)</div>
-                    <div class="stat-value txt-title-h2">{{ "%.2f" % top_killers[0][6] }}</div>
+                    <div class="stat-value txt-title-h2">{{ "%.2f" % top_killers[0][7] }}</div>
                     <div class="flex flex-wrap justify-center gap-1.5 mt-1 pb-[2px]">
                         <div class="inline-flex flex-col items-center">
-                            <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(top_killers[0][0]) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ top_killers[0][0] }}</span>
-                            {% if win_messages_by_player.get(top_killers[0][0], []) %}
-                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(top_killers[0][0], []) | random_choice | capitalize_first) }}</div>
+                            <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(top_killers[0][1]) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ top_killers[0][1] }}</span>
+                            {% if win_messages_by_player.get(top_killers[0][1], []) %}
+                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(top_killers[0][1], []) | random_choice | capitalize_first) }}</div>
                             {% endif %}
                         </div>
                     </div>
@@ -271,17 +271,17 @@
                 {% if least_deaths_row %}
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Moins de Deaths (moy./partie)</div>
-                    <div class="stat-value txt-title-h2">{{ "%.2f" % least_deaths_row[7] }}</div>
+                    <div class="stat-value txt-title-h2">{{ "%.2f" % least_deaths_row[8] }}</div>
                     <div class="flex justify-center mt-1 pb-[2px]">
                         <div class="inline-flex flex-col items-center">
                             <span class="stat-label txt-sm px-1 py-0.5 rounded"
-                                  style="color: {{ get_player_color(least_deaths_row[0]) }};
+                                  style="color: {{ get_player_color(least_deaths_row[1]) }};
                                          text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
                                          background: rgba(0,0,0,0.25);">
-                                {{ least_deaths_row[0] }}
+                                {{ least_deaths_row[1] }}
                             </span>
-                            {% if win_messages_by_player.get(least_deaths_row[0], []) %}
-                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(least_deaths_row[0], []) | random_choice | capitalize_first) }}</div>
+                            {% if win_messages_by_player.get(least_deaths_row[1], []) %}
+                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(least_deaths_row[1], []) | random_choice | capitalize_first) }}</div>
                             {% endif %}
                         </div>
                     </div>
@@ -290,17 +290,17 @@
                 {% if least_self_kills_row %}
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Moins d'Auto-Kills (moy./partie)</div>
-                    <div class="stat-value txt-title-h2">{{ "%.2f" % least_self_kills_row[8] }}</div>
+                    <div class="stat-value txt-title-h2">{{ "%.2f" % least_self_kills_row[9] }}</div>
                     <div class="flex justify-center mt-1 pb-[2px]">
                         <div class="inline-flex flex-col items-center">
                             <span class="stat-label txt-sm px-1 py-0.5 rounded"
-                                  style="color: {{ get_player_color(least_self_kills_row[0]) }};
+                                  style="color: {{ get_player_color(least_self_kills_row[1]) }};
                                          text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
                                          background: rgba(0,0,0,0.25);">
-                                {{ least_self_kills_row[0] }}
+                                {{ least_self_kills_row[1] }}
                             </span>
-                            {% if win_messages_by_player.get(least_self_kills_row[0], []) %}
-                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(least_self_kills_row[0], []) | random_choice | capitalize_first) }}</div>
+                            {% if win_messages_by_player.get(least_self_kills_row[1], []) %}
+                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(least_self_kills_row[1], []) | random_choice | capitalize_first) }}</div>
                             {% endif %}
                         </div>
                     </div>
@@ -327,17 +327,17 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for rank, item in kill_death_ranking|enumerate(1) %}
+                        {% for item in kill_death_ranking %}
                         <tr>
-                            <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(item[0]) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ item[0] }}</td>
-                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ item[1] }}</td>
-                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ item[2] }}</td>
-                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ item[3] }}</td>
-                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f" % item[4] }}</td>
-                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ item[5] }}</td>
-                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f" % item[6] }}</td>
-                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f" % item[7] }}</td>
-                            <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f" % item[8] }}</td>
+                            <td class="player-column {% if item[0] <= 3 %}rank-{{ item[0] }}{% endif %}" style="color: {{ get_player_color(item[1]) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(item[0]) }} {{ item[1] }}</td>
+                            <td class="{% if item[0] <= 3 %}rank-{{ item[0] }}{% endif %}">{{ item[2] }}</td>
+                            <td class="{% if item[0] <= 3 %}rank-{{ item[0] }}{% endif %}">{{ item[3] }}</td>
+                            <td class="{% if item[0] <= 3 %}rank-{{ item[0] }}{% endif %}">{{ item[4] }}</td>
+                            <td class="{% if item[0] <= 3 %}rank-{{ item[0] }}{% endif %}">{{ "%.2f" % item[5] }}</td>
+                            <td class="{% if item[0] <= 3 %}rank-{{ item[0] }}{% endif %}">{{ item[6] }}</td>
+                            <td class="{% if item[0] <= 3 %}rank-{{ item[0] }}{% endif %}">{{ "%.2f" % item[7] }}</td>
+                            <td class="{% if item[0] <= 3 %}rank-{{ item[0] }}{% endif %}">{{ "%.2f" % item[8] }}</td>
+                            <td class="{% if item[0] <= 3 %}rank-{{ item[0] }}{% endif %}">{{ "%.2f" % item[9] }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -380,8 +380,8 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for rank, item in win_percentage_ranking|enumerate(1) %}
-                    {% set player, victories, games_played, win_percentage = item %}
+                    {% for item in win_percentage_ranking %}
+                    {% set rank, player, victories, games_played, win_percentage = item[0], item[1], item[2], item[3], item[4] %}
                     <tr>
                         <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
                         <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ victories }}/{{ games_played }}</td>
@@ -436,8 +436,8 @@
                 </thead>
                 <tbody>
                     {% if elo_ranking %}
-                    {% for rank, item in elo_ranking|enumerate(1) %}
-                    {% set player, elo = item %}
+                    {% for item in elo_ranking %}
+                    {% set rank, player, elo = item[0], item[1], item[2] %}
                     <tr>
                         <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
                         <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.0f" % elo }}</td>
@@ -464,8 +464,8 @@
                     </thead>
                     <tbody>
                         {% if elo_legacy_ranking %}
-                        {% for rank, item in elo_legacy_ranking|enumerate(1) %}
-                        {% set player, elo = item %}
+                        {% for item in elo_legacy_ranking %}
+                        {% set rank, player, elo = item[0], item[1], item[2] %}
                         <tr>
                             <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
                             <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.0f" % elo }}</td>
@@ -520,8 +520,8 @@
                     </tr>
                 </thead>
                 <tbody id="ranking-tbody">
-                    {% for rank, item in default_ranking|enumerate(1) %}
-                    {% set player, total = item %}
+                    {% for item in default_ranking %}
+                    {% set rank, player, total = item[0], item[1], item[2] %}
                     <tr>
                         <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
                         <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ total }}</td>
@@ -554,8 +554,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {% for rank in range(1, players|length + 1) %}
-                            {% set player, stats = players[rank - 1] %}
+                            {% for rank, player, stats in players %}
                             <tr>
                                 <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
                                 <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ stats.today }}</td>

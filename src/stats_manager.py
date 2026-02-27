@@ -58,6 +58,40 @@ class SessionStatsManager:
             filtered.append(session)
         return filtered
 
+    @staticmethod
+    def _session_ranks_from_sorted(sorted_players):
+        """Assign dense ranks: same 'today' score => same rank (avoids arbitrary ELO gap on ties)."""
+        player_ranks = {}
+        current_rank = 0
+        prev_today = None
+        for rank_pos, (player, data) in enumerate(sorted_players, start=1):
+            today = data['today']
+            if prev_today is None or today != prev_today:
+                current_rank = rank_pos
+            player_ranks[player] = current_rank
+            prev_today = today
+        return player_ranks
+
+    @staticmethod
+    def _add_dense_ranks(items, score_index, name_index=0):
+        """Sort by score desc then name asc; assign dense rank. Returns list of (rank, *item)."""
+        if not items:
+            return []
+        sorted_items = sorted(
+            items,
+            key=lambda x: (-x[score_index] if isinstance(x[score_index], (int, float)) else 0, x[name_index])
+        )
+        result = []
+        current_rank = 0
+        prev_score = None
+        for i, row in enumerate(sorted_items):
+            s = row[score_index]
+            if prev_score is None or s != prev_score:
+                current_rank = i + 1
+            result.append((current_rank,) + row)
+            prev_score = s
+        return result
+
     def get_unique_groups(self):
         """Récupère tous les groupes de joueurs uniques (basés sur l'ID de session).
         
@@ -228,7 +262,7 @@ class SessionStatsManager:
                 key=lambda x: x[1]['today'],
                 reverse=True
             )
-            player_ranks = {player: rank for rank, (player, _) in enumerate(sorted_players, start=1)}
+            player_ranks = self._session_ranks_from_sorted(sorted_players)
             player_names = sorted(players.keys())
             session_deltas = defaultdict(float)
 
@@ -332,7 +366,7 @@ class SessionStatsManager:
                 key=lambda x: x[1]['today'],
                 reverse=True
             )
-            player_ranks = {player: rank for rank, (player, _) in enumerate(sorted_players, start=1)}
+            player_ranks = self._session_ranks_from_sorted(sorted_players)
             session_deltas = defaultdict(float)
 
             for i, player_a in enumerate(player_names):
@@ -586,15 +620,16 @@ class SessionStatsManager:
         latest_date = list(sessions_by_date.keys())[0] if sessions_by_date else None
         latest_sessions = sessions_by_date[latest_date] if latest_date else []
         
-        # Calculer les classements pour chaque groupe
+        # Calculer les classements pour chaque groupe (avec rangs denses, tri score puis nom)
         rankings_by_group = {}
         for group_id in unique_groups:
-            rankings_by_group[group_id] = self.get_global_ranking(group_id)
+            raw = self.get_global_ranking(group_id)
+            rankings_by_group[group_id] = self._add_dense_ranks(raw, score_index=1, name_index=0)
         
         # Trier les groupes par le meilleur score du groupe (décroissant)
         sorted_groups = sorted(
-            unique_groups, 
-            key=lambda g: rankings_by_group.get(g, [])[0][1] if rankings_by_group.get(g) else 0,
+            unique_groups,
+            key=lambda g: rankings_by_group.get(g, [])[0][2] if rankings_by_group.get(g) else 0,
             reverse=True
         )
         
@@ -624,7 +659,7 @@ class SessionStatsManager:
         # Meilleur joueur (parmi tous les groupes)
         all_player_totals = defaultdict(int)
         for ranking in rankings_by_group.values():
-            for player, total in ranking:
+            for _rank, player, total in ranking:
                 if total > all_player_totals[player]:
                     all_player_totals[player] = total
         
@@ -634,25 +669,24 @@ class SessionStatsManager:
             best_score = max(all_player_totals.values())
             best_players = [p for p, total in all_player_totals.items() if total == best_score]
         
-        # Meilleur pourcentage de victoires
-        win_percentage_ranking = self.get_win_percentage_ranking()
+        # Meilleur pourcentage de victoires (avec rangs denses, tri % puis nom)
+        win_percentage_ranking = self._add_dense_ranks(
+            self.get_win_percentage_ranking(), score_index=3, name_index=0
+        )
         best_percentage_players = []
         best_percentage = 0.0
         if win_percentage_ranking:
-            _, _, _, top_percentage = win_percentage_ranking[0]
-            best_percentage = top_percentage
+            best_percentage = win_percentage_ranking[0][4]
             best_percentage_players = [
-                player for player, _, _, pct in win_percentage_ranking if pct == top_percentage
+                row[1] for row in win_percentage_ranking if row[4] == best_percentage
             ]
         
-        # Classement ELO (nouvelle version batch)
+        # Classement ELO (avec rangs denses, tri ELO puis nom)
         try:
-            elo_ranking = self.get_elo_ranking()
-            # S'assurer que elo_ranking est une liste
-            if not isinstance(elo_ranking, list):
-                elo_ranking = list(elo_ranking) if elo_ranking else []
+            elo_raw = self.get_elo_ranking()
+            elo_list = list(elo_raw) if elo_raw else []
+            elo_ranking = self._add_dense_ranks(elo_list, score_index=1, name_index=0)
         except Exception:
-            # En cas d'erreur, retourner une liste vide
             elo_ranking = []
 
         # Évolution ELO après chaque session (pour le graphique)
@@ -667,11 +701,10 @@ class SessionStatsManager:
         except Exception:
             win_rate_evolution = []
 
-        # Classement ELO legacy
+        # Classement ELO legacy (avec rangs denses)
         try:
-            elo_legacy_ranking = self.get_elo_legacy_ranking()
-            if not isinstance(elo_legacy_ranking, list):
-                elo_legacy_ranking = list(elo_legacy_ranking) if elo_legacy_ranking else []
+            elo_legacy_list = list(self.get_elo_legacy_ranking() or [])
+            elo_legacy_ranking = self._add_dense_ranks(elo_legacy_list, score_index=1, name_index=0)
         except Exception:
             elo_legacy_ranking = []
 
@@ -679,41 +712,49 @@ class SessionStatsManager:
         best_elo_players = []
         best_elo = 0.0
         if elo_ranking:
-            best_elo = elo_ranking[0][1]
-            best_elo_players = [player for player, rating in elo_ranking if rating == best_elo]
+            best_elo = elo_ranking[0][2]
+            best_elo_players = [row[1] for row in elo_ranking if row[2] == best_elo]
 
         # Meilleur ELO legacy
         best_elo_legacy_players = []
         best_elo_legacy = 0.0
         if elo_legacy_ranking:
-            best_elo_legacy = elo_legacy_ranking[0][1]
+            best_elo_legacy = elo_legacy_ranking[0][2]
             best_elo_legacy_players = [
-                player for player, rating in elo_legacy_ranking if rating == best_elo_legacy
+                row[1] for row in elo_legacy_ranking if row[2] == best_elo_legacy
             ]
         
-        def sorted_players_by_today(session):
+        def session_players_with_dense_rank(session):
             players = SessionDataManager.parse_session_data(session)
             if not players:
                 return None
-            return sorted(players.items(), key=lambda x: x[1]['today'], reverse=True)
+            sorted_players = sorted(
+                players.items(),
+                key=lambda x: (-x[1]['today'], x[0])
+            )
+            ranks = self._session_ranks_from_sorted(sorted_players)
+            return [(ranks[p], p, s) for p, s in sorted_players]
 
         latest_sessions_parsed = []
         for session in latest_sessions:
-            sorted_players = sorted_players_by_today(session)
-            if sorted_players:
-                latest_sessions_parsed.append({'session': session, 'players': sorted_players})
+            players_list = session_players_with_dense_rank(session)
+            if players_list:
+                latest_sessions_parsed.append({'session': session, 'players': players_list})
 
         all_sessions_data = []
         for date, date_sessions in sessions_by_date.items():
             for session in date_sessions:
-                sorted_players = sorted_players_by_today(session)
-                if sorted_players:
+                players_list = session_players_with_dense_rank(session)
+                if players_list:
                     all_sessions_data.append({
                         'id': session['id'],
                         'group': session['id'],
                         'date': session['date'],
                         'formatted_date': self.format_date(date),
-                        'players': [{'name': p, 'today': s['today'], 'total': s['total']} for p, s in sorted_players]
+                        'players': [
+                            {'rank': r, 'name': p, 'today': s['today'], 'total': s['total']}
+                            for r, p, s in players_list
+                        ]
                     })
         
         # Statistiques détaillées (si disponibles)
@@ -732,14 +773,16 @@ class SessionStatsManager:
         max_kills_in_matrix = 1
 
         if has_detailed:
-            kill_death_ranking = self.get_kill_death_stats()
+            kill_death_ranking = self._add_dense_ranks(
+                self.get_kill_death_stats(), score_index=4, name_index=0
+            )
             kill_sources_aggregated = self.get_kill_sources_stats()
             kill_relationships = self.get_kill_relationships()
 
             # Collecter tous les joueurs uniques pour la matrice (tueurs + victimes)
             all_players_set = set()
-            for player, *_ in kill_death_ranking:
-                all_players_set.add(player)
+            for row in kill_death_ranking:
+                all_players_set.add(row[1])
             for killer in kill_relationships.keys():
                 all_players_set.add(killer)
                 for victim in kill_relationships[killer].keys():
@@ -752,17 +795,17 @@ class SessionStatsManager:
                     if count > max_kills_in_matrix:
                         max_kills_in_matrix = count
 
-            # Top / least depuis kill_death_ranking (une seule source pour cartes et tableau)
+            # Top / least depuis kill_death_ranking (rank at index 0, then player, k, d, self_k, kd, games, kpg, dpg, self_pg)
             if kill_death_ranking:
-                top_killers = sorted(kill_death_ranking, key=lambda x: x[6], reverse=True)[:5]
-                by_deaths = sorted(kill_death_ranking, key=lambda x: x[7], reverse=True)
+                top_killers = sorted(kill_death_ranking, key=lambda x: x[7], reverse=True)[:5]
+                by_deaths = sorted(kill_death_ranking, key=lambda x: x[8], reverse=True)
                 top_deaths = by_deaths[:5]
                 least_deaths_row = by_deaths[-1]
-                by_self = sorted(kill_death_ranking, key=lambda x: x[8], reverse=True)
-                top_self_kills = [(r[0], r[3], r[8]) for r in by_self[:5]]
+                by_self = sorted(kill_death_ranking, key=lambda x: x[9], reverse=True)
+                top_self_kills = [(r[1], r[4], r[9]) for r in by_self[:5]]
                 least_self_kills_row = by_self[-1]
-                best_kd_value = kill_death_ranking[0][4]
-                best_kd_ratio = [row[0] for row in kill_death_ranking if row[4] == best_kd_value]
+                best_kd_value = kill_death_ranking[0][5]
+                best_kd_ratio = [row[1] for row in kill_death_ranking if row[5] == best_kd_value]
         
         return {
             'unique_groups': unique_groups,
