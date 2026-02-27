@@ -47,22 +47,22 @@
                 </div>
                 <button type="button" id="mobile-menu-toggle" class="info-button global-info-button txt-xs sm:hidden" aria-label="Menu" aria-expanded="false">☰</button>
                 <ul class="hidden sm:flex flex-wrap justify-center gap-grid flex-1 min-w-0">
-                    <li class="flex-1 min-w-0"><a href="#leaderboards" class="block text-center">Leaderboards</a></li>
-                    <li class="flex-1 min-w-0"><a href="#classements" class="block text-center">Classements</a></li>
-                    <li class="flex-1 min-w-0"><a href="#sessions" class="block text-center">Sessions</a></li>
-                    <li class="flex-1 min-w-0"><a href="#kills" class="block text-center">Kills</a></li>
-                    <li class="flex-1 min-w-0"><a href="#evolution" class="block text-center">Évolution</a></li>
+                    <li class="flex-1 min-w-0"><a href="#leaderboards" class="block text-center">🙌 Leaderboards</a></li>
+                    <li class="flex-1 min-w-0"><a href="#classements" class="block text-center">🏆 Classements</a></li>
+                    <li class="flex-1 min-w-0"><a href="#sessions" class="block text-center">📅 Sessions</a></li>
+                    <li class="flex-1 min-w-0"><a href="#kills" class="block text-center">🎯 Kills</a></li>
+                    <li class="flex-1 min-w-0"><a href="#evolution" class="block text-center">📈 Évolution</a></li>
                 </ul>
                 <div class="shrink-0 flex items-center justify-end">
                     <button class="info-button global-info-button txt-xs" data-info="global-data-info">?</button>
                 </div>
             </div>
             <div id="mobile-menu" class="mobile-menu sm:hidden" aria-hidden="true">
-                <a href="#leaderboards" class="mobile-menu-link">Leaderboards</a>
-                <a href="#classements" class="mobile-menu-link">Classements</a>
-                <a href="#sessions" class="mobile-menu-link">Sessions</a>
-                <a href="#kills" class="mobile-menu-link">Kills</a>
-                <a href="#evolution" class="mobile-menu-link">Évolution</a>
+                <a href="#leaderboards" class="mobile-menu-link">🙌 Leaderboards</a>
+                <a href="#classements" class="mobile-menu-link">🏆 Classements</a>
+                <a href="#sessions" class="mobile-menu-link">📅 Sessions</a>
+                <a href="#kills" class="mobile-menu-link">🎯 Kills</a>
+                <a href="#evolution" class="mobile-menu-link">📈 Évolution</a>
             </div>
         </div>
         <div id="date-picker-popover" class="date-picker-popover" aria-hidden="true">
@@ -138,11 +138,11 @@
     <div class="container mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-4 md:py-5" style="max-width: 1000px !important;">
         <section id="statistiques" class="margin-bottom-section pad-section overflow-x-auto">
             <div class="section-header">
-                <h2 class="txt-heading break-words">📊 Statistiques Générales</h2>
+                <h2 class="txt-heading break-words">🙌 Leaderboards</h2>
                 <button class="info-button" data-info="statistiques-info">?</button>
             </div>
             <div id="statistiques-info" class="info-bubble">
-                <div class="info-bubble-title">📊 Statistiques Générales</div>
+                <div class="info-bubble-title">🙌 Leaderboard</div>
                 <div class="info-bubble-content">
                     <strong>Meilleur % Victoires</strong><br>
                     Le joueur avec le meilleur pourcentage de victoires. Calculé en additionnant toutes ses victoires, puis en divisant par le nombre total de parties auxquelles il a participé.<br><br>
@@ -211,11 +211,11 @@
         {% if has_detailed_stats %}
         <section id="combat-stats" class="margin-bottom-section pad-section overflow-x-auto">
             <div class="section-header">
-                <h2 class="txt-heading break-words">⚔️ Statistiques de Combat</h2>
+                <h2 class="txt-heading break-words">⚔️ Leaderboard de combat</h2>
                 <button class="info-button" data-info="combat-stats-info">?</button>
             </div>
             <div id="combat-stats-info" class="info-bubble">
-                <div class="info-bubble-title">⚔️ Statistiques de Combat</div>
+                <div class="info-bubble-title">⚔️ Leaderboard de combat</div>
                 <div class="info-bubble-content">
                     <strong>K/D Ratio :</strong> Ratio Kills/Deaths. Plus le ratio est élevé, meilleur est le joueur en combat.<br><br>
                     <strong>Plus de Kills / Moins de Deaths / Moins d'Auto-Kills :</strong> Moyennes par partie jouée (total divisé par le nombre de parties).<br><br>
@@ -574,50 +574,6 @@
             </div>
         </section>
 
-        <section id="evolution-scores" class="margin-bottom-section pad-section overflow-x-auto">
-            <div class="section-header">
-                <h2 class="txt-heading break-words">📈 Évolution des Scores par Groupe</h2>
-                <button class="info-button" data-info="evolution-scores-info">?</button>
-            </div>
-            <div id="evolution-scores-info" class="info-bubble">
-                <div class="info-bubble-title">📈 Évolution des Scores</div>
-                <div class="info-bubble-content">
-                    <strong>Ce que vous voyez :</strong><br><br>
-                    
-                    Ce graphique montre comment le score total de chaque joueur évolue dans le temps pour le groupe sélectionné.<br><br>
-                    
-                    <strong>Lecture du graphique :</strong><br>
-                    • <strong>Axe horizontal (bas) :</strong> Les dates des sessions, de la plus ancienne (gauche) à la plus récente (droite)<br>
-                    • <strong>Axe vertical (gauche) :</strong> Le score total cumulé<br>
-                    • <strong>Les barres :</strong> Chaque barre représente le score total d'un joueur à une date donnée. La couleur correspond au joueur.<br><br>
-                    
-                    <em>Astuce :</em> Plus la barre est haute, meilleur était le score total du joueur à cette date.
-                </div>
-            </div>
-            <div class="mb-3 sm:mb-4 md:mb-5 relative z-10">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 md:gap-5">
-                    <div class="flex-1 w-full sm:w-auto">
-                        <label for="evolution-group-select" class="block mb-1.5 sm:mb-2 md:mb-2.5 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
-                            Sélectionner un groupe de joueurs:
-                        </label>
-                        <div class="select-wrapper relative w-full max-w-md">
-                            <select id="evolution-group-select" class="group-select w-full p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
-                                <option value="">Sélectionner un groupe</option>
-                            </select>
-                            <span class="select-arrow">▼</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 mt-4 sm:mt-0">
-                        <input type="checkbox" id="evolution-cumul-checkbox" checked class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: #8b4513;">
-                        <label for="evolution-cumul-checkbox" class="text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px] cursor-pointer" style="color: #ffd700;">Cumulé</label>
-                    </div>
-                </div>
-            </div>
-            <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
-                <canvas id="evolution-chart"></canvas>
-            </div>
-        </section>
-
         {% if has_detailed_stats %}
         <section id="kill-relationships" class="margin-bottom-section pad-section overflow-x-auto">
             <div class="section-header">
@@ -715,9 +671,53 @@
         </section>
         {% endif %}
 
+        <section id="evolution-scores" class="margin-bottom-section pad-section overflow-x-auto">
+            <div class="section-header">
+                <h2 class="txt-heading break-words">📊 Évolution des Scores par Groupe</h2>
+                <button class="info-button" data-info="evolution-scores-info">?</button>
+            </div>
+            <div id="evolution-scores-info" class="info-bubble">
+                <div class="info-bubble-title">📊 Évolution des Scores</div>
+                <div class="info-bubble-content">
+                    <strong>Ce que vous voyez :</strong><br><br>
+                    
+                    Ce graphique montre comment le score total de chaque joueur évolue dans le temps pour le groupe sélectionné.<br><br>
+                    
+                    <strong>Lecture du graphique :</strong><br>
+                    • <strong>Axe horizontal (bas) :</strong> Les dates des sessions, de la plus ancienne (gauche) à la plus récente (droite)<br>
+                    • <strong>Axe vertical (gauche) :</strong> Le score total cumulé<br>
+                    • <strong>Les barres :</strong> Chaque barre représente le score total d'un joueur à une date donnée. La couleur correspond au joueur.<br><br>
+                    
+                    <em>Astuce :</em> Plus la barre est haute, meilleur était le score total du joueur à cette date.
+                </div>
+            </div>
+            <div class="mb-3 sm:mb-4 md:mb-5 relative z-10">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 md:gap-5">
+                    <div class="flex-1 w-full sm:w-auto">
+                        <label for="evolution-group-select" class="block mb-1.5 sm:mb-2 md:mb-2.5 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
+                            Sélectionner un groupe de joueurs:
+                        </label>
+                        <div class="select-wrapper relative w-full max-w-md">
+                            <select id="evolution-group-select" class="group-select w-full p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
+                                <option value="">Sélectionner un groupe</option>
+                            </select>
+                            <span class="select-arrow">▼</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 mt-4 sm:mt-0">
+                        <input type="checkbox" id="evolution-cumul-checkbox" checked class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: #8b4513;">
+                        <label for="evolution-cumul-checkbox" class="text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px] cursor-pointer" style="color: #ffd700;">Cumulé</label>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
+                <canvas id="evolution-chart"></canvas>
+            </div>
+        </section>
+
         <section id="win-rate-evolution-chart" class="margin-bottom-section pad-section overflow-x-auto">
             <div class="section-header">
-                <h2 class="txt-heading break-words">📊 Évolution % de victoires</h2>
+                <h2 class="txt-heading break-words">📈 Évolution % de victoires</h2>
             </div>
             <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
                 <canvas id="win-rate-evolution-chart-canvas"></canvas>

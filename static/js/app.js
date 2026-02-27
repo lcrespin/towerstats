@@ -502,7 +502,7 @@ var ANCHOR_HASH_MAP = {
     'classements': 'pourcentage-victoires',
     'sessions': 'derniere-soiree',
     'kills': 'kill-relationships',
-    'evolution': 'win-rate-evolution-chart'
+    'evolution': 'evolution-scores'
 };
 
 function scrollToAnchor() {
