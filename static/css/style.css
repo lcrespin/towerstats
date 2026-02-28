@@ -797,6 +797,74 @@ section h2 {
     transform: scale(1.1);
 }
 
+.active-filters-banner {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.active-filters-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    padding: 10px 14px;
+    background: rgba(139, 69, 19, 0.25);
+    border: 2px solid #8b4513;
+    border-radius: 6px;
+    color: #ffd700;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    font-size: 8px;
+    line-height: 1.4;
+}
+
+@media (min-width: 640px) {
+    .active-filters-inner { font-size: 9px; }
+}
+
+@media (min-width: 1024px) {
+    .active-filters-inner { font-size: 10px; }
+}
+
+.active-filters-title {
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.active-filters-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    align-items: center;
+}
+
+.active-filters-list li {
+    display: inline;
+}
+
+.active-filters-list li::before {
+    content: '• ';
+    margin-right: 2px;
+}
+
+.active-filters-reset {
+    margin-left: auto;
+    color: #ffd700;
+    text-decoration: underline;
+    font-weight: bold;
+    font-size: 8px;
+}
+
+@media (min-width: 640px) {
+    .active-filters-reset { font-size: 9px; }
+}
+
+.active-filters-reset:hover {
+    color: #ffed4e;
+}
+
 .date-picker-popover {
     display: none;
     position: fixed;

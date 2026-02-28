@@ -144,6 +144,30 @@
         </div>
     </nav>
 
+    {% if selected_session_id or selected_group_id or selected_date_start or selected_date_end %}
+    <div class="active-filters-banner container mx-auto px-2 sm:px-4 md:px-6 lg:px-8" style="max-width: 1000px !important;">
+        <div class="active-filters-inner">
+            <span class="active-filters-title">Filtres appliqués :</span>
+            <ul class="active-filters-list">
+                {% if selected_session_id %}
+                {% for session in all_sessions_data %}
+                {% if session.date ~ '|' ~ session.id == selected_session_id %}
+                <li>Session : {{ session.formatted_date }} ({{ session.players|map(attribute='name')|join(', ') }})</li>
+                {% endif %}
+                {% endfor %}
+                {% endif %}
+                {% if selected_group_id and not selected_session_id %}
+                <li>Groupe : {{ selected_group_id }}</li>
+                {% endif %}
+                {% if selected_date_start or selected_date_end %}
+                <li>Période : {% if selected_date_start %}{{ selected_date_start }}{% else %}—{% endif %} → {% if selected_date_end %}{{ selected_date_end }}{% else %}—{% endif %}</li>
+                {% endif %}
+            </ul>
+            <a href="/" class="active-filters-reset">Réinitialiser</a>
+        </div>
+    </div>
+    {% endif %}
+
     <div class="container mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-4 md:py-5" style="max-width: 1000px !important;">
         <section id="statistiques" class="margin-bottom-section pad-section overflow-x-auto">
             <div class="section-header">
