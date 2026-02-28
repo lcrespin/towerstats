@@ -158,11 +158,34 @@ class SessionDataManager:
                     # Mettre à jour le total précédent
                     previous_totals[player] = current_total
 
+    def recompute_totals_from_today(self) -> None:
+        """Recompute totalWin from cumulative sum of todayWin per group (fixes source inconsistencies)."""
+        sessions_by_group = defaultdict(list)
+        for session in self.sessions:
+            if session.get('id'):
+                sessions_by_group[session['id']].append(session)
+        for group_id, group_sessions in sessions_by_group.items():
+            group_sessions.sort(key=lambda x: x['date'])
+            cumulative = defaultdict(int)
+            for session in group_sessions:
+                SessionDataManager.normalize_session_players(session)
+                data = session['data']
+                if 'todayWin' not in data:
+                    continue
+                if 'totalWin' not in data:
+                    data['totalWin'] = {}
+                for player, today in data['todayWin'].items():
+                    if SessionDataManager.should_ignore_player(player):
+                        continue
+                    cumulative[player] += today
+                    data['totalWin'][player] = cumulative[player]
+
     def load_all(self) -> None:
         """Charge toutes les données : fetch, filter, correct, et tri."""
         self.fetch()
         self.filter_sessions()
         self.correct_sessions()
+        self.recompute_totals_from_today()
         # Trier par date (plus récent en premier)
         self.sessions.sort(key=lambda x: x['date'], reverse=True)
 
