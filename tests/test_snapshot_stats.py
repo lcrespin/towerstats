@@ -195,8 +195,9 @@ EXPECTED_TEMPLATE_KEYS = frozenset({
     "latest_date",
     "latest_sessions_parsed", "sessions_by_date", "all_sessions_data",
     "player_colors", "has_detailed_stats", "kill_death_ranking",
-    "kill_sources_aggregated", "kill_relationships", "all_players_for_matrix",
-    "max_kills_in_matrix", "top_killers", "top_deaths", "top_self_kills",
+    "kill_sources_aggregated", "kill_relationships", "kill_relationships_totals",
+    "all_players_for_matrix", "max_kills_in_matrix", "max_kills_in_matrix_totals",
+    "top_killers", "top_deaths", "top_self_kills",
     "least_deaths_row", "least_self_kills_row",
     "best_kd_ratio", "best_kd_value",
 })

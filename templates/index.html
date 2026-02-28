@@ -610,12 +610,18 @@
 
         {% if has_detailed_stats %}
         <section id="kill-relationships" class="margin-bottom-section pad-section overflow-x-auto">
-            <div class="section-header">
-                <h2 class="txt-heading break-words">🔗 Relations de Kills</h2>
-                <button class="info-button" data-info="kill-relationships-info">?</button>
+            <div class="section-header flex flex-wrap items-center justify-between gap-2">
+                <div class="flex items-center gap-2">
+                    <h2 class="txt-heading break-words">🔗 Relations de Kills</h2>
+                    <button class="info-button" data-info="kill-relationships-info">?</button>
+                </div>
+                <div class="flex items-center gap-2" style="color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+                    <input type="checkbox" id="kill-relationships-totals-toggle" class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: #8b4513;">
+                    <label for="kill-relationships-totals-toggle" class="text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px] cursor-pointer">Totaux</label>
+                </div>
             </div>
             <div class="text-center mb-3 sm:mb-4" style="color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-                <p class="text-[6px] sm:text-[7px] md:text-[9px] lg:text-[10px]">Moyenne de kills par partie</p>
+                <p id="kill-relationships-subtitle" class="text-[6px] sm:text-[7px] md:text-[9px] lg:text-[10px]">Moyenne de kills par partie</p>
             </div>
             <div id="kill-relationships-info" class="info-bubble">
                 <div class="info-bubble-title">🔗 Relations de Kills</div>
@@ -644,13 +650,15 @@
                     <tbody>
                         {% for killer in all_players_for_matrix %}
                         {% set victims = kill_relationships.get(killer, {}) %}
+                        {% set victims_totals = kill_relationships_totals.get(killer, {}) %}
                         <tr>
                             <td class="player-column" style="color: {{ get_player_color(killer) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ killer }}</td>
                             {% for victim_player in all_players_for_matrix %}
                             {% set kill_avg = victims.get(victim_player, 0) %}
+                            {% set kill_total = victims_totals.get(victim_player, 0) %}
                             {% set intensity = [kill_avg / max_kills_in_matrix, 1.0]|min if max_kills_in_matrix > 0 else 0 %}
                             {% set hue = (1 - intensity) * 120 %}
-                            <td class="kill-cell" data-count="{{ kill_avg }}" style="background-color: hsla({{ hue }}, 70%, 52%, 0.40); color: #1a1a2e;">
+                            <td class="kill-cell" data-avg="{{ kill_avg }}" data-total="{{ kill_total }}" data-max-avg="{{ max_kills_in_matrix }}" data-max-total="{{ max_kills_in_matrix_totals }}" style="background-color: hsla({{ hue }}, 70%, 52%, 0.40); color: #1a1a2e;">
                                 {% if kill_avg > 0 %}{{ "%.2f" % kill_avg }}{% else %}-{% endif %}
                             </td>
                             {% endfor %}

@@ -566,51 +566,36 @@ class SessionStatsManager:
         }
     
     def get_kill_relationships(self):
-        """Crée une matrice montrant qui tue qui avec la moyenne de kills par partie.
-        
-        Pour chaque paire (killer, victim), calcule la moyenne de kills par partie
-        en divisant le total de kills par le nombre total de parties dans les sessions
-        où les deux joueurs ont joué ensemble.
-        
+        """Matrice qui tue qui: moyennes et totaux par paire (killer, victim).
+
         Returns:
-            dict: {killer: {victim: average_kills_per_game}} - Matrice des moyennes de kills entre joueurs
+            tuple: (averages, totals) - averages: {killer: {victim: float}}, totals: {killer: {victim: int}}
         """
-        # Dictionnaires pour stocker les totaux de kills et le nombre de parties
         total_kills = defaultdict(lambda: defaultdict(int))
         total_games = defaultdict(lambda: defaultdict(int))
-        
+
         for session in self.sessions:
             players = SessionDataManager.parse_session_data(session)
             if not players:
                 continue
-            
-            # Calculer le nombre total de parties dans cette session
             total_games_in_session = sum(stats['today'] for stats in players.values())
-            
-            # Pour chaque joueur (victime)
             for player, stats in players.items():
                 if 'detailed' in stats:
                     kill_by = stats['detailed'].get('killBy', {})
-                    # Pour chaque tueur qui a tué ce joueur
                     for killer, count in kill_by.items():
-                        # Ajouter les kills au total
                         total_kills[killer][player] += count
-                        # Ajouter le nombre de parties de cette session
                         total_games[killer][player] += total_games_in_session
-        
-        # Calculer les moyennes
-        relationships = defaultdict(dict)
+
+        relationships_avg = defaultdict(dict)
+        relationships_totals = defaultdict(dict)
         for killer in total_kills:
             for victim in total_kills[killer]:
                 kills = total_kills[killer][victim]
                 games = total_games[killer][victim]
-                if games > 0:
-                    average = kills / games
-                    relationships[killer][victim] = average
-                else:
-                    relationships[killer][victim] = 0.0
-        
-        return dict(relationships)
+                relationships_totals[killer][victim] = kills
+                relationships_avg[killer][victim] = (kills / games) if games > 0 else 0.0
+
+        return dict(relationships_avg), dict(relationships_totals)
     
     def prepare_template_data(self):
         """Prépare toutes les données nécessaires pour le template HTML."""
@@ -771,15 +756,16 @@ class SessionStatsManager:
         best_kd_ratio = []
         best_kd_value = 0.0
         max_kills_in_matrix = 1
+        max_kills_in_matrix_totals = 1
+        kill_relationships_totals = {}
 
         if has_detailed:
             kill_death_ranking = self._add_dense_ranks(
                 self.get_kill_death_stats(), score_index=4, name_index=0
             )
             kill_sources_aggregated = self.get_kill_sources_stats()
-            kill_relationships = self.get_kill_relationships()
+            kill_relationships, kill_relationships_totals = self.get_kill_relationships()
 
-            # Collecter tous les joueurs uniques pour la matrice (tueurs + victimes)
             all_players_set = set()
             for row in kill_death_ranking:
                 all_players_set.add(row[1])
@@ -789,11 +775,15 @@ class SessionStatsManager:
                     all_players_set.add(victim)
             all_players_for_matrix = sorted(list(all_players_set))
 
-            # Maximum de kills pour la normalisation de la matrice
+            max_kills_in_matrix_totals = 1
             for killer, victims in kill_relationships.items():
                 for victim, count in victims.items():
                     if count > max_kills_in_matrix:
                         max_kills_in_matrix = count
+            for killer, victims in kill_relationships_totals.items():
+                for victim, count in victims.items():
+                    if count > max_kills_in_matrix_totals:
+                        max_kills_in_matrix_totals = count
 
             # Top / least depuis kill_death_ranking (rank at index 0, then player, k, d, self_k, kd, games, kpg, dpg, self_pg)
             if kill_death_ranking:
@@ -843,8 +833,10 @@ class SessionStatsManager:
             'kill_death_ranking': kill_death_ranking,
             'kill_sources_aggregated': kill_sources_aggregated,
             'kill_relationships': kill_relationships,
+            'kill_relationships_totals': kill_relationships_totals,
             'all_players_for_matrix': all_players_for_matrix,
             'max_kills_in_matrix': max_kills_in_matrix,
+            'max_kills_in_matrix_totals': max_kills_in_matrix_totals,
             'top_killers': top_killers,
             'top_deaths': top_deaths,
             'top_self_kills': top_self_kills,

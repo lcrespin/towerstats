@@ -1111,6 +1111,34 @@ function updateKillSourcesPercentLabel() {
     label.textContent = check.checked ? 'Moyennes' : 'Pourcentages';
 }
 
+function updateKillRelationshipsTable(useTotals) {
+    const subtitle = document.getElementById('kill-relationships-subtitle');
+    if (subtitle) {
+        subtitle.textContent = useTotals ? 'Nombre total de kills' : 'Moyenne de kills par partie';
+    }
+    const cells = document.querySelectorAll('#kill-relationships-table .kill-cell');
+    cells.forEach(function(cell) {
+        const avg = parseFloat(cell.getAttribute('data-avg')) || 0;
+        const total = parseInt(cell.getAttribute('data-total'), 10) || 0;
+        const maxAvg = parseFloat(cell.getAttribute('data-max-avg')) || 1;
+        const maxTotal = parseInt(cell.getAttribute('data-max-total'), 10) || 1;
+        const value = useTotals ? total : avg;
+        const maxVal = useTotals ? maxTotal : maxAvg;
+        cell.textContent = value > 0 ? (useTotals ? String(value) : value.toFixed(2)) : '-';
+        const intensity = maxVal > 0 ? Math.min(value / maxVal, 1) : 0;
+        const hue = (1 - intensity) * 120;
+        cell.style.backgroundColor = 'hsla(' + hue + ', 70%, 52%, 0.40)';
+    });
+}
+
+function initKillRelationshipsTotalsToggle() {
+    const toggle = document.getElementById('kill-relationships-totals-toggle');
+    if (!toggle) return;
+    toggle.addEventListener('change', function() {
+        updateKillRelationshipsTable(toggle.checked);
+    });
+}
+
 function updateKillSourcesByPlayerChart() {
     const byPlayerCanvas = document.getElementById('kill-sources-by-player-chart');
     if (!byPlayerCanvas || !killSourcesAggregated) return;
@@ -1327,6 +1355,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initInfoBubbles();
     if (hasDetailedStats) {
         initKillSourcesCharts();
+        initKillRelationshipsTotalsToggle();
     }
     initAnchorOnLoad();
 });
