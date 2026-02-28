@@ -882,6 +882,14 @@ section h2 {
     min-width: 220px;
 }
 
+@media (max-width: 639px) {
+    .date-picker-popover {
+        width: calc(100vw - 24px);
+        max-width: 360px;
+        box-sizing: border-box;
+    }
+}
+
 .date-picker-popover.active {
     display: block;
 }
@@ -907,6 +915,7 @@ section h2 {
     flex-direction: column;
     gap: 4px;
     align-items: center;
+    width: 100%;
 }
 
 .date-picker-label {
@@ -935,6 +944,20 @@ section h2 {
     align-items: center;
     justify-content: center;
     gap: 8px 12px;
+    width: 100%;
+}
+
+@media (max-width: 639px) {
+    .date-picker-date-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 6px;
+    }
+    .date-picker-date-row .date-picker-input {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
 }
 
 .date-picker-sublabel {

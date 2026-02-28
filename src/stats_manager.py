@@ -106,24 +106,19 @@ class SessionStatsManager:
 
     def get_global_ranking(self, group_id=None):
         """Calcule le classement global pour un groupe spécifique.
-        
-        Utilise stats['total'] (le maximum parmi toutes les sessions du groupe)
-        pour obtenir le meilleur score dans ce groupe spécifique.
+
+        Utilise la somme des scores de chaque session (stats['today']) pour chaque joueur,
+        afin que le score par groupe soit recalculé lorsque des filtres (ex. dates) sont appliqués.
         """
         player_totals = defaultdict(int)
-        
+
         for session in self.sessions:
-            # Filtrer par groupe si spécifié
             if group_id and session['id'] != group_id:
                 continue
-            
             players = SessionDataManager.parse_session_data(session)
             for player, stats in players.items():
-                # Prendre le total le plus élevé (stats['total']) pour chaque joueur
-                if stats['total'] > player_totals[player]:
-                    player_totals[player] = stats['total']
-        
-        # Trier par total décroissant
+                player_totals[player] += stats['today']
+
         ranking = sorted(player_totals.items(), key=lambda x: x[1], reverse=True)
         return ranking
 

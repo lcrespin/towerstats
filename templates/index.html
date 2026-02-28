@@ -184,7 +184,7 @@
                     Le joueur ayant le score ELO le plus élevé avec le nouveau calcul ELO (batch par session).<br><br>
                     
                     <strong>Meilleur Score dans un groupe</strong><br>
-                    Le score total le plus élevé jamais atteint par un joueur dans n'importe quel groupe.<br><br>
+                    Le plus haut score par groupe, calculé comme la somme des victoires de chaque session du groupe (selon les filtres appliqués).<br><br>
                     
                     <strong>Joueurs Uniques / Total Sessions</strong><br>
                     Nombre de joueurs différents qui ont joué au moins une fois, et nombre total de sessions de jeu enregistrées depuis le début.
@@ -524,11 +524,11 @@
                 <div class="info-bubble-content">
                     <strong>Comment ça marche ?</strong><br><br>
                     
-                    Pour chaque joueur du groupe sélectionné, on prend son <strong>meilleur score total</strong> parmi toutes les sessions de ce groupe.<br><br>
+                    Pour chaque joueur du groupe sélectionné, on additionne ses <strong>scores de chaque session</strong> (victoires du jour) de ce groupe.<br><br>
                     
-                    Les joueurs sont ensuite classés du meilleur score au moins bon score.<br><br>
+                    Les joueurs sont classés du plus haut total au plus bas. Lorsque des filtres (ex. dates) sont appliqués, le classement est recalculé sur les sessions visibles.<br><br>
                     
-                    <em>Exemple :</em> Si un joueur a eu des scores de 50, 75 et 60 dans ce groupe, on prend 75 (son meilleur score).
+                    <em>Exemple :</em> Si un joueur a eu 50, 75 et 60 victoires dans trois sessions du groupe, son score groupe est 50+75+60 = 185.
                 </div>
             </div>
             <div class="mb-3 sm:mb-4 md:mb-5 relative z-10">
