@@ -611,14 +611,10 @@ class SessionStatsManager:
             raw = self.get_global_ranking(group_id)
             rankings_by_group[group_id] = self._add_dense_ranks(raw, score_index=1, name_index=0)
         
-        # Trier les groupes par le meilleur score du groupe (décroissant)
-        sorted_groups = sorted(
-            unique_groups,
-            key=lambda g: rankings_by_group.get(g, [])[0][2] if rankings_by_group.get(g) else 0,
-            reverse=True
-        )
+        # Trier les groupes par nombre de sessions jouées (décroissant), même ordre que le filtre
+        sorted_groups = SessionDataManager.sorted_group_ids_by_session_count(self.sessions)
         
-        # Classement par défaut (groupe avec le meilleur score)
+        # Classement par défaut (groupe avec le plus de sessions)
         default_group = sorted_groups[0] if sorted_groups else None
         default_ranking = rankings_by_group.get(default_group, []) if default_group else []
         

@@ -16,6 +16,13 @@ def _filter_sessions_by_session_id(sessions, session_id):
     """Filter sessions by session_id using data_manager helper."""
     return SessionDataManager.filter_sessions_by_session_id(sessions, session_id)
 
+
+def _filter_sessions_by_group_id(sessions, group_id):
+    """Keep only sessions whose id equals group_id."""
+    if not group_id or not group_id.strip():
+        return sessions
+    return [s for s in sessions if s.get('id') == group_id]
+
 # Chemin vers la racine du projet (un niveau au-dessus de src/)
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -73,16 +80,24 @@ def flask_display_stats(path):
     date_start = request.args.get('dateStart') or None
     date_end = request.args.get('dateEnd') or None
     session_id = request.args.get('sessionId') or None
+    group_id = request.args.get('groupId') or None
+
+    all_groups_for_filter = SessionDataManager.sorted_group_ids_by_session_count(sessions)
 
     if session_id:
         sessions = _filter_sessions_by_session_id(sessions, session_id)
         date_start = None
         date_end = None
+    elif group_id:
+        sessions = _filter_sessions_by_group_id(sessions, group_id)
+
     stats_manager = SessionStatsManager(sessions, date_start=date_start, date_end=date_end)
     template_data = stats_manager.prepare_template_data()
     template_data['selected_date_start'] = date_start
     template_data['selected_date_end'] = date_end
     template_data['selected_session_id'] = session_id
+    template_data['selected_group_id'] = group_id
+    template_data['all_groups_for_filter'] = all_groups_for_filter
     template_data['win_messages_by_player'] = load_win_messages()
 
     if session_id:

@@ -171,6 +171,16 @@ class SessionDataManager:
         return self.sessions
 
     @staticmethod
+    def sorted_group_ids_by_session_count(sessions: List[Dict[str, Any]]) -> List[str]:
+        """Return group ids sorted by number of sessions (descending)."""
+        count: Dict[str, int] = defaultdict(int)
+        for s in sessions:
+            gid = s.get('id')
+            if gid:
+                count[gid] += 1
+        return sorted(count.keys(), key=lambda g: -count[g])
+
+    @staticmethod
     def filter_sessions_by_session_id(
         sessions: List[Dict[str, Any]], session_id: str | None
     ) -> List[Dict[str, Any]]:

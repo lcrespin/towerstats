@@ -43,7 +43,7 @@
         <div class="flex flex-col gap-1.5 sm:gap-2.5">
             <div class="flex items-center justify-between w-full gap-2">
                 <div class="shrink-0 flex items-center justify-start">
-                    <button type="button" id="toggle-date-picker" class="info-button global-info-button txt-xs" title="Filtrer par dates" aria-label="Filtrer par dates">📅</button>
+                    <button type="button" id="toggle-date-picker" class="info-button global-info-button txt-xs" title="Filtrer" aria-label="Filtrer">🎚️</button>
                 </div>
                 <button type="button" id="mobile-menu-toggle" class="info-button global-info-button txt-xs sm:hidden" aria-label="Menu" aria-expanded="false">☰</button>
                 <ul class="hidden sm:flex flex-wrap justify-center gap-grid flex-1 min-w-0">
@@ -66,34 +66,43 @@
             </div>
         </div>
         <div id="date-picker-popover" class="date-picker-popover" aria-hidden="true">
-            <a href="/" class="date-picker-clear" aria-label="Tout remettre par défaut (aucune date, toutes les sessions)" title="Tout remettre par défaut (aucune date, toutes les sessions)">&#128465;</a>
             <button type="button" class="date-picker-close" aria-label="Fermer">×</button>
-            <form method="get" class="flex flex-col gap-2 sm:gap-3">
+            <form method="get" class="date-picker-form flex flex-col gap-3">
+                <h3 class="text-center text-[8px] sm:text-[9px] md:text-[11px] lg:text-xs font-bold" style="color: #ffd700;">Filtrer les sessions</h3>
                 {% set current_start = selected_date_start or date_debut_raw %}
                 {% set current_end = selected_date_end or date_fin_raw %}
-                <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-                    <div class="flex items-center gap-1 sm:gap-1.5">
-                        <label for="dateStart" class="text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">Depuis :</label>
-                        <input type="date" id="dateStart" name="dateStart" value="{{ current_start }}" class="bg-black/40 border border-yellow-700 rounded px-1 py-0.5 text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] text-yellow-100" {% if selected_session_id %}disabled{% endif %}>
-                    </div>
-                    <div class="flex items-center gap-1 sm:gap-1.5">
-                        <label for="dateEnd" class="text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">Jusqu'à :</label>
-                        <input type="date" id="dateEnd" name="dateEnd" value="{{ current_end }}" class="bg-black/40 border border-yellow-700 rounded px-1 py-0.5 text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] text-yellow-100" {% if selected_session_id %}disabled{% endif %}>
+                <div class="date-picker-field">
+                    <div class="date-picker-date-row">
+                        <label for="dateStart" class="date-picker-sublabel">Depuis</label>
+                        <input type="date" id="dateStart" name="dateStart" value="{{ current_start }}" class="date-picker-input" {% if selected_session_id %}disabled{% endif %}>
+                        <label for="dateEnd" class="date-picker-sublabel">Jusqu'à</label>
+                        <input type="date" id="dateEnd" name="dateEnd" value="{{ current_end }}" class="date-picker-input" {% if selected_session_id %}disabled{% endif %}>
                     </div>
                 </div>
-                <div class="flex flex-col items-center">
-                    <label for="session-select" class="block mb-1 text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">Choisir une session</label>
-                    <div class="select-wrapper relative w-auto max-w-full">
-                        <select id="session-select" name="sessionId" class="group-select w-auto min-w-[12rem] max-w-full p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px] bg-black/40 border border-yellow-700 rounded text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] text-yellow-100">
+                <div class="date-picker-field">
+                    <div class="date-picker-select-wrapper">
+                        <select id="session-select" name="sessionId" class="date-picker-select">
                             <option value="">Toutes les sessions</option>
                             {% for session in all_sessions_data %}
                             <option value="{{ session.date }}|{{ session.id }}" {% if selected_session_id == session.date ~ '|' ~ session.id %}selected{% endif %}>{{ session.formatted_date }} ({{ session.players|map(attribute='name')|join(', ') }})</option>
                             {% endfor %}
                         </select>
-                        <span class="select-arrow">▼</span>
+                        <span class="date-picker-select-arrow">▼</span>
                     </div>
                 </div>
-                <div class="flex justify-center">
+                <div class="date-picker-field">
+                    <div class="date-picker-select-wrapper">
+                        <select id="filter-group-select" name="groupId" class="date-picker-select">
+                            <option value="">Tous les groupes</option>
+                            {% for gid in all_groups_for_filter %}
+                            <option value="{{ gid }}" {% if gid == selected_group_id %}selected{% endif %}>{{ gid }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="date-picker-select-arrow">▼</span>
+                    </div>
+                </div>
+                <div class="date-picker-actions">
+                    <a href="/" class="toggle-button toggle-button-secondary text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] px-2 py-1 sm:px-3 sm:py-1.5">Réinitialiser</a>
                     <button type="submit" class="toggle-button text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] px-2 py-1 sm:px-3 sm:py-1.5">Appliquer</button>
                 </div>
             </form>
