@@ -180,8 +180,10 @@
                     <strong>Meilleur % Victoires</strong><br>
                     Le joueur avec le meilleur pourcentage de victoires. Calculé en additionnant toutes ses victoires, puis en divisant par le nombre total de parties auxquelles il a participé.<br><br>
                     
-                    <strong>Meilleur ELO</strong><br>
-                    Le joueur ayant le score ELO le plus élevé avec le nouveau calcul ELO (batch par session).<br><br>
+                    <strong>ELO session (carte du dessus)</strong><br>
+                    Le ou les joueurs avec le plus haut ELO calculé <em>par session</em> (une mise à jour batch par session d’après les victoires du jour).<br><br>
+                    <strong>ELO match (carte du dessous, si affiché)</strong><br>
+                    Le ou les joueurs avec le plus haut ELO calculé <em>match par match</em> d’après les kills par match (champ <code>matchsResults</code> dans les données) : toutes les sessions par ordre de date, puis chaque match dans l’ordre du tableau.<br><br>
                     
                     <strong>Meilleur Score dans un groupe</strong><br>
                     Le plus haut score par groupe, calculé comme la somme des victoires de chaque session du groupe (selon les filtres appliqués).<br><br>
@@ -207,20 +209,40 @@
                     </div>
                 </div>
                 {% endif %}
-                {% if best_elo_players %}
-                <div class="stat-card stat-card-align pad-card">
-                    <div class="stat-label txt-xs">Meilleur ELO</div>
-                    <div class="stat-value txt-title-h2">{{ "%.0f" % best_elo }}</div>
-                    <div class="flex flex-wrap justify-center gap-1.5 mt-1 pb-[2px]">
-                        {% for player in best_elo_players %}
-                        <div class="inline-flex flex-col items-center">
-                            <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
-                            {% if win_messages_by_player.get(player, []) %}
-                            <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
-                            {% endif %}
+                {% if best_elo_players or best_elo_match_players %}
+                <div class="stat-card pad-card flex flex-col gap-1.5 [&_.stat-value]:my-0.5">
+                    {% if best_elo_players %}
+                    <div>
+                        <div class="stat-label txt-xs">ELO session</div>
+                        <div class="stat-value txt-title-h2">{{ "%.0f" % best_elo }}</div>
+                        <div class="flex flex-wrap justify-center gap-1.5 mt-0.5 pb-[2px]">
+                            {% for player in best_elo_players %}
+                            <div class="inline-flex flex-col items-center">
+                                <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                                {% if win_messages_by_player.get(player, []) %}
+                                <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
                         </div>
-                        {% endfor %}
                     </div>
+                    {% endif %}
+                    {% if best_elo_match_players %}
+                    <div>
+                        <div class="stat-label txt-xs">ELO match</div>
+                        <div class="stat-value txt-title-h2">{{ "%.0f" % best_elo_match }}</div>
+                        <div class="flex flex-wrap justify-center gap-1.5 mt-0.5 pb-[2px]">
+                            {% for player in best_elo_match_players %}
+                            <div class="inline-flex flex-col items-center">
+                                <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                                {% if win_messages_by_player.get(player, []) %}
+                                <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
                 </div>
                 {% endif %}
                 {% if best_players %}
@@ -455,8 +477,11 @@
                     <strong>Interprétation de la session</strong><br>
                     Les joueurs sont classés selon leur nombre de victoires dans la session. Le meilleur gagne contre tous les autres, le deuxième gagne contre tous sauf le premier, etc.<br><br>
                     
+                    <strong>Colonne ELO match</strong><br>
+                    Deuxième métrique (à droite) : ELO recalculé <em>match par match</em> dans l’ordre global (dates de session, puis ordre du tableau <code>matchsResults</code> dans chaque enregistrement). Pour chaque match, les joueurs sont classés par nombre de kills ; les paires et le batch (somme des deltas) suivent la même règle que l’ELO session. Si une session n’a pas de <code>matchsResults</code>, elle n’alimente pas ce calcul ; le joueur reste à 1500 jusqu’à ses matchs comptés.<br><br>
+
                     <strong>Facteur K = 32</strong><br>
-                    Détermine la vitesse de changement. Plus K est élevé, plus les scores changent rapidement après chaque session.
+                    Détermine la vitesse de changement. Plus K est élevé, plus les scores changent rapidement après chaque session (ELO session) ou après chaque match (ELO match).
                 </div>
             </div>
             <div class="overflow-x-auto">
@@ -464,7 +489,8 @@
                 <thead>
                     <tr>
                         <th class="player-column">Joueur</th>
-                        <th>ELO</th>
+                        <th>ELO session</th>
+                        <th>ELO match</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -474,11 +500,12 @@
                     <tr>
                         <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
                         <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.0f" % elo }}</td>
+                        <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.0f" % (elo_match_by_player.get(player, 1500)) }}</td>
                     </tr>
                     {% endfor %}
                     {% else %}
                     <tr>
-                        <td colspan="2" class="text-center" style="color: #ffd700; padding: 20px;">Aucun classement ELO disponible</td>
+                        <td colspan="3" class="text-center" style="color: #ffd700; padding: 20px;">Aucun classement ELO disponible</td>
                     </tr>
                     {% endif %}
                 </tbody>
@@ -804,13 +831,36 @@
 
         <section id="elo-evolution-chart" class="margin-bottom-section pad-section overflow-x-auto">
             <div class="section-header">
-                <h2 class="txt-heading break-words">📈 Évolution ELO</h2>
+                <h2 class="txt-heading break-words">📈 Évolution ELO (session)</h2>
             </div>
             <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
                 <canvas id="elo-evolution-chart-canvas"></canvas>
             </div>
             <div class="stats-dates">
                 <div>Depuis le {{ date_debut }}</div>
+            </div>
+        </section>
+
+        <section id="elo-match-evolution-chart" class="margin-bottom-section pad-section overflow-x-auto">
+            <div class="section-header">
+                <h2 class="txt-heading break-words">📈 Évolution ELO (match)</h2>
+            </div>
+            <div class="flex flex-wrap items-center gap-3 mb-2">
+                <span class="txt-xs" style="color: #ffd700;">Affichage :</span>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer txt-xs" style="color: #ffd700;">
+                    <input type="radio" name="elo-match-granularity" id="elo-match-granularity-session" value="session" checked class="w-3 h-3 cursor-pointer" style="accent-color: #8b4513;">
+                    Par session
+                </label>
+                <label class="inline-flex items-center gap-1.5 cursor-pointer txt-xs" style="color: #ffd700;">
+                    <input type="radio" name="elo-match-granularity" id="elo-match-granularity-match" value="match" class="w-3 h-3 cursor-pointer" style="accent-color: #8b4513;">
+                    Par match
+                </label>
+            </div>
+            <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
+                <canvas id="elo-match-evolution-chart-canvas"></canvas>
+            </div>
+            <div class="stats-dates">
+                <div>Par session : dernier ELO match de chaque session · Par match : tous les matchs · point de départ aligné sur l'ELO session (1500)</div>
             </div>
         </section>
 
@@ -827,6 +877,7 @@
         const hasDetailedStats = {{ has_detailed_stats|tojson }};
         const killSourcesAggregated = {{ kill_sources_aggregated|tojson }};
         const eloEvolutionData = {{ elo_evolution|tojson }};
+        const eloMatchEvolutionData = {{ elo_match_evolution|tojson }};
         const winRateEvolutionData = {{ win_rate_evolution|tojson }};
         let currentPage = 1;
         const sessionsPerPage = 10;

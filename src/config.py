@@ -15,6 +15,7 @@ PLAYER_TO_COLOR = {
     'ERIC': '#9370DB',
     'BENOIT': '#4169E1',
     'DAVID': '#FFFFFF',
+    'ZAYA': '#FF3333',
 }
 
 def get_player_color(player_name):

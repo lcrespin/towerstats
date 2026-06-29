@@ -304,6 +304,276 @@ class SessionStatsManager:
         elo_ratings = self.calculate_elo_legacy_ratings(initial_elo, k_factor)
         return list(elo_ratings.items())
 
+    def calculate_elo_match_ratings(self, initial_elo=1500, k_factor=32):
+        """Calcule l'ELO « match » : un batch (somme des paires) par match, dans l'ordre global.
+
+        Les sessions sont triées par date ; pour chacune, les éléments de
+        :func:`SessionDataManager.parse_matchs_results` définissent l'ordre
+        des matchs. Même règle de paires / rangs que l'ELO session, avec des
+        rangs dérivés des kills sur ce match uniquement.
+        """
+        elo_ratings = defaultdict(lambda: initial_elo)
+        sorted_sessions = sorted(self.sessions, key=lambda x: x.get('date', ''))
+
+        for session in sorted_sessions:
+            for match in SessionDataManager.parse_matchs_results(session):
+                if len(match) < 2:
+                    continue
+
+                sorted_by_kills = sorted(
+                    match.items(),
+                    key=lambda x: x[1],
+                    reverse=True,
+                )
+                sorted_players = [
+                    (player, {'today': kills})
+                    for player, kills in sorted_by_kills
+                ]
+                player_ranks = self._session_ranks_from_sorted(sorted_players)
+                player_names = sorted(match.keys())
+                match_deltas = defaultdict(float)
+
+                for i, player_a in enumerate(player_names):
+                    for player_b in player_names[i + 1:]:
+                        rank_a = player_ranks[player_a]
+                        rank_b = player_ranks[player_b]
+                        elo_a = elo_ratings[player_a]
+                        elo_b = elo_ratings[player_b]
+                        expected_score_a = 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
+
+                        if rank_a < rank_b:
+                            actual_score_a = 1.0
+                        elif rank_a == rank_b:
+                            actual_score_a = 0.5
+                        else:
+                            actual_score_a = 0.0
+
+                        elo_change = k_factor * (actual_score_a - expected_score_a)
+                        match_deltas[player_a] += elo_change
+                        match_deltas[player_b] -= elo_change
+
+                for player, delta in match_deltas.items():
+                    elo_ratings[player] += delta
+
+        return dict(
+            sorted(elo_ratings.items(), key=lambda x: x[1], reverse=True)
+        )
+
+    def get_elo_match_evolution(self, initial_elo=1500, k_factor=32) -> List[Dict[str, Any]]:
+        """Elo match : snapshot à la fin de chaque journée (sessions par date, matchs en ordre).
+
+        Pour chaque date (clé de session) présente, après toutes les sessions de ce jour
+        dans l'ordre de tri, produit l'Elo de chaque joueur connu (``parse_session_data``).
+        """
+        all_players: set = set()
+        for s in self.sessions:
+            all_players.update(SessionDataManager.parse_session_data(s).keys())
+        if not all_players:
+            return []
+        players_order = sorted(all_players)
+        elo_ratings = defaultdict(lambda: initial_elo)
+        sorted_sessions = sorted(self.sessions, key=lambda x: x.get('date', ''))
+        by_date: Dict[str, Dict[str, float]] = {}
+
+        for session in sorted_sessions:
+            for match in SessionDataManager.parse_matchs_results(session):
+                if len(match) < 2:
+                    continue
+                sorted_by_kills = sorted(
+                    match.items(), key=lambda x: x[1], reverse=True
+                )
+                sorted_players = [
+                    (pl, {'today': k}) for pl, k in sorted_by_kills
+                ]
+                player_ranks = self._session_ranks_from_sorted(sorted_players)
+                player_names = sorted(match.keys())
+                match_deltas = defaultdict(float)
+
+                for i, player_a in enumerate(player_names):
+                    for player_b in player_names[i + 1:]:
+                        rank_a = player_ranks[player_a]
+                        rank_b = player_ranks[player_b]
+                        elo_a = elo_ratings[player_a]
+                        elo_b = elo_ratings[player_b]
+                        expected_a = 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
+                        if rank_a < rank_b:
+                            actual_a = 1.0
+                        elif rank_a == rank_b:
+                            actual_a = 0.5
+                        else:
+                            actual_a = 0.0
+                        d_elo = k_factor * (actual_a - expected_a)
+                        match_deltas[player_a] += d_elo
+                        match_deltas[player_b] -= d_elo
+                for pl, delta in match_deltas.items():
+                    elo_ratings[pl] += delta
+            d = self._session_date_str(session)
+            if d:
+                by_date[d] = {p: float(elo_ratings[p]) for p in players_order}
+        return [
+            {
+                'date': d,
+                'formatted_date': self.format_date(d),
+                'elo_by_player': by_date[d],
+            }
+            for d in sorted(by_date.keys())
+        ]
+
+    def get_elo_match_evolution_by_match(
+        self, initial_elo: float = 1500, k_factor: float = 32
+    ) -> List[Dict[str, Any]]:
+        """ELO match : un point par match (après chaque match), ordre global date + matchs.
+
+        Même règles que :func:`calculate_elo_match_ratings`. Chaque point contient
+        ``date`` (session), ``formatted_date`` (libellé court + numéro de match),
+        et ``elo_by_player`` (tous les joueurs connus en session, à 1500 si jamais
+        concernés par un match).
+
+        Le graphique démarre au même instant que :func:`get_elo_evolution` (tous
+        à ``initial_elo``). Tant qu'aucun match n'a été joué dans la fenêtre filtrée,
+        l'ELO reste plat à ``initial_elo`` (un point par session sans ``matchsResults``).
+        """
+        all_players: set = set()
+        for s in self.sessions:
+            all_players.update(SessionDataManager.parse_session_data(s).keys())
+        if not all_players:
+            return []
+        players_order = sorted(all_players)
+        elo_ratings = defaultdict(lambda: initial_elo)
+        sorted_sessions = sorted(self.sessions, key=lambda x: x.get('date', ''))
+        out: List[Dict[str, Any]] = []
+        match_num = 0
+        matches_started = False
+
+        session_evo = self.get_elo_evolution(initial_elo, k_factor)
+        if session_evo:
+            baseline = session_evo[0]
+            out.append(
+                {
+                    'date': baseline['date'],
+                    'formatted_date': baseline['formatted_date'],
+                    'match_index': 0,
+                    'is_chart_baseline': True,
+                    'elo_by_player': {
+                        p: float(baseline['elo_by_player'].get(p, initial_elo))
+                        for p in players_order
+                    },
+                }
+            )
+
+        for session in sorted_sessions:
+            valid_matches = [
+                m for m in SessionDataManager.parse_matchs_results(session)
+                if len(m) >= 2
+            ]
+            if not matches_started and not valid_matches:
+                d = self._session_date_str(session)
+                out.append(
+                    {
+                        'date': d,
+                        'formatted_date': self.format_date(d),
+                        'match_index': 0,
+                        'session_id': session.get('id', ''),
+                        'session_date': session.get('date', ''),
+                        'session_label': self.format_date(d),
+                        'is_prematch_flat': True,
+                        'elo_by_player': {
+                            p: float(initial_elo) for p in players_order
+                        },
+                    }
+                )
+                continue
+
+            if not valid_matches:
+                continue
+
+            matches_started = True
+            for match in valid_matches:
+                sorted_by_kills = sorted(
+                    match.items(), key=lambda x: x[1], reverse=True
+                )
+                sorted_players = [
+                    (pl, {'today': k}) for pl, k in sorted_by_kills
+                ]
+                player_ranks = self._session_ranks_from_sorted(sorted_players)
+                player_names = sorted(match.keys())
+                match_deltas = defaultdict(float)
+                for i, player_a in enumerate(player_names):
+                    for player_b in player_names[i + 1:]:
+                        rank_a = player_ranks[player_a]
+                        rank_b = player_ranks[player_b]
+                        elo_a = elo_ratings[player_a]
+                        elo_b = elo_ratings[player_b]
+                        expected_a = 1 / (1 + 10 ** ((elo_b - elo_a) / 400))
+                        if rank_a < rank_b:
+                            actual_a = 1.0
+                        elif rank_a == rank_b:
+                            actual_a = 0.5
+                        else:
+                            actual_a = 0.0
+                        d_elo = k_factor * (actual_a - expected_a)
+                        match_deltas[player_a] += d_elo
+                        match_deltas[player_b] -= d_elo
+                for pl, delta in match_deltas.items():
+                    elo_ratings[pl] += delta
+                match_num += 1
+                d = self._session_date_str(session)
+                label = f"{self.format_date(d, format_short=True)} · M{match_num}"
+                out.append(
+                    {
+                        'date': d,
+                        'formatted_date': label,
+                        'match_index': match_num,
+                        'session_id': session.get('id', ''),
+                        'session_date': session.get('date', ''),
+                        'session_label': self.format_date(d),
+                        'elo_by_player': {
+                            p: float(elo_ratings[p]) for p in players_order
+                        },
+                    }
+                )
+
+        if match_num == 0:
+            return []
+        return out
+
+    def write_elo_match_evolution_log(
+        self,
+        file_path: str,
+        initial_elo: float = 1500,
+        k_factor: float = 32,
+    ) -> None:
+        """Écrit l'évolution Elo match (fin de journée) en texte lisible, une date par bloc."""
+        points = self.get_elo_match_evolution(initial_elo, k_factor)
+        lines: List[str] = [
+            f"# Elo match (fin de journée)  initial={initial_elo!r}  K={k_factor!r}",
+            f"# Colonnes: joueur -> Elo après toutes les sessions de la date.",
+            '#',
+        ]
+        for p in points:
+            lines.append(f"{p['date']}\t{p['formatted_date']}")
+            for name in sorted(p['elo_by_player'].keys()):
+                v = p['elo_by_player'][name]
+                lines.append(f"  {name}\t{v:.4f}")
+            lines.append('')
+        content = '\n'.join(lines)
+        if content and not content.endswith('\n'):
+            content += '\n'
+        with open(file_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+
+    def get_elo_match_ranking(self, initial_elo=1500, k_factor=32):
+        """Classement ELO match : tous les joueurs vus dans ``parse_session_data``, ELO = match ou 1500."""
+        ratings = self.calculate_elo_match_ratings(initial_elo, k_factor)
+        all_players = set()
+        for s in self.sessions:
+            all_players.update(SessionDataManager.parse_session_data(s).keys())
+        if not all_players:
+            return []
+        out = [(p, ratings.get(p, initial_elo)) for p in all_players]
+        out.sort(key=lambda x: (-x[1], x[0]))
+        return out
+
     def get_elo_evolution(self, initial_elo=1500, k_factor=32) -> List[Dict[str, Any]]:
         """Returns ELO after each session for chart: list of {date, formatted_date, elo_by_player}."""
         elo_ratings = defaultdict(lambda: initial_elo)
@@ -671,6 +941,12 @@ class SessionStatsManager:
         except Exception:
             elo_evolution = []
 
+        # Évolution ELO match : un point par match (pour le graphique)
+        try:
+            elo_match_evolution = self.get_elo_match_evolution_by_match()
+        except Exception:
+            elo_match_evolution = []
+
         # Évolution moyenne de victoires après chaque session (pour le graphique)
         try:
             win_rate_evolution = self.get_win_rate_evolution()
@@ -699,7 +975,26 @@ class SessionStatsManager:
             best_elo_legacy_players = [
                 row[1] for row in elo_legacy_ranking if row[2] == best_elo_legacy
             ]
-        
+
+        # ELO match (kills par match) + dictionnaire pour l'affichage à côté de l'ELO session
+        try:
+            elo_match_list = self.get_elo_match_ranking() or []
+            elo_match_ranking = self._add_dense_ranks(
+                list(elo_match_list), score_index=1, name_index=0
+            )
+            elo_match_by_player = dict(elo_match_list)
+        except Exception:
+            elo_match_ranking = []
+            elo_match_by_player = {}
+
+        best_elo_match_players = []
+        best_elo_match = 0.0
+        if elo_match_ranking:
+            best_elo_match = elo_match_ranking[0][2]
+            best_elo_match_players = [
+                row[1] for row in elo_match_ranking if row[2] == best_elo_match
+            ]
+
         def session_players_with_dense_rank(session):
             players = SessionDataManager.parse_session_data(session)
             if not players:
@@ -809,12 +1104,17 @@ class SessionStatsManager:
             'win_percentage_ranking': win_percentage_ranking,
             'elo_ranking': elo_ranking,
             'elo_evolution': elo_evolution,
+            'elo_match_evolution': elo_match_evolution,
             'win_rate_evolution': win_rate_evolution,
             'best_elo_players': best_elo_players,
             'best_elo': best_elo,
             'elo_legacy_ranking': elo_legacy_ranking,
             'best_elo_legacy_players': best_elo_legacy_players,
             'best_elo_legacy': best_elo_legacy,
+            'elo_match_ranking': elo_match_ranking,
+            'elo_match_by_player': elo_match_by_player,
+            'best_elo_match': best_elo_match,
+            'best_elo_match_players': best_elo_match_players,
             'latest_date': latest_date,
             'latest_sessions_parsed': latest_sessions_parsed,
             'sessions_by_date': sessions_by_date,

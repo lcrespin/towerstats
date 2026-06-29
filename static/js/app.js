@@ -676,11 +676,16 @@ function updateEvolutionChart(groupId, isCumul) {
         const data = sortedOriginalDates.map(function(originalDate) {
             return dataByDate[originalDate][player] || 0;
         });
+        const color = getPlayerColor(player);
         return {
             label: player,
             data: data,
-            backgroundColor: getPlayerColor(player),
-            borderColor: getPlayerColor(player),
+            _baseColor: color,
+            _baseBackgroundColor: color,
+            _baseBorderColor: color,
+            _baseBorderWidth: 1,
+            backgroundColor: color,
+            borderColor: color,
             borderWidth: 1
         };
     });
@@ -708,6 +713,8 @@ function updateEvolutionChart(groupId, isCumul) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: { mode: 'index', axis: 'x', intersect: false },
+            onHover: createDatasetHoverHandler(function() { return evolutionChart; }),
             scales: {
                 y: {
                     beginAtZero: true,
@@ -775,6 +782,7 @@ function updateEvolutionChart(groupId, isCumul) {
                     bodyColor: '#ffd700',
                     borderColor: '#8b4513',
                     borderWidth: 2,
+                    itemSort: sortTooltipItemsByValueDesc,
                     titleFont: {
                         family: 'Press Start 2P',
                         size: 8
@@ -788,6 +796,8 @@ function updateEvolutionChart(groupId, isCumul) {
             }
         }
     });
+    evolutionChart._hoverDatasetIndex = null;
+    bindMultiSeriesChartHoverReset(canvas, function() { return evolutionChart; });
 }
 
 // Graphique d'évolution moyenne de victoires par session
@@ -798,26 +808,7 @@ function initWinRateEvolutionChart() {
         return;
     }
     const labels = winRateEvolutionData.map(function(point) { return point.formatted_date; });
-    const allPlayers = new Set();
-    winRateEvolutionData.forEach(function(point) {
-        Object.keys(point.win_rate_by_player || {}).forEach(function(p) { allPlayers.add(p); });
-    });
-    const sortedPlayers = Array.from(allPlayers).sort();
-    const datasets = sortedPlayers.map(function(player) {
-        const data = winRateEvolutionData.map(function(point) {
-            const rate = point.win_rate_by_player && point.win_rate_by_player[player];
-            return rate != null ? rate : null;
-        });
-        return {
-            label: player,
-            data: data,
-            borderColor: getPlayerColor(player),
-            backgroundColor: getPlayerColor(player) + '33',
-            borderWidth: 2,
-            fill: false,
-            spanGaps: false
-        };
-    });
+    const datasets = buildPlayerLineDatasets(winRateEvolutionData, 'win_rate_by_player');
     let dataMax = 0;
     winRateEvolutionData.forEach(function(point) {
         const rates = point.win_rate_by_player || {};
@@ -834,23 +825,19 @@ function initWinRateEvolutionChart() {
     winRateEvolutionChart = new Chart(canvas.getContext('2d'), {
         type: 'line',
         data: { labels: labels, datasets: datasets },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    title: { display: true, text: 'Session', color: '#ffd700' },
-                    ticks: { color: '#ffd700', maxRotation: 45 }
-                },
-                y: {
-                    title: { display: true, text: 'Taux de victoires', color: '#ffd700' },
-                    ticks: { color: '#ffd700', callback: function(value) { return (value * 100).toFixed(0) + '%'; } },
-                    min: 0,
-                    max: yMax
+        options: buildPlayerLineChartOptions({
+            xTitle: 'Session',
+            yTitle: 'Taux de victoires',
+            hoverChartRef: function() { return winRateEvolutionChart; },
+            yScale: {
+                min: 0,
+                max: yMax,
+                ticks: {
+                    color: '#ffd700',
+                    callback: function(value) { return (value * 100).toFixed(0) + '%'; }
                 }
             },
             plugins: {
-                legend: { labels: { color: '#ffd700' } },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
@@ -860,7 +847,296 @@ function initWinRateEvolutionChart() {
                     }
                 }
             }
+        })
+    });
+    winRateEvolutionChart._hoverDatasetIndex = null;
+    bindMultiSeriesChartHoverReset(canvas, function() { return winRateEvolutionChart; });
+}
+
+// --- Utilitaires communs (survol + lignes sans points) ---
+
+function sortTooltipItemsByValueDesc(a, b) {
+    const ya = a.parsed.y != null ? a.parsed.y : a.raw;
+    const yb = b.parsed.y != null ? b.parsed.y : b.raw;
+    if (ya == null && yb == null) {
+        return 0;
+    }
+    if (ya == null) {
+        return 1;
+    }
+    if (yb == null) {
+        return -1;
+    }
+    return yb - ya;
+}
+
+function dimChartColor(color, alpha) {
+    if (typeof color !== 'string') {
+        return color;
+    }
+    const rgba = color.match(/^rgba?\(([^)]+)\)$/);
+    if (rgba) {
+        const parts = rgba[1].split(',').map(function(part) { return part.trim(); });
+        if (parts.length >= 3) {
+            return 'rgba(' + parts[0] + ', ' + parts[1] + ', ' + parts[2] + ', ' + alpha + ')';
         }
+    }
+    if (color.charAt(0) === '#' && color.length >= 7) {
+        const hexAlpha = Math.round(alpha * 255).toString(16).padStart(2, '0');
+        return color.slice(0, 7) + hexAlpha;
+    }
+    return color;
+}
+
+function applyMultiSeriesChartHighlight(chart, activeDatasetIndex) {
+    if (!chart || !chart.data || !chart.data.datasets) {
+        return;
+    }
+    chart.data.datasets.forEach(function(ds, i) {
+        const base = ds._baseColor || ds.borderColor;
+        const bg = ds._baseBackgroundColor != null ? ds._baseBackgroundColor : base;
+        const border = ds._baseBorderColor != null ? ds._baseBorderColor : base;
+        const bw = ds._baseBorderWidth != null ? ds._baseBorderWidth : 2;
+        if (activeDatasetIndex == null) {
+            ds.borderColor = border;
+            ds.backgroundColor = bg;
+            ds.borderWidth = bw;
+        } else if (i === activeDatasetIndex) {
+            ds.borderColor = border;
+            ds.backgroundColor = bg;
+            ds.borderWidth = 3;
+        } else {
+            ds.borderColor = typeof border === 'string' && border.indexOf('rgba') === 0
+                ? dimChartColor(border, 0.45) : border + '55';
+            ds.backgroundColor = typeof bg === 'string' && bg.indexOf('rgba') === 0
+                ? dimChartColor(bg, 0.2)
+                : (typeof base === 'string' && base.charAt(0) === '#' ? base + '55' : bg);
+            ds.borderWidth = 1;
+        }
+    });
+    chart.update('none');
+}
+
+function applyPieSliceHighlight(chart, activeIndex) {
+    const ds = chart && chart.data && chart.data.datasets[0];
+    if (!ds) {
+        return;
+    }
+    if (!ds._baseColors) {
+        ds._baseColors = (Array.isArray(ds.backgroundColor) ? ds.backgroundColor : [ds.backgroundColor]).slice();
+    }
+    if (!ds._baseBorderWidths) {
+        const bw = ds.borderWidth;
+        ds._baseBorderWidths = Array.isArray(bw)
+            ? bw.slice()
+            : ds._baseColors.map(function() { return bw != null ? bw : 2; });
+    }
+    ds.backgroundColor = ds._baseColors.map(function(color, i) {
+        if (activeIndex == null || i === activeIndex) {
+            return color;
+        }
+        return dimChartColor(color, 0.25);
+    });
+    ds.borderWidth = ds._baseBorderWidths.map(function(width, i) {
+        if (activeIndex == null) {
+            return width;
+        }
+        return i === activeIndex ? 3 : 1;
+    });
+    chart.update('none');
+}
+
+function getMultiSeriesHoveredDatasetIndex(chart, event) {
+    const native = event && (event.native || event);
+    if (!chart || !native || !chart.canvas || !chart.scales.x) {
+        return null;
+    }
+    const rect = chart.canvas.getBoundingClientRect();
+    const mouseX = native.clientX - rect.left;
+    const mouseY = native.clientY - rect.top;
+    const area = chart.chartArea;
+    if (
+        mouseX < area.left || mouseX > area.right ||
+        mouseY < area.top || mouseY > area.bottom
+    ) {
+        return null;
+    }
+    const rawIndex = chart.scales.x.getValueForPixel(mouseX);
+    if (rawIndex == null || Number.isNaN(rawIndex)) {
+        return null;
+    }
+    const dataIndex = Math.max(0, Math.min(
+        chart.data.labels.length - 1,
+        Math.round(rawIndex)
+    ));
+    let bestIdx = null;
+    let bestDist = Infinity;
+    chart.data.datasets.forEach(function(ds, datasetIndex) {
+        const value = ds.data[dataIndex];
+        if (value == null) {
+            return;
+        }
+        const meta = chart.getDatasetMeta(datasetIndex);
+        const point = meta.data[dataIndex];
+        if (!point || point.skip) {
+            return;
+        }
+        const dist = Math.abs(point.y - mouseY);
+        if (dist < bestDist) {
+            bestDist = dist;
+            bestIdx = datasetIndex;
+        }
+    });
+    return bestIdx;
+}
+
+function createDatasetHoverHandler(getChart) {
+    return function(event) {
+        const chart = getChart();
+        if (!chart) {
+            return;
+        }
+        const idx = getMultiSeriesHoveredDatasetIndex(chart, event);
+        if (chart._hoverDatasetIndex === idx) {
+            return;
+        }
+        chart._hoverDatasetIndex = idx;
+        applyMultiSeriesChartHighlight(chart, idx);
+    };
+}
+
+function createPieHoverHandler(getChart) {
+    return function(_event, elements) {
+        const chart = getChart();
+        if (!chart) {
+            return;
+        }
+        const idx = elements.length ? elements[0].index : null;
+        if (chart._hoverSliceIndex === idx) {
+            return;
+        }
+        chart._hoverSliceIndex = idx;
+        applyPieSliceHighlight(chart, idx);
+    };
+}
+
+function bindChartHoverReset(canvas, getChart, resetFn) {
+    if (!canvas || canvas.dataset.hoverResetBound) {
+        return;
+    }
+    canvas.dataset.hoverResetBound = '1';
+    canvas.addEventListener('mouseleave', function() {
+        const chart = getChart();
+        if (!chart) {
+            return;
+        }
+        resetFn(chart);
+    });
+}
+
+function bindMultiSeriesChartHoverReset(canvas, getChart) {
+    bindChartHoverReset(canvas, getChart, function(chart) {
+        chart._hoverDatasetIndex = null;
+        applyMultiSeriesChartHighlight(chart, null);
+    });
+}
+
+function bindPieChartHoverReset(canvas, getChart) {
+    bindChartHoverReset(canvas, getChart, function(chart) {
+        chart._hoverSliceIndex = null;
+        applyPieSliceHighlight(chart, null);
+    });
+}
+
+function buildPlayerLineDataset(player, data) {
+    const color = getPlayerColor(player);
+    return {
+        label: player,
+        data: data,
+        _baseColor: color,
+        _baseBackgroundColor: color + '33',
+        _baseBorderWidth: 2,
+        borderColor: color,
+        backgroundColor: color + '33',
+        borderWidth: 2,
+        fill: false,
+        spanGaps: false,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        pointHitRadius: 8
+    };
+}
+
+function buildPlayerLineDatasets(points, playerValuesKey) {
+    const allPlayers = new Set();
+    points.forEach(function(point) {
+        Object.keys(point[playerValuesKey] || {}).forEach(function(p) { allPlayers.add(p); });
+    });
+    return Array.from(allPlayers).sort().map(function(player) {
+        const data = points.map(function(point) {
+            const value = point[playerValuesKey] && point[playerValuesKey][player];
+            return value != null ? value : null;
+        });
+        return buildPlayerLineDataset(player, data);
+    });
+}
+
+function buildPlayerLineChartOptions(opts) {
+    opts = opts || {};
+    const xTicks = {
+        color: '#ffd700',
+        maxRotation: 45,
+        autoSkip: true
+    };
+    if (opts.xTickLimit) {
+        xTicks.maxTicksLimit = opts.xTickLimit;
+        xTicks.minRotation = 45;
+        xTicks.maxRotation = 60;
+    }
+    const hoverChartRef = opts.hoverChartRef;
+    const yScale = Object.assign({
+        title: { display: true, text: opts.yTitle || 'ELO', color: '#ffd700' },
+        ticks: { color: '#ffd700' }
+    }, opts.yScale || {});
+    const xScale = Object.assign({
+        title: { display: true, text: opts.xTitle || 'Session', color: '#ffd700' },
+        ticks: xTicks
+    }, opts.xScale || {});
+    const plugins = Object.assign({
+        legend: { labels: { color: '#ffd700' } }
+    }, opts.plugins || {});
+    plugins.tooltip = Object.assign(
+        { itemSort: sortTooltipItemsByValueDesc },
+        plugins.tooltip || {}
+    );
+    return {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: hoverChartRef ? { mode: 'index', axis: 'x', intersect: false } : undefined,
+        onHover: hoverChartRef ? createDatasetHoverHandler(hoverChartRef) : undefined,
+        scales: { x: xScale, y: yScale },
+        plugins: plugins
+    };
+}
+
+function buildEloEvolutionDatasets(points) {
+    return buildPlayerLineDatasets(points, 'elo_by_player');
+}
+
+function applyEloChartHighlight(chart, activeDatasetIndex) {
+    applyMultiSeriesChartHighlight(chart, activeDatasetIndex);
+}
+
+function getEloChartHoveredDatasetIndex(chart, event) {
+    return getMultiSeriesHoveredDatasetIndex(chart, event);
+}
+
+function buildEloLineChartOptions(xTitle, xTickLimit, hoverChartRef) {
+    return buildPlayerLineChartOptions({
+        xTitle: xTitle,
+        yTitle: 'ELO',
+        xTickLimit: xTickLimit,
+        hoverChartRef: hoverChartRef
     });
 }
 
@@ -872,49 +1148,110 @@ function initEloEvolutionChart() {
         return;
     }
     const labels = eloEvolutionData.map(function(point) { return point.formatted_date; });
-    const allPlayers = new Set();
-    eloEvolutionData.forEach(function(point) {
-        Object.keys(point.elo_by_player || {}).forEach(function(p) { allPlayers.add(p); });
-    });
-    const sortedPlayers = Array.from(allPlayers).sort();
-    const datasets = sortedPlayers.map(function(player) {
-        const data = eloEvolutionData.map(function(point) {
-            const elo = point.elo_by_player && point.elo_by_player[player];
-            return elo != null ? elo : null;
-        });
-        return {
-            label: player,
-            data: data,
-            borderColor: getPlayerColor(player),
-            backgroundColor: getPlayerColor(player) + '33',
-            borderWidth: 2,
-            fill: false,
-            spanGaps: false
-        };
-    });
+    const datasets = buildEloEvolutionDatasets(eloEvolutionData);
     const canvas = document.getElementById('elo-evolution-chart-canvas');
     if (!canvas) { return; }
     if (eloEvolutionChart) { eloEvolutionChart.destroy(); }
     eloEvolutionChart = new Chart(canvas.getContext('2d'), {
         type: 'line',
         data: { labels: labels, datasets: datasets },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    title: { display: true, text: 'Session', color: '#ffd700' },
-                    ticks: { color: '#ffd700', maxRotation: 45 }
-                },
-                y: {
-                    title: { display: true, text: 'ELO', color: '#ffd700' },
-                    ticks: { color: '#ffd700' }
-                }
-            },
-            plugins: {
-                legend: { labels: { color: '#ffd700' } }
-            }
+        options: buildPlayerLineChartOptions({
+            xTitle: 'Session',
+            yTitle: 'ELO',
+            hoverChartRef: function() { return eloEvolutionChart; }
+        })
+    });
+    eloEvolutionChart._hoverDatasetIndex = null;
+    bindMultiSeriesChartHoverReset(canvas, function() { return eloEvolutionChart; });
+}
+
+// Graphique d'évolution ELO match (un point par match)
+let eloMatchEvolutionChart = null;
+
+function getEloMatchGranularity() {
+    const checked = document.querySelector('input[name="elo-match-granularity"]:checked');
+    return checked ? checked.value : 'session';
+}
+
+function isEloMatchChartBaseline(point) {
+    return point.is_chart_baseline || point.formatted_date === 'Départ';
+}
+
+function eloMatchEvolutionSessionView(matchPoints) {
+    if (!matchPoints || !matchPoints.length) {
+        return [];
+    }
+    const depart = matchPoints.find(isEloMatchChartBaseline);
+    const sessionLast = new Map();
+    const sessionOrder = [];
+    matchPoints.forEach(function(point) {
+        if (isEloMatchChartBaseline(point)) {
+            return;
         }
+        const key = (point.session_date || point.date || '') + '|' + (point.session_id || '');
+        if (!sessionLast.has(key)) {
+            sessionOrder.push(key);
+        }
+        sessionLast.set(key, point);
+    });
+    const out = [];
+    if (depart) {
+        out.push(depart);
+    }
+    sessionOrder.forEach(function(key) {
+        const point = sessionLast.get(key);
+        out.push(Object.assign({}, point, {
+            formatted_date: point.session_label || point.formatted_date
+        }));
+    });
+    return out;
+}
+
+function getEloMatchEvolutionDisplayPoints() {
+    if (typeof eloMatchEvolutionData === 'undefined' || !eloMatchEvolutionData.length) {
+        return [];
+    }
+    if (getEloMatchGranularity() === 'match') {
+        return eloMatchEvolutionData;
+    }
+    return eloMatchEvolutionSessionView(eloMatchEvolutionData);
+}
+
+function renderEloMatchEvolutionChart() {
+    const points = getEloMatchEvolutionDisplayPoints();
+    if (!points.length) {
+        return;
+    }
+    const labels = points.map(function(point) { return point.formatted_date; });
+    const datasets = buildEloEvolutionDatasets(points);
+    const canvas = document.getElementById('elo-match-evolution-chart-canvas');
+    if (!canvas) {
+        return;
+    }
+    const isMatchView = getEloMatchGranularity() === 'match';
+    if (eloMatchEvolutionChart) {
+        eloMatchEvolutionChart.destroy();
+    }
+    eloMatchEvolutionChart = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: { labels: labels, datasets: datasets },
+        options: buildEloLineChartOptions('Match', isMatchView ? 24 : undefined, function() {
+            return eloMatchEvolutionChart;
+        })
+    });
+    eloMatchEvolutionChart._hoverDatasetIndex = null;
+    bindMultiSeriesChartHoverReset(canvas, function() { return eloMatchEvolutionChart; });
+}
+
+function initEloMatchEvolutionChart() {
+    if (typeof eloMatchEvolutionData === 'undefined' || eloMatchEvolutionData.length === 0) {
+        return;
+    }
+    renderEloMatchEvolutionChart();
+    document.querySelectorAll('input[name="elo-match-granularity"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            renderEloMatchEvolutionChart();
+        });
     });
 }
 
@@ -1058,6 +1395,7 @@ function initKillSourcesCharts() {
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                onHover: createPieHoverHandler(function() { return killSourcesGlobalChart; }),
                 plugins: {
                     legend: {
                         display: true,
@@ -1090,6 +1428,8 @@ function initKillSourcesCharts() {
                 }
             }
         });
+        killSourcesGlobalChart._hoverSliceIndex = null;
+        bindPieChartHoverReset(globalCanvas, function() { return killSourcesGlobalChart; });
     }
     
     // Graphique par joueur (barres empilées)
@@ -1176,10 +1516,15 @@ function updateKillSourcesByPlayerChart() {
                 return totals[i] > 0 ? (val / totals[i]) * 100 : 0;
             });
         }
+        const bg = sourceColors[source] || 'rgba(128, 128, 128, 0.8)';
         return {
             label: source,
             data: data,
-            backgroundColor: sourceColors[source] || 'rgba(128, 128, 128, 0.8)',
+            _baseColor: bg,
+            _baseBackgroundColor: bg,
+            _baseBorderColor: '#8b4513',
+            _baseBorderWidth: 1,
+            backgroundColor: bg,
             borderColor: '#8b4513',
             borderWidth: 1
         };
@@ -1197,6 +1542,8 @@ function updateKillSourcesByPlayerChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            interaction: { mode: 'index', axis: 'x', intersect: false },
+            onHover: createDatasetHoverHandler(function() { return killSourcesByPlayerChart; }),
             scales: {
                 x: {
                     stacked: true,
@@ -1244,6 +1591,7 @@ function updateKillSourcesByPlayerChart() {
                     bodyColor: '#ffd700',
                     borderColor: '#8b4513',
                     borderWidth: 2,
+                    itemSort: sortTooltipItemsByValueDesc,
                     titleFont: { family: 'Press Start 2P', size: 8 },
                     bodyFont: { family: 'Press Start 2P', size: 7 },
                     padding: 10,
@@ -1263,6 +1611,8 @@ function updateKillSourcesByPlayerChart() {
             }
         }
     });
+    killSourcesByPlayerChart._hoverDatasetIndex = null;
+    bindMultiSeriesChartHoverReset(byPlayerCanvas, function() { return killSourcesByPlayerChart; });
 }
 
 function syncDateInputsWithSessionSelect() {
@@ -1352,6 +1702,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initEvolutionChart();
     initWinRateEvolutionChart();
     initEloEvolutionChart();
+    initEloMatchEvolutionChart();
     initInfoBubbles();
     if (hasDetailedStats) {
         initKillSourcesCharts();

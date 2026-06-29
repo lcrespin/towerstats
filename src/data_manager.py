@@ -423,3 +423,42 @@ class SessionDataManager:
         
         return players
 
+    @staticmethod
+    def parse_matchs_results(session: Dict[str, Any]) -> List[Dict[str, int]]:
+        """Extrait et valide `data['matchsResults']` pour une session.
+
+        Schéma attendu :
+            ``data['matchsResults']`` : liste d'objets ; chaque élément est un match,
+            dictionnaire **joueur → nombre de kills** (entier >= 0).
+            L'ordre de la liste est l'ordre chronologique des matchs.
+
+        Les joueurs listés par `should_ignore_player` sont exclus. Les kills
+        négatifs ou non numériques sont ignorés. Les matchs qui n'ont pas au
+        moins 2 joueurs valides restants peuvent être ignorés par l'appelant.
+
+        Returns:
+            Liste de dictionnaires ``{joueur: kills}`` (un par match, dans l'ordre),
+            chaque dict ne contenant que des joueurs valides et des kills >= 0.
+        """
+        data = session.get('data') or {}
+        raw = data.get('matchsResults')
+        if not raw or not isinstance(raw, list):
+            return []
+        out: List[Dict[str, int]] = []
+        for entry in raw:
+            if not isinstance(entry, dict):
+                continue
+            match: Dict[str, int] = {}
+            for name, value in entry.items():
+                if SessionDataManager.should_ignore_player(name):
+                    continue
+                if isinstance(value, bool):
+                    continue
+                if isinstance(value, (int, float)):
+                    k = int(value)
+                    if k < 0:
+                        continue
+                    match[name] = k
+            out.append(match)
+        return out
+
