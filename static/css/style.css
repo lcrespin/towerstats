@@ -535,6 +535,68 @@ section h2 {
     margin-top: auto;
 }
 
+.stat-card-elo-dual {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.stat-card-elo-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
+}
+
+.stat-card-elo-grid--split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+}
+
+.stat-card-elo-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 4px;
+    min-width: 0;
+}
+
+.stat-card-elo-grid--split .stat-card-elo-col + .stat-card-elo-col {
+    border-left: 1px solid rgba(139, 69, 19, 0.45);
+}
+
+.stat-value-elo-dual {
+    font-size: clamp(6px, 3vw, 18px);
+    margin: 4px 0;
+    line-height: 1.2;
+}
+
+.stat-card-elo-players {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 2px;
+    padding-bottom: 2px;
+}
+
+.stat-card-elo-players--merged {
+    margin-top: auto;
+    padding-top: 4px;
+}
+
+.stat-card-elo-quote {
+    display: none;
+}
+
+@media (min-width: 640px) {
+    .stat-card-elo-quote {
+        display: block;
+    }
+}
+
 .stat-value {
     /* Tailwind classes handle responsive sizing: text-[12px] sm:text-[14px] md:text-[18px] lg:text-[20px] */
     color: #ffd700;

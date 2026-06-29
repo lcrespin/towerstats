@@ -199,9 +199,9 @@
                     <strong>Meilleur % Victoires</strong><br>
                     Le joueur avec le meilleur pourcentage de victoires. Calculé en additionnant toutes ses victoires, puis en divisant par le nombre total de parties auxquelles il a participé.<br><br>
                     
-                    <strong>ELO session (carte du dessus)</strong><br>
+                    <strong>ELO session (colonne gauche)</strong><br>
                     Le ou les joueurs avec le plus haut ELO calculé <em>par session</em> (une mise à jour batch par session d’après les victoires du jour).<br><br>
-                    <strong>ELO match (carte du dessous, si affiché)</strong><br>
+                    <strong>ELO match (colonne droite, si affiché)</strong><br>
                     Le ou les joueurs avec le plus haut ELO calculé <em>match par match</em> d’après les kills par match (champ <code>matchsResults</code> dans les données) : toutes les sessions par ordre de date, puis chaque match dans l’ordre du tableau.<br><br>
                     
                     <strong>Meilleur Score dans un groupe</strong><br>
@@ -229,37 +229,58 @@
                 </div>
                 {% endif %}
                 {% if best_elo_players or best_elo_match_players %}
-                <div class="stat-card pad-card flex flex-col gap-1.5 [&_.stat-value]:my-0.5">
-                    {% if best_elo_players %}
-                    <div>
-                        <div class="stat-label txt-xs">ELO session</div>
-                        <div class="stat-value txt-title-h2">{{ "%.0f" % best_elo }}</div>
-                        <div class="flex flex-wrap justify-center gap-1.5 mt-0.5 pb-[2px]">
-                            {% for player in best_elo_players %}
-                            <div class="inline-flex flex-col items-center">
-                                <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
-                                {% if win_messages_by_player.get(player, []) %}
-                                <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
-                                {% endif %}
+                {% set elo_session_sorted = best_elo_players|sort if best_elo_players else [] %}
+                {% set elo_match_sorted = best_elo_match_players|sort if best_elo_match_players else [] %}
+                {% set elo_players_merged = elo_session_sorted and elo_match_sorted and elo_session_sorted == elo_match_sorted %}
+                <div class="stat-card stat-card-align stat-card-elo-dual pad-card">
+                    <div class="stat-card-elo-grid{% if best_elo_players and best_elo_match_players %} stat-card-elo-grid--split{% endif %}">
+                        {% if best_elo_players %}
+                        <div class="stat-card-elo-col">
+                            <div class="stat-label txt-xs">ELO session</div>
+                            <div class="stat-value stat-value-elo-dual">{{ "%.0f" % best_elo }}</div>
+                            {% if not elo_players_merged %}
+                            <div class="stat-card-elo-players">
+                                {% for player in best_elo_players %}
+                                <div class="inline-flex flex-col items-center">
+                                    <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                                    {% if win_messages_by_player.get(player, []) %}
+                                    <div class="stat-card-elo-quote text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
                             </div>
-                            {% endfor %}
+                            {% endif %}
                         </div>
+                        {% endif %}
+                        {% if best_elo_match_players %}
+                        <div class="stat-card-elo-col">
+                            <div class="stat-label txt-xs">ELO match</div>
+                            <div class="stat-value stat-value-elo-dual">{{ "%.0f" % best_elo_match }}</div>
+                            {% if not elo_players_merged %}
+                            <div class="stat-card-elo-players">
+                                {% for player in best_elo_match_players %}
+                                <div class="inline-flex flex-col items-center">
+                                    <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                                    {% if win_messages_by_player.get(player, []) %}
+                                    <div class="stat-card-elo-quote text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
-                    {% if best_elo_match_players %}
-                    <div>
-                        <div class="stat-label txt-xs">ELO match</div>
-                        <div class="stat-value txt-title-h2">{{ "%.0f" % best_elo_match }}</div>
-                        <div class="flex flex-wrap justify-center gap-1.5 mt-0.5 pb-[2px]">
-                            {% for player in best_elo_match_players %}
-                            <div class="inline-flex flex-col items-center">
-                                <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
-                                {% if win_messages_by_player.get(player, []) %}
-                                <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
-                                {% endif %}
-                            </div>
-                            {% endfor %}
+                    {% if elo_players_merged %}
+                    <div class="stat-card-elo-players stat-card-elo-players--merged">
+                        {% for player in best_elo_players %}
+                        <div class="inline-flex flex-col items-center">
+                            <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                            {% if win_messages_by_player.get(player, []) %}
+                            <div class="stat-card-elo-quote text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
+                            {% endif %}
                         </div>
+                        {% endfor %}
                     </div>
                     {% endif %}
                 </div>
