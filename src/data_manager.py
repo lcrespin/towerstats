@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 from typing import List, Dict, Any
 
-from .config import CSV_URL
+from .config import CSV_URL, DEFAULT_GAME_MODE, normalize_game_mode
 
 
 class SessionDataManager:
@@ -54,6 +54,7 @@ class SessionDataManager:
                         # Si aucun joueur valide, ignorer la session
                         continue
                     session['id'] = calculated_id
+                    session['mode'] = normalize_game_mode(data.get('mode'))
                     sessions.append(session)
                 except json.JSONDecodeError:
                     continue
@@ -105,10 +106,16 @@ class SessionDataManager:
         self.sessions = sessions_to_keep
 
     @staticmethod
+    def _session_group_mode_key(session: Dict[str, Any]) -> tuple:
+        """Grouping key for corrections and midnight dedup: (group_id, game_mode)."""
+        return (session.get('id', ''), session.get('mode', DEFAULT_GAME_MODE))
+
+    @staticmethod
     def _has_matching_next_day_session(sessions_sorted, i, session, is_next_day_fn) -> bool:
-        """True if a session with same id exists at a later index and is_next_day_fn(other) is True."""
+        """True if a session with same group+mode exists at a later index and is_next_day_fn(other) is True."""
+        session_key = SessionDataManager._session_group_mode_key(session)
         for j, other in enumerate(sessions_sorted):
-            if j >= i or other['id'] != session['id']:
+            if j >= i or SessionDataManager._session_group_mode_key(other) != session_key:
                 continue
             if is_next_day_fn(other):
                 return True
@@ -116,14 +123,12 @@ class SessionDataManager:
 
     def correct_sessions(self) -> None:
         """Corrige les incohérences dans les sessions (today/total)."""
-        # Grouper les sessions par ID (groupe)
         sessions_by_group = defaultdict(list)
         for session in self.sessions:
             if session.get('id'):
-                sessions_by_group[session['id']].append(session)
+                sessions_by_group[SessionDataManager._session_group_mode_key(session)].append(session)
         
-        # Pour chaque groupe, corriger les sessions
-        for group_id, group_sessions in sessions_by_group.items():
+        for _group_mode_key, group_sessions in sessions_by_group.items():
             # Trier les sessions par date (croissante, de la plus ancienne à la plus récente)
             group_sessions.sort(key=lambda x: x['date'])
             
@@ -163,8 +168,8 @@ class SessionDataManager:
         sessions_by_group = defaultdict(list)
         for session in self.sessions:
             if session.get('id'):
-                sessions_by_group[session['id']].append(session)
-        for group_id, group_sessions in sessions_by_group.items():
+                sessions_by_group[SessionDataManager._session_group_mode_key(session)].append(session)
+        for _group_mode_key, group_sessions in sessions_by_group.items():
             group_sessions.sort(key=lambda x: x['date'])
             cumulative = defaultdict(int)
             for session in group_sessions:
@@ -204,19 +209,50 @@ class SessionDataManager:
         return sorted(count.keys(), key=lambda g: -count[g])
 
     @staticmethod
+    def format_session_select_id(session: Dict[str, Any]) -> str:
+        """URL/form value for a single session: date|group_id|mode."""
+        return f"{session.get('date', '')}|{session.get('id', '')}|{session.get('mode', DEFAULT_GAME_MODE)}"
+
+    @staticmethod
     def filter_sessions_by_session_id(
         sessions: List[Dict[str, Any]], session_id: str | None
     ) -> List[Dict[str, Any]]:
-        """Filter sessions by session_id (format 'date|id'). Returns only matching session(s)."""
+        """Filter sessions by session_id (format 'date|id|mode' or legacy 'date|id')."""
         if not session_id or not session_id.strip():
             return sessions
-        parts = session_id.split('|', 1)
-        if len(parts) != 2:
-            return sessions
-        date_str, sid = parts[0].strip(), parts[1].strip()
-        if not date_str or not sid:
-            return sessions
-        return [s for s in sessions if s.get('date') == date_str and s.get('id') == sid]
+        parts = [p.strip() for p in session_id.split('|')]
+        if len(parts) == 3:
+            date_str, sid, mode = parts
+            if not date_str or not sid:
+                return sessions
+            mode = normalize_game_mode(mode)
+            return [
+                s for s in sessions
+                if s.get('date') == date_str
+                and s.get('id') == sid
+                and s.get('mode', DEFAULT_GAME_MODE) == mode
+            ]
+        if len(parts) == 2:
+            date_str, sid = parts
+            if not date_str or not sid:
+                return sessions
+            return [s for s in sessions if s.get('date') == date_str and s.get('id') == sid]
+        return sessions
+
+    @staticmethod
+    def filter_sessions_by_game_mode(
+        sessions: List[Dict[str, Any]], game_mode: str
+    ) -> List[Dict[str, Any]]:
+        """Keep only sessions matching the given game mode."""
+        mode = normalize_game_mode(game_mode)
+        return [s for s in sessions if s.get('mode', DEFAULT_GAME_MODE) == mode]
+
+    @staticmethod
+    def game_modes_present(sessions: List[Dict[str, Any]]) -> List[str]:
+        """Return configured game mode ids that appear in sessions (config order)."""
+        from .config import GAME_MODES
+        present = {s.get('mode', DEFAULT_GAME_MODE) for s in sessions}
+        return [m for m in GAME_MODES if m in present]
 
     # ---- Static helpers (date, ID, etc) ----
     @staticmethod

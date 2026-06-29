@@ -5,7 +5,7 @@ from collections import defaultdict
 from typing import List, Dict, Any
 
 from .data_manager import SessionDataManager
-from .config import PLAYER_TO_COLOR
+from .config import PLAYER_TO_COLOR, game_mode_label, DEFAULT_GAME_MODE
 
 MEDAL_BY_RANK = {1: '🥇', 2: '🥈', 3: '🥉'}
 
@@ -1022,6 +1022,9 @@ class SessionStatsManager:
                         'group': session['id'],
                         'date': session['date'],
                         'formatted_date': self.format_date(date),
+                        'game_mode': session.get('mode', DEFAULT_GAME_MODE),
+                        'game_mode_label': game_mode_label(session.get('mode', DEFAULT_GAME_MODE)),
+                        'session_select_id': SessionDataManager.format_session_select_id(session),
                         'players': [
                             {'rank': r, 'name': p, 'today': s['today'], 'total': s['total']}
                             for r, p, s in players_list

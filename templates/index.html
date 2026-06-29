@@ -69,6 +69,17 @@
             <button type="button" class="date-picker-close" aria-label="Fermer">×</button>
             <form method="get" class="date-picker-form flex flex-col gap-3">
                 <h3 class="text-center text-[8px] sm:text-[9px] md:text-[11px] lg:text-xs font-bold" style="color: #ffd700;">Filtrer les sessions</h3>
+                <div class="date-picker-field">
+                    <label for="game-mode-select" class="date-picker-label">Mode de jeu</label>
+                    <div class="date-picker-select-wrapper">
+                        <select id="game-mode-select" name="gameMode" class="date-picker-select">
+                            {% for mode_id, mode_info in game_modes.items() %}
+                            <option value="{{ mode_id }}" {% if mode_id == selected_game_mode %}selected{% endif %}>{{ mode_info.label }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="date-picker-select-arrow">▼</span>
+                    </div>
+                </div>
                 {% set current_start = selected_date_start or date_debut_raw %}
                 {% set current_end = selected_date_end or date_fin_raw %}
                 <div class="date-picker-field">
@@ -84,7 +95,7 @@
                         <select id="session-select" name="sessionId" class="date-picker-select">
                             <option value="">Toutes les sessions</option>
                             {% for session in all_sessions_data %}
-                            <option value="{{ session.date }}|{{ session.id }}" {% if selected_session_id == session.date ~ '|' ~ session.id %}selected{% endif %}>{{ session.formatted_date }} ({{ session.players|map(attribute='name')|join(', ') }})</option>
+                            <option value="{{ session.session_select_id }}" {% if selected_session_id == session.session_select_id or selected_session_id == session.date ~ '|' ~ session.id %}selected{% endif %}>{{ session.formatted_date }} — {{ session.game_mode_label }} ({{ session.players|map(attribute='name')|join(', ') }})</option>
                             {% endfor %}
                         </select>
                         <span class="date-picker-select-arrow">▼</span>
@@ -139,20 +150,28 @@
                 <strong>Filtrage :</strong><br>
                 • Sessions passant minuit : si une session se termine après minuit, seule la session du jour suivant (00h-05h) est conservée<br>
                 • Joueurs invalides : AIJIMMY, P1, P2, etc. sont ignorés<br>
-                • (Parce qu'apparemment, Eric aime bien laisser des traces de debug dans les données de production...)
+                • (Parce qu'apparemment, Eric aime bien laisser des traces de debug dans les données de production...)<br><br>
+
+                <strong>Modes de jeu (v4) :</strong><br>
+                Depuis avril 2026, Eric a ajouté un champ <code>mode</code> dans les stats v4. Avant ça, tout le monde jouait Head Hunters sans le savoir — comme si vous aviez le choix. Les anciennes sessions sans <code>mode</code> sont traitées comme Head Hunters.<br>
+                Les cumuls (<code>todayWin</code> / <code>totalWin</code>) et les corrections sont calculés <em>séparément par mode</em>, pour qu'Eric ne mélange pas Head Hunters et Respawn 3 dans la même addition. (Il a fallu qu'on le précise nous-mêmes.)<br>
+                Si une session v4 oublie le champ <code>mode</code>, on assume Head Hunters — parce que TowerStats doit marcher même quand Eric oublie un champ.
             </div>
         </div>
     </nav>
 
-    {% if selected_session_id or selected_group_id or selected_date_start or selected_date_end %}
+    {% if selected_session_id or selected_group_id or selected_date_start or selected_date_end or selected_game_mode != default_game_mode %}
     <div class="active-filters-banner container mx-auto px-2 sm:px-4 md:px-6 lg:px-8" style="max-width: 1000px !important;">
         <div class="active-filters-inner">
             <span class="active-filters-title">Filtres appliqués :</span>
             <ul class="active-filters-list">
+                {% if selected_game_mode != default_game_mode %}
+                <li>Mode : {{ selected_game_mode_label }}</li>
+                {% endif %}
                 {% if selected_session_id %}
                 {% for session in all_sessions_data %}
-                {% if session.date ~ '|' ~ session.id == selected_session_id %}
-                <li>Session : {{ session.formatted_date }} ({{ session.players|map(attribute='name')|join(', ') }})</li>
+                {% if selected_session_id == session.session_select_id or selected_session_id == session.date ~ '|' ~ session.id %}
+                <li>Session : {{ session.formatted_date }} — {{ session.game_mode_label }} ({{ session.players|map(attribute='name')|join(', ') }})</li>
                 {% endif %}
                 {% endfor %}
                 {% endif %}

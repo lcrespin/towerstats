@@ -8,7 +8,14 @@ import random
 
 from .data_manager import SessionDataManager
 from .stats_manager import SessionStatsManager
-from .config import get_player_color
+from .config import (
+    get_player_color,
+    DEFAULT_GAME_MODE,
+    GAME_MODES,
+    normalize_game_mode,
+    is_valid_game_mode,
+    game_mode_label,
+)
 from .messages_loader import load_win_messages
 
 
@@ -81,7 +88,11 @@ def flask_display_stats(path):
     date_end = request.args.get('dateEnd') or None
     session_id = request.args.get('sessionId') or None
     group_id = request.args.get('groupId') or None
+    raw_game_mode = request.args.get('gameMode') or DEFAULT_GAME_MODE
+    game_mode = normalize_game_mode(raw_game_mode) if is_valid_game_mode(raw_game_mode) else DEFAULT_GAME_MODE
 
+    all_sessions = sessions
+    sessions = SessionDataManager.filter_sessions_by_game_mode(all_sessions, game_mode)
     all_groups_for_filter = SessionDataManager.sorted_group_ids_by_session_count(sessions)
 
     if session_id:
@@ -97,11 +108,16 @@ def flask_display_stats(path):
     template_data['selected_date_end'] = date_end
     template_data['selected_session_id'] = session_id
     template_data['selected_group_id'] = group_id
+    template_data['selected_game_mode'] = game_mode
+    template_data['game_modes'] = GAME_MODES
+    template_data['default_game_mode'] = DEFAULT_GAME_MODE
+    template_data['selected_game_mode_label'] = game_mode_label(game_mode)
     template_data['all_groups_for_filter'] = all_groups_for_filter
     template_data['win_messages_by_player'] = load_win_messages()
 
     if session_id:
-        full_stats = SessionStatsManager(data_manager.get_sessions(), date_start=None, date_end=None)
+        mode_filtered = SessionDataManager.filter_sessions_by_game_mode(all_sessions, game_mode)
+        full_stats = SessionStatsManager(mode_filtered, date_start=None, date_end=None)
         full_data = full_stats.prepare_template_data()
         template_data['all_sessions_data'] = full_data['all_sessions_data']
     

@@ -7,20 +7,26 @@ if BASE_DIR not in sys.path:
 
 from src.data_manager import SessionDataManager
 from src.stats_manager import SessionStatsManager
+from src.config import DEFAULT_GAME_MODE
 
 DATA_DIR = os.path.join(BASE_DIR, "tests", "data")
 SNAPSHOT_2025 = os.path.join(DATA_DIR, "TowerFallStat_snapshot_2025-02-25.csv")
 SNAPSHOT_2026 = os.path.join(DATA_DIR, "TowerFallStat_snapshot_2026-04-24.csv")
+SNAPSHOT_2026_LIVE = os.path.join(DATA_DIR, "TowerFallStat_snapshot_2026-06-30.csv")
 SNAPSHOT_PATHS_INTEGRATION = (SNAPSHOT_2025, SNAPSHOT_2026)
 SNAPSHOT_PATH = SNAPSHOT_2025
 MATCHS_MINIMAL = os.path.join(DATA_DIR, "TowerFallStat_matchs_minimal.csv")
+MATCHS_MODES = os.path.join(DATA_DIR, "TowerFallStat_matchs_modes.csv")
 
 
-def build_stats_from_path(path: str) -> SessionStatsManager:
-    """Build stats manager from a local CSV path."""
+def build_stats_from_path(path: str, game_mode: str | None = None) -> SessionStatsManager:
+    """Build stats manager from a local CSV path, optionally filtered by game mode."""
     manager = SessionDataManager(local_file=path)
     manager.load_all()
-    return SessionStatsManager(manager.get_sessions())
+    sessions = manager.get_sessions()
+    if game_mode is not None:
+        sessions = SessionDataManager.filter_sessions_by_game_mode(sessions, game_mode)
+    return SessionStatsManager(sessions)
 
 
 def build_stats_from_snapshot() -> SessionStatsManager:
@@ -122,9 +128,97 @@ def test_elo_batch_scores_for_all_players_from_snapshot():
             assert elo >= elo_ranking[i + 1][2], "Classement ELO batch doit être décroissant"
 
 
-def _assert_elo_session_and_match_invariants(snapshot_path: str) -> None:
+def test_sessions_without_mode_default_to_head_hunters():
+    manager = SessionDataManager(local_file=SNAPSHOT_2025)
+    manager.load_all()
+    for session in manager.get_sessions():
+        assert session.get("mode") == DEFAULT_GAME_MODE
+
+
+def test_filter_sessions_by_game_mode_counts():
+    manager = SessionDataManager(local_file=MATCHS_MODES)
+    manager.load_all()
+    all_sessions = manager.get_sessions()
+    hh = SessionDataManager.filter_sessions_by_game_mode(all_sessions, "HeadHunters")
+    m13 = SessionDataManager.filter_sessions_by_game_mode(all_sessions, "13")
+    assert len(hh) == 2
+    assert len(m13) == 1
+
+
+def test_game_mode_isolates_cumulative_totals():
+    manager = SessionDataManager(local_file=MATCHS_MODES)
+    manager.load_all()
+    hh = SessionDataManager.filter_sessions_by_game_mode(manager.get_sessions(), "HeadHunters")
+    hh.sort(key=lambda s: s["date"])
+    last_hh = hh[-1]
+    players = SessionDataManager.parse_session_data(last_hh)
+    assert players["A"]["total"] == 3
+    assert players["B"]["total"] == 3
+
+    m13 = SessionDataManager.filter_sessions_by_game_mode(manager.get_sessions(), "13")
+    players_13 = SessionDataManager.parse_session_data(m13[0])
+    assert players_13["A"]["total"] == 5
+    assert players_13["B"]["total"] == 0
+
+
+def test_midnight_filter_does_not_cross_game_modes():
+    """Head Hunters ending at 23h must not be dropped because mode 13 continues after midnight."""
+    dm = SessionDataManager()
+    dm.sessions = [
+        {
+            "id": "A-B",
+            "date": "2025-06-01",
+            "mode": "HeadHunters",
+            "data": {"date": "2025-06-01-23", "todayWin": {"A": 1}, "totalWin": {"A": 1}},
+        },
+        {
+            "id": "A-B",
+            "date": "2025-06-02",
+            "mode": "13",
+            "data": {"date": "2025-06-02-01", "todayWin": {"A": 2}, "totalWin": {"A": 2}},
+        },
+    ]
+    dm.filter_sessions()
+    assert len(dm.sessions) == 2
+
+
+def test_filter_sessions_by_session_id_with_mode():
+    manager = SessionDataManager(local_file=MATCHS_MODES)
+    manager.load_all()
+    sessions = manager.get_sessions()
+    hh_sessions = SessionDataManager.filter_sessions_by_game_mode(sessions, "HeadHunters")
+    target_id = SessionDataManager.format_session_select_id(hh_sessions[0])
+    filtered = SessionDataManager.filter_sessions_by_session_id(hh_sessions, target_id)
+    assert len(filtered) == 1
+    assert filtered[0]["mode"] == "HeadHunters"
+
+
+def test_all_sessions_data_includes_mode_fields():
+    stats = build_stats_from_path(MATCHS_MODES)
+    ctx = stats.prepare_template_data()
+    for entry in ctx["all_sessions_data"]:
+        assert "game_mode" in entry
+        assert "game_mode_label" in entry
+        assert "session_select_id" in entry
+        assert entry["session_select_id"].count("|") == 2
+
+
+def test_live_snapshot_has_mode_13_rows():
+    manager = SessionDataManager(local_file=SNAPSHOT_2026_LIVE)
+    manager.load_all()
+    modes = {s.get("mode") for s in manager.get_sessions()}
+    assert "13" in modes
+    assert DEFAULT_GAME_MODE in modes
+
+
+def test_elo_invariants_on_live_snapshot_per_mode():
+    for mode in ("HeadHunters", "13"):
+        _assert_elo_session_and_match_invariants(SNAPSHOT_2026_LIVE, game_mode=mode)
+
+
+def _assert_elo_session_and_match_invariants(snapshot_path: str, game_mode: str | None = None) -> None:
     """ELO session + ELO match : cohérence et ordre sur un export CSV d'intégration."""
-    stats = build_stats_from_path(snapshot_path)
+    stats = build_stats_from_path(snapshot_path, game_mode=game_mode)
     ctx = stats.prepare_template_data()
     n = ctx["unique_players_count"]
     assert n >= 1
