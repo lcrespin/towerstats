@@ -159,9 +159,10 @@ class SessionDataManager:
                             # Corriger le today dans les données
                             if 'todayWin' in data and player in data['todayWin']:
                                 data['todayWin'][player] = expected_today
-                    
-                    # Mettre à jour le total précédent
-                    previous_totals[player] = current_total
+
+                    # Ignore partial exports that reset totalWin below the running cumulative.
+                    if current_total >= previous_totals.get(player, 0):
+                        previous_totals[player] = current_total
 
     def recompute_totals_from_today(self) -> None:
         """Recompute totalWin from cumulative sum of todayWin per group (fixes source inconsistencies)."""
@@ -176,6 +177,19 @@ class SessionDataManager:
                 SessionDataManager.normalize_session_players(session)
                 data = session['data']
                 if 'todayWin' not in data:
+                    continue
+                players = SessionDataManager.parse_session_data(session)
+                if any(
+                    players[p]['total'] < cumulative[p]
+                    for p in players
+                    if p in cumulative
+                ):
+                    if 'totalWin' not in data:
+                        data['totalWin'] = {}
+                    for player in players:
+                        if SessionDataManager.should_ignore_player(player):
+                            continue
+                        data['totalWin'][player] = cumulative.get(player, 0)
                     continue
                 if 'totalWin' not in data:
                     data['totalWin'] = {}

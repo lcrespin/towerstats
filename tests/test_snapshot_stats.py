@@ -161,6 +161,63 @@ def test_game_mode_isolates_cumulative_totals():
     assert players_13["BOB"]["total"] == 0
 
 
+def test_partial_export_does_not_inflate_cumulative_totals():
+    """A bogus row with reset totalWin must not corrupt todayWin or group totals."""
+    dm = SessionDataManager()
+    dm.sessions = [
+        {
+            "id": "DAVID-ERIC-LOUIS",
+            "date": "2026-08-29",
+            "mode": "HeadHunters",
+            "data": {
+                "date": "2026-08-29-00",
+                "todayWin": {"LOUIS": 304, "DAVID": 282, "ERIC": 273},
+                "totalWin": {"LOUIS": 304, "DAVID": 282, "ERIC": 273},
+            },
+        },
+        {
+            "id": "DAVID-ERIC-LOUIS",
+            "date": "2026-08-29",
+            "mode": "HeadHunters",
+            "data": {
+                "date": "2026-08-29-00",
+                "todayWin": {"LOUIS": 1, "DAVID": 0, "ERIC": 0},
+                "totalWin": {"LOUIS": 1, "DAVID": 0, "ERIC": 0},
+            },
+        },
+        {
+            "id": "DAVID-ERIC-LOUIS",
+            "date": "2026-09-12",
+            "mode": "HeadHunters",
+            "data": {
+                "date": "2026-09-12-00",
+                "todayWin": {"LOUIS": 2, "DAVID": 1, "ERIC": 2},
+                "totalWin": {"LOUIS": 2, "DAVID": 1, "ERIC": 2},
+            },
+        },
+        {
+            "id": "DAVID-ERIC-LOUIS",
+            "date": "2026-09-12",
+            "mode": "HeadHunters",
+            "data": {
+                "date": "2026-09-12-01",
+                "todayWin": {"LOUIS": 10, "DAVID": 9, "ERIC": 5},
+                "totalWin": {"LOUIS": 314, "DAVID": 291, "ERIC": 278},
+            },
+        },
+    ]
+    dm.correct_sessions()
+    dm.recompute_totals_from_today()
+    last = [
+        s
+        for s in dm.sessions
+        if s["data"].get("date") == "2026-09-12-01"
+    ][0]
+    players = SessionDataManager.parse_session_data(last)
+    assert players["LOUIS"]["today"] == 10
+    assert players["LOUIS"]["total"] == 314
+
+
 def test_midnight_filter_does_not_cross_game_modes():
     """Head Hunters ending at 23h must not be dropped because mode 13 continues after midnight."""
     dm = SessionDataManager()
