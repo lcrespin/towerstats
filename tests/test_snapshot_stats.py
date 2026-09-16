@@ -152,13 +152,13 @@ def test_game_mode_isolates_cumulative_totals():
     hh.sort(key=lambda s: s["date"])
     last_hh = hh[-1]
     players = SessionDataManager.parse_session_data(last_hh)
-    assert players["A"]["total"] == 3
-    assert players["B"]["total"] == 3
+    assert players["ALICE"]["total"] == 3
+    assert players["BOB"]["total"] == 3
 
     m13 = SessionDataManager.filter_sessions_by_game_mode(manager.get_sessions(), "13")
     players_13 = SessionDataManager.parse_session_data(m13[0])
-    assert players_13["A"]["total"] == 5
-    assert players_13["B"]["total"] == 0
+    assert players_13["ALICE"]["total"] == 5
+    assert players_13["BOB"]["total"] == 0
 
 
 def test_midnight_filter_does_not_cross_game_modes():
@@ -166,16 +166,16 @@ def test_midnight_filter_does_not_cross_game_modes():
     dm = SessionDataManager()
     dm.sessions = [
         {
-            "id": "A-B",
+            "id": "ALICE-BOB",
             "date": "2025-06-01",
             "mode": "HeadHunters",
-            "data": {"date": "2025-06-01-23", "todayWin": {"A": 1}, "totalWin": {"A": 1}},
+            "data": {"date": "2025-06-01-23", "todayWin": {"ALICE": 1}, "totalWin": {"ALICE": 1}},
         },
         {
-            "id": "A-B",
+            "id": "ALICE-BOB",
             "date": "2025-06-02",
             "mode": "13",
-            "data": {"date": "2025-06-02-01", "todayWin": {"A": 2}, "totalWin": {"A": 2}},
+            "data": {"date": "2025-06-02-01", "todayWin": {"ALICE": 2}, "totalWin": {"ALICE": 2}},
         },
     ]
     dm.filter_sessions()
@@ -512,7 +512,7 @@ def test_matchs_minimal_parse_and_session_without_field():
     m.load_all()
     sessions = sorted(m.get_sessions(), key=lambda s: s.get("date", ""))
     assert len(sessions) == 3
-    assert SessionDataManager.parse_matchs_results(sessions[0]) == [{"A": 3, "B": 1}]
+    assert SessionDataManager.parse_matchs_results(sessions[0]) == [{"ALICE": 3, "BOB": 1}]
     assert len(SessionDataManager.parse_matchs_results(sessions[1])) == 3
     assert SessionDataManager.parse_matchs_results(sessions[2]) == []
 

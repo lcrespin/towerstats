@@ -326,12 +326,15 @@ class SessionDataManager:
 
     @staticmethod
     def should_ignore_player(player_name: str) -> bool:
-        """Vérifie si un joueur doit être ignoré (AIJIMMY, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, etc.)."""
+        """Vérifie si un joueur doit être ignoré (AIJIMMY, P1, P2, A, BB, etc.)."""
         if not player_name:
             return True
         player_upper = player_name.upper().replace(' ', '')
-        # Ignorer AIJIMMY, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10
-        return 'AIJIMMY' in player_upper or player_upper in ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10']
+        # Ignorer AIJIMMY, placeholders P1-P10, et noms invalides ajoutés par erreur (A, BB)
+        return (
+            'AIJIMMY' in player_upper
+            or player_upper in ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'A', 'BB']
+        )
 
     @staticmethod
     def normalize_session_players(session: Dict[str, Any]) -> None:
