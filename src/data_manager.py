@@ -262,6 +262,27 @@ class SessionDataManager:
         return [s for s in sessions if s.get('mode', DEFAULT_GAME_MODE) == mode]
 
     @staticmethod
+    def filter_sessions_by_date(
+        sessions: List[Dict[str, Any]],
+        date_start: str | None = None,
+        date_end: str | None = None,
+    ) -> List[Dict[str, Any]]:
+        """Keep sessions whose YYYY-MM-DD date falls in the inclusive window."""
+        if not date_start and not date_end:
+            return sessions
+        filtered: List[Dict[str, Any]] = []
+        for session in sessions:
+            date_str = SessionDataManager.extract_date_str(str(session.get('date', '')))
+            if not date_str:
+                continue
+            if date_start and date_str < date_start:
+                continue
+            if date_end and date_str > date_end:
+                continue
+            filtered.append(session)
+        return filtered
+
+    @staticmethod
     def game_modes_present(sessions: List[Dict[str, Any]]) -> List[str]:
         """Return configured game mode ids that appear in sessions (config order)."""
         from .config import GAME_MODES

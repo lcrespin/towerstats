@@ -41,6 +41,19 @@
 
     <nav class="sticky top-0 z-50">
         <div class="flex flex-col gap-1.5 sm:gap-2.5">
+            <div class="season-switcher-wrap">
+                <div class="season-switcher" role="navigation" aria-label="Saisons">
+                    {% for item in season_switcher %}
+                    <a href="{{ item.href }}" class="season-pill{% if item.active %} is-active{% endif %}" {% if item.active %}aria-current="page"{% endif %} title="{{ item.label }} — {{ item.period_label }}">
+                        <span class="season-pill-short">{{ item.short }}</span>
+                        {% if item.live %}
+                        <span class="season-live-badge">LIVE</span>
+                        {% endif %}
+                    </a>
+                    {% endfor %}
+                </div>
+                <div class="season-switcher-caption">{{ season_period_label }}</div>
+            </div>
             <div class="flex items-center justify-between w-full gap-2">
                 <div class="shrink-0 flex items-center justify-start">
                     <button type="button" id="toggle-date-picker" class="info-button global-info-button txt-xs" title="Filtrer" aria-label="Filtrer">🎚️</button>
@@ -68,6 +81,9 @@
         <div id="date-picker-popover" class="date-picker-popover" aria-hidden="true">
             <button type="button" class="date-picker-close" aria-label="Fermer">×</button>
             <form method="get" class="date-picker-form flex flex-col gap-3">
+                {% if selected_season != current_season_id %}
+                <input type="hidden" name="season" value="{{ selected_season }}">
+                {% endif %}
                 <h3 class="text-center text-[8px] sm:text-[9px] md:text-[11px] lg:text-xs font-bold" style="color: #ffd700;">Filtrer les sessions</h3>
                 <div class="date-picker-field">
                     <label for="game-mode-select" class="date-picker-label">Mode de jeu</label>
@@ -80,14 +96,14 @@
                         <span class="date-picker-select-arrow">▼</span>
                     </div>
                 </div>
-                {% set current_start = selected_date_start or date_debut_raw %}
-                {% set current_end = selected_date_end or date_fin_raw %}
+                {% set current_start = selected_date_start or date_debut_raw or season_picker_min %}
+                {% set current_end = selected_date_end or date_fin_raw or season_picker_max %}
                 <div class="date-picker-field">
                     <div class="date-picker-date-row">
                         <label for="dateStart" class="date-picker-sublabel">Depuis</label>
-                        <input type="date" id="dateStart" name="dateStart" value="{{ current_start }}" class="date-picker-input" {% if selected_session_id %}disabled{% endif %}>
+                        <input type="date" id="dateStart" name="dateStart" value="{{ current_start }}" class="date-picker-input" {% if season_picker_min %}min="{{ season_picker_min }}"{% endif %} {% if season_picker_max %}max="{{ season_picker_max }}"{% endif %} {% if selected_session_id %}disabled{% endif %}>
                         <label for="dateEnd" class="date-picker-sublabel">Jusqu'à</label>
-                        <input type="date" id="dateEnd" name="dateEnd" value="{{ current_end }}" class="date-picker-input" {% if selected_session_id %}disabled{% endif %}>
+                        <input type="date" id="dateEnd" name="dateEnd" value="{{ current_end }}" class="date-picker-input" {% if season_picker_min %}min="{{ season_picker_min }}"{% endif %} {% if season_picker_max %}max="{{ season_picker_max }}"{% endif %} {% if selected_session_id %}disabled{% endif %}>
                     </div>
                 </div>
                 <div class="date-picker-field">
@@ -113,7 +129,7 @@
                     </div>
                 </div>
                 <div class="date-picker-actions">
-                    <a href="/" class="toggle-button toggle-button-secondary text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] px-2 py-1 sm:px-3 sm:py-1.5">Réinitialiser</a>
+                    <a href="{{ reset_filters_url }}" class="toggle-button toggle-button-secondary text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] px-2 py-1 sm:px-3 sm:py-1.5">Réinitialiser</a>
                     <button type="submit" class="toggle-button text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] px-2 py-1 sm:px-3 sm:py-1.5">Appliquer</button>
                 </div>
             </form>
@@ -160,6 +176,12 @@
         </div>
     </nav>
 
+    {% if season_banner %}
+    <div class="season-context-banner container mx-auto px-2 sm:px-4 md:px-6 lg:px-8" style="max-width: 1000px !important;">
+        <div class="season-context-inner">{{ season_banner }}</div>
+    </div>
+    {% endif %}
+
     {% if selected_session_id or selected_group_id or selected_date_start or selected_date_end or selected_game_mode != default_game_mode %}
     <div class="active-filters-banner container mx-auto px-2 sm:px-4 md:px-6 lg:px-8" style="max-width: 1000px !important;">
         <div class="active-filters-inner">
@@ -182,7 +204,7 @@
                 <li>Période : {% if selected_date_start %}{{ selected_date_start }}{% else %}—{% endif %} → {% if selected_date_end %}{{ selected_date_end }}{% else %}—{% endif %}</li>
                 {% endif %}
             </ul>
-            <a href="/" class="active-filters-reset">Réinitialiser</a>
+            <a href="{{ reset_filters_url }}" class="active-filters-reset">Réinitialiser</a>
         </div>
     </div>
     {% endif %}
@@ -220,6 +242,9 @@
                         {% for player in best_percentage_players %}
                         <div class="inline-flex flex-col items-center">
                             <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                            {% if career_deltas and career_deltas.win_pct.get(player) %}
+                            <div class="career-delta">{{ career_deltas.win_pct.get(player) }}</div>
+                            {% endif %}
                             {% if win_messages_by_player.get(player, []) %}
                             <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
                             {% endif %}
@@ -243,6 +268,9 @@
                                 {% for player in best_elo_players %}
                                 <div class="inline-flex flex-col items-center">
                                     <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                                    {% if career_deltas and career_deltas.elo.get(player) %}
+                                    <div class="career-delta">{{ career_deltas.elo.get(player) }}</div>
+                                    {% endif %}
                                     {% if win_messages_by_player.get(player, []) %}
                                     <div class="stat-card-elo-quote text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
                                     {% endif %}
@@ -261,6 +289,9 @@
                                 {% for player in best_elo_match_players %}
                                 <div class="inline-flex flex-col items-center">
                                     <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                                    {% if career_deltas and career_deltas.elo_match.get(player) %}
+                                    <div class="career-delta">{{ career_deltas.elo_match.get(player) }}</div>
+                                    {% endif %}
                                     {% if win_messages_by_player.get(player, []) %}
                                     <div class="stat-card-elo-quote text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
                                     {% endif %}
@@ -276,6 +307,9 @@
                         {% for player in best_elo_players %}
                         <div class="inline-flex flex-col items-center">
                             <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                            {% if career_deltas and career_deltas.elo.get(player) %}
+                            <div class="career-delta">{{ career_deltas.elo.get(player) }}</div>
+                            {% endif %}
                             {% if win_messages_by_player.get(player, []) %}
                             <div class="stat-card-elo-quote text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
                             {% endif %}
@@ -293,6 +327,9 @@
                         {% for player in best_players %}
                         <div class="inline-flex flex-col items-center">
                             <span class="stat-label txt-sm px-1 py-0.5 rounded" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); background: rgba(0,0,0,0.25);">{{ player }}</span>
+                            {% if career_deltas and career_deltas.group_score.get(player) %}
+                            <div class="career-delta">{{ career_deltas.group_score.get(player) }}</div>
+                            {% endif %}
                             {% if win_messages_by_player.get(player, []) %}
                             <div class="text-[6px] mt-0.5" style="color: #8d8d8d;">{{ (win_messages_by_player.get(player, []) | random_choice | capitalize_first) }}</div>
                             {% endif %}

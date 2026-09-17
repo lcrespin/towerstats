@@ -10,6 +10,64 @@ from .config import PLAYER_TO_COLOR, game_mode_label, DEFAULT_GAME_MODE
 MEDAL_BY_RANK = {1: '🥇', 2: '🥈', 3: '🥉'}
 
 
+def _player_rank_map(ranking: List[Any], name_index: int = 1, rank_index: int = 0) -> Dict[str, int]:
+    """Map player name -> dense rank from a ranked table."""
+    return {row[name_index]: row[rank_index] for row in ranking or []}
+
+
+def _career_delta_label(season_rank: int, career_rank: int | None) -> str | None:
+    if career_rank is None:
+        return None
+    if career_rank == season_rank:
+        return 'même rang'
+    return f'carrière : {career_rank}e'
+
+
+def _best_group_score_ranking(rankings_by_group: Dict[str, List[Any]]) -> List[tuple]:
+    """Dense ranking of players by their best per-group win total."""
+    best_by_player: Dict[str, int] = {}
+    for ranking in (rankings_by_group or {}).values():
+        for row in ranking:
+            player = row[1]
+            total = row[2]
+            if total > best_by_player.get(player, -1):
+                best_by_player[player] = total
+    raw = list(best_by_player.items())
+    return SessionStatsManager._add_dense_ranks(raw, score_index=1, name_index=0)
+
+
+def leaderboard_career_deltas(season_data: Dict[str, Any], career_data: Dict[str, Any]) -> Dict[str, Dict[str, str]]:
+    """Ghost career ranks for leaderboard cards (player -> label)."""
+    deltas: Dict[str, Dict[str, str]] = {
+        'win_pct': {},
+        'elo': {},
+        'elo_match': {},
+        'group_score': {},
+    }
+    career_win = _player_rank_map(career_data.get('win_percentage_ranking') or [])
+    career_elo = _player_rank_map(career_data.get('elo_ranking') or [])
+    career_elo_match = _player_rank_map(career_data.get('elo_match_ranking') or [])
+    career_score = _player_rank_map(_best_group_score_ranking(career_data.get('rankings_by_group') or {}))
+
+    for player in season_data.get('best_percentage_players') or []:
+        label = _career_delta_label(1, career_win.get(player))
+        if label:
+            deltas['win_pct'][player] = label
+    for player in season_data.get('best_elo_players') or []:
+        label = _career_delta_label(1, career_elo.get(player))
+        if label:
+            deltas['elo'][player] = label
+    for player in season_data.get('best_elo_match_players') or []:
+        label = _career_delta_label(1, career_elo_match.get(player))
+        if label:
+            deltas['elo_match'][player] = label
+    for player in season_data.get('best_players') or []:
+        label = _career_delta_label(1, career_score.get(player))
+        if label:
+            deltas['group_score'][player] = label
+    return deltas
+
+
 class SessionStatsManager:
     """Effectue tous les calculs d'agrégat/statistiques à partir d'une liste de sessions filtrées."""
     
@@ -26,7 +84,9 @@ class SessionStatsManager:
             date_start: Date de début au format YYYY-MM-DD (inclusif).
             date_end: Date de fin au format YYYY-MM-DD (inclusif).
         """
-        self.sessions = self._filter_sessions_by_date(sessions, date_start, date_end)
+        self.sessions = SessionDataManager.filter_sessions_by_date(
+            sessions, date_start, date_end
+        )
 
     def _session_date_str(self, session: Dict[str, Any]) -> str:
         """Normalised YYYY-MM-DD date string for a session."""
@@ -38,25 +98,24 @@ class SessionStatsManager:
         date_start: str | None,
         date_end: str | None,
     ) -> List[Dict[str, Any]]:
-        """Filtre les sessions selon une fenêtre de dates (inclusives).
+        """Filtre les sessions selon une fenêtre de dates (inclusives)."""
+        return SessionDataManager.filter_sessions_by_date(sessions, date_start, date_end)
 
-        Les dates sont comparées au format YYYY-MM-DD.
-        Si aucune date n'est fournie, toutes les sessions sont conservées.
-        """
-        if not date_start and not date_end:
-            return sessions
-
-        filtered: List[Dict[str, Any]] = []
-        for session in sessions:
-            date_str = self._session_date_str(session)
-            if not date_str:
-                continue
-            if date_start and date_str < date_start:
-                continue
-            if date_end and date_str > date_end:
-                continue
-            filtered.append(session)
-        return filtered
+    def _window_running_totals(self) -> Dict[int, Dict[str, int]]:
+        """Cumulative today-wins per player within the current session window, per group+mode."""
+        running: Dict[int, Dict[str, int]] = {}
+        sessions_by_group: Dict[tuple, List[Dict[str, Any]]] = defaultdict(list)
+        for session in self.sessions:
+            sessions_by_group[SessionDataManager._session_group_mode_key(session)].append(session)
+        for group_sessions in sessions_by_group.values():
+            group_sessions.sort(key=lambda s: s.get('date', ''))
+            totals: Dict[str, int] = defaultdict(int)
+            for session in group_sessions:
+                players = SessionDataManager.parse_session_data(session)
+                for player, stats in players.items():
+                    totals[player] += stats.get('today', 0)
+                running[id(session)] = dict(totals)
+        return running
 
     @staticmethod
     def _session_ranks_from_sorted(sorted_players):
@@ -995,12 +1054,21 @@ class SessionStatsManager:
                 row[1] for row in elo_match_ranking if row[2] == best_elo_match
             ]
 
+        window_totals = self._window_running_totals()
+
         def session_players_with_dense_rank(session):
             players = SessionDataManager.parse_session_data(session)
             if not players:
                 return None
+            season_totals = window_totals.get(id(session), {})
+            ranked_players = {}
+            for player, stats in players.items():
+                ranked_players[player] = {
+                    **stats,
+                    'total': season_totals.get(player, stats.get('today', 0)),
+                }
             sorted_players = sorted(
-                players.items(),
+                ranked_players.items(),
                 key=lambda x: (-x[1]['today'], x[0])
             )
             ranks = self._session_ranks_from_sorted(sorted_players)
