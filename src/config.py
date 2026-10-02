@@ -31,7 +31,7 @@ def game_mode_label(mode: str) -> str:
 # Win/lose messages sheet (columns: NOMwin, NOMlose per player)
 MESSAGES_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTyNKz-IP1qJHMNpW8SFpvYOy_IXA9uDbN8FxZEOZRAR1kbP1ABb35ZKnhvB-0MJ_-d96ddIqER38fR/pub?gid=0&single=true&output=csv'
 
-# Mapping des couleurs pour l'affichage
+# Mapping des couleurs pour l'affichage. Seuls ces joueurs sont comptés.
 PLAYER_TO_COLOR = {
     'MEHDI': '#FFC0CB',
     'JULIEN': '#90EE90',
@@ -43,7 +43,29 @@ PLAYER_TO_COLOR = {
     'ZAYA': '#FF3333',
 }
 
+# Sheet names that should display as a declared player.
+PLAYER_NAME_ALIASES = {
+    'ALEXANDRE': 'ALEX',
+}
+
+
+def canonical_player_name(player_name) -> str | None:
+    """Return the declared player id, or None when the name is not in PLAYER_TO_COLOR."""
+    if not isinstance(player_name, str):
+        return None
+    normalized = player_name.strip().upper()
+    if not normalized:
+        return None
+    normalized = PLAYER_NAME_ALIASES.get(normalized, normalized)
+    if normalized in PLAYER_TO_COLOR:
+        return normalized
+    return None
+
+
 def get_player_color(player_name):
     """Retourne la couleur d'un joueur pour l'affichage."""
-    return PLAYER_TO_COLOR.get(player_name.upper(), '#FFD700')  # Par défaut: or
+    canonical = canonical_player_name(player_name)
+    if canonical:
+        return PLAYER_TO_COLOR[canonical]
+    return '#FFD700'
 

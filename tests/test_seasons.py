@@ -24,7 +24,7 @@ from src.data_manager import SessionDataManager
 from src.stats_manager import SessionStatsManager, leaderboard_career_deltas
 
 
-def _session(day: str, wins: dict, group: str = 'ALICE-BOB', mode: str = 'HeadHunters'):
+def _session(day: str, wins: dict, group: str = 'ERIC-LOUIS', mode: str = 'HeadHunters'):
     return {
         'id': group,
         'date': day,
@@ -69,8 +69,8 @@ def test_merge_date_bounds_clamps_user_range_to_season():
 
 def test_season_boundary_sessions_split_on_august_15():
     sessions = [
-        _session('2026-08-14', {'ALICE': 3, 'BOB': 1}),
-        _session('2026-08-15', {'ALICE': 1, 'BOB': 5}),
+        _session('2026-08-14', {'LOUIS': 3, 'ERIC': 1}),
+        _session('2026-08-15', {'LOUIS': 1, 'ERIC': 5}),
     ]
     s1_start, s1_end = season_date_bounds('1')
     s2_start, s2_end = season_date_bounds('2')
@@ -84,23 +84,23 @@ def test_season_boundary_sessions_split_on_august_15():
 
 def test_window_totals_reset_per_season():
     sessions = [
-        _session('2026-08-14', {'ALICE': 3, 'BOB': 1}),
-        _session('2026-08-15', {'ALICE': 1, 'BOB': 5}),
-        _session('2026-08-16', {'ALICE': 2, 'BOB': 2}),
+        _session('2026-08-14', {'LOUIS': 3, 'ERIC': 1}),
+        _session('2026-08-15', {'LOUIS': 1, 'ERIC': 5}),
+        _session('2026-08-16', {'LOUIS': 2, 'ERIC': 2}),
     ]
     s2_start, s2_end = season_date_bounds('2')
     stats = SessionStatsManager(sessions, date_start=s2_start, date_end=s2_end)
     ctx = stats.prepare_template_data()
     by_date = {row['date']: {p['name']: p['total'] for p in row['players']} for row in ctx['all_sessions_data']}
-    assert by_date['2026-08-15'] == {'ALICE': 1, 'BOB': 5}
-    assert by_date['2026-08-16'] == {'ALICE': 3, 'BOB': 7}
+    assert by_date['2026-08-15'] == {'LOUIS': 1, 'ERIC': 5}
+    assert by_date['2026-08-16'] == {'LOUIS': 3, 'ERIC': 7}
     assert '2026-08-14' not in by_date
 
 
 def test_season_elo_starts_from_1500():
     sessions = [
-        _session('2026-08-14', {'ALICE': 10, 'BOB': 1}),
-        _session('2026-08-15', {'ALICE': 1, 'BOB': 10}),
+        _session('2026-08-14', {'LOUIS': 10, 'ERIC': 1}),
+        _session('2026-08-15', {'LOUIS': 1, 'ERIC': 10}),
     ]
     s2_start, s2_end = season_date_bounds('2')
     stats = SessionStatsManager(sessions, date_start=s2_start, date_end=s2_end)
@@ -156,10 +156,10 @@ def test_period_label_uses_actual_session_dates():
         'depuis le 26 août 2026'
     )
     sessions = [
-        _session('2025-05-31', {'ALICE': 1, 'BOB': 1}),
-        _session('2025-06-03', {'ALICE': 1, 'BOB': 1}),
-        _session('2026-07-18', {'ALICE': 1, 'BOB': 1}),
-        _session('2026-08-26', {'ALICE': 1, 'BOB': 1}),
+        _session('2025-05-31', {'LOUIS': 1, 'ERIC': 1}),
+        _session('2025-06-03', {'LOUIS': 1, 'ERIC': 1}),
+        _session('2026-07-18', {'LOUIS': 1, 'ERIC': 1}),
+        _session('2026-08-26', {'LOUIS': 1, 'ERIC': 1}),
     ]
     spans = season_spans_from_sessions(sessions)
     assert spans['1'] == ('2025-06-03', '2026-07-18')
@@ -171,10 +171,10 @@ def test_period_label_uses_actual_session_dates():
 
 
 SYNTHETIC_SESSIONS = [
-    _session('2025-05-31', {'ALICE': 2, 'BOB': 2}),
-    _session('2025-06-03', {'ALICE': 4, 'BOB': 1}),
-    _session('2026-08-14', {'ALICE': 3, 'BOB': 1}),
-    _session('2026-08-26', {'ALICE': 1, 'BOB': 5}),
+    _session('2025-05-31', {'LOUIS': 2, 'ERIC': 2}),
+    _session('2025-06-03', {'LOUIS': 4, 'ERIC': 1}),
+    _session('2026-08-14', {'LOUIS': 3, 'ERIC': 1}),
+    _session('2026-08-26', {'LOUIS': 1, 'ERIC': 5}),
 ]
 
 
@@ -202,8 +202,8 @@ def test_default_route_uses_current_season(_messages):
     assert 'compteurs à zéro' in html
     assert 'Filtres appliqués' not in html
     assert 'name="season"' not in html
-    assert 'Session: ALICE-BOB - 2026-08-14' not in html
-    assert 'Session: ALICE-BOB - 2026-08-26' in html
+    assert 'Session: ERIC-LOUIS - 2026-08-14' not in html
+    assert 'Session: ERIC-LOUIS - 2026-08-26' in html
     assert 'depuis le 26 août 2026' in html
 
 
@@ -233,9 +233,9 @@ def test_season_1_route_stops_before_august_15(_messages):
     assert 'min="2025-06-01"' in html
     assert 'max="2026-08-14"' in html
     assert 'close' in html
-    assert 'Session: ALICE-BOB - 2026-08-14' in html
-    assert 'Session: ALICE-BOB - 2026-08-26' not in html
-    assert 'Session: ALICE-BOB - 2025-05-31' not in html
+    assert 'Session: ERIC-LOUIS - 2026-08-14' in html
+    assert 'Session: ERIC-LOUIS - 2026-08-26' not in html
+    assert 'Session: ERIC-LOUIS - 2025-05-31' not in html
     assert '2025-06-03' in html
     assert 'Depuis le 03/06/25' in html
     assert 'juin 2025 → août 2026' in html

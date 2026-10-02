@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 from typing import List, Dict, Any
 
-from .config import CSV_URL, DEFAULT_GAME_MODE, normalize_game_mode
+from .config import CSV_URL, DEFAULT_GAME_MODE, canonical_player_name, normalize_game_mode
 
 
 class SessionDataManager:
@@ -361,15 +361,85 @@ class SessionDataManager:
 
     @staticmethod
     def should_ignore_player(player_name: str) -> bool:
-        """Vérifie si un joueur doit être ignoré (AIJIMMY, P1, P2, A, BB, etc.)."""
-        if not player_name:
-            return True
-        player_upper = player_name.upper().replace(' ', '')
-        # Ignorer AIJIMMY, placeholders P1-P10, et noms invalides ajoutés par erreur (A, BB)
-        return (
-            'AIJIMMY' in player_upper
-            or player_upper in ['P1', 'P2', 'P3', 'P4', 'P5', 'P6', 'P7', 'P8', 'P9', 'P10', 'A', 'BB']
-        )
+        """True when the name is not a declared player in PLAYER_TO_COLOR."""
+        return canonical_player_name(player_name) is None
+
+    @staticmethod
+    def _is_kill_source(name: str) -> bool:
+        """Kill sources (Arrow, Lava, JumpedOn) are not player names."""
+        letters = ''.join(ch for ch in name if ch.isalpha())
+        return bool(letters) and not letters.isupper()
+
+    @staticmethod
+    def _filter_kill_counts(raw, keep_sources: bool) -> Dict[str, Any]:
+        """Keep declared players, and kill sources when keep_sources is set."""
+        if not isinstance(raw, dict):
+            return {}
+        filtered: Dict[str, Any] = {}
+        for name, count in raw.items():
+            if not isinstance(name, str):
+                continue
+            canonical = canonical_player_name(name)
+            if canonical is not None:
+                key = canonical
+            elif keep_sources and SessionDataManager._is_kill_source(name):
+                key = name
+            else:
+                continue
+            if (
+                key in filtered
+                and isinstance(filtered[key], (int, float))
+                and isinstance(count, (int, float))
+                and not isinstance(count, bool)
+            ):
+                filtered[key] += count
+            else:
+                filtered[key] = count
+        return filtered
+
+    @staticmethod
+    def _rename_player_mapping(mapping: Dict[str, Any], nested_stats: bool) -> Dict[str, Any]:
+        """Rename declared players to their canonical id. Unknown names stay, so the session can be dropped."""
+        renamed: Dict[str, Any] = {}
+        for name, value in mapping.items():
+            canonical = canonical_player_name(name) if isinstance(name, str) else None
+            key = canonical if canonical is not None else name
+            if nested_stats and isinstance(value, dict):
+                value = dict(value)
+                for field in ('killBy', 'killFrom'):
+                    if isinstance(value.get(field), dict):
+                        value[field] = SessionDataManager._filter_kill_counts(
+                            value[field], keep_sources=(field == 'killFrom')
+                        )
+            if (
+                key in renamed
+                and isinstance(renamed[key], (int, float))
+                and isinstance(value, (int, float))
+                and not isinstance(value, bool)
+            ):
+                renamed[key] += value
+            elif key not in renamed:
+                renamed[key] = value
+        return renamed
+
+    @staticmethod
+    def _canonicalize_declared_player_keys(data: Dict[str, Any]) -> None:
+        """Rewrite declared player keys (ALEXANDRE -> ALEX) inside a session payload."""
+        if not isinstance(data, dict):
+            return
+        for key in ('todayWin', 'totalWin', 'today', 'total'):
+            block = data.get(key)
+            if isinstance(block, dict):
+                data[key] = SessionDataManager._rename_player_mapping(
+                    block, nested_stats=(key in ('today', 'total'))
+                )
+        matches = data.get('matchsResults')
+        if isinstance(matches, list):
+            data['matchsResults'] = [
+                SessionDataManager._rename_player_mapping(entry, nested_stats=False)
+                if isinstance(entry, dict) else entry
+                for entry in matches
+            ]
 
     @staticmethod
     def normalize_session_players(session: Dict[str, Any]) -> None:
@@ -380,6 +450,7 @@ class SessionDataManager:
             session: Dictionnaire de session avec 'data' contenant les données JSON
         """
         data = session.get('data', {})
+        SessionDataManager._canonicalize_declared_player_keys(data)
         if 'today' not in data:
             return
         
@@ -429,12 +500,9 @@ class SessionDataManager:
                     raw = player_stats.get(field)
                     if not isinstance(raw, dict):
                         continue
-                    filtered = {
-                        name: count
-                        for name, count in raw.items()
-                        if not SessionDataManager.should_ignore_player(name)
-                    }
-                    player_stats[field] = filtered
+                    player_stats[field] = SessionDataManager._filter_kill_counts(
+                        raw, keep_sources=(field == 'killFrom')
+                    )
 
     @staticmethod
     def has_detailed_stats(session: Dict[str, Any]) -> bool:
@@ -467,34 +535,44 @@ class SessionDataManager:
             all_players.update(data['today'].keys())
         
         for player in all_players:
-            if not SessionDataManager.should_ignore_player(player):
-                # Récupérer today_wins depuis todayWin, ou 0 si absent
-                today_wins = data.get('todayWin', {}).get(player, 0)
-                # Récupérer total_wins depuis totalWin, ou depuis total.win si absent
-                total_wins = data.get('totalWin', {}).get(player, 
-                    data.get('total', {}).get(player, {}).get('win', 0))
-                
-                player_data = {
-                    'today': today_wins,
-                    'total': total_wins
-                }
-                
-                # Ajouter les stats détaillées si disponibles
-                if has_detailed:
-                    today_stats = data.get('today', {}).get(player, {})
-                    total_stats = data.get('total', {}).get(player, {})
-                    
-                    if today_stats or total_stats:
-                        player_data['detailed'] = {
-                            'kill': total_stats.get('kill', 0),
-                            'death': total_stats.get('death', 0),
-                            'self': total_stats.get('self', 0),
-                            'killFrom': total_stats.get('killFrom', {}),
-                            'killBy': total_stats.get('killBy', {})
-                        }
-                
-                players[player] = player_data
-        
+            canonical = canonical_player_name(player)
+            if canonical is None:
+                continue
+            # Récupérer today_wins depuis todayWin, ou 0 si absent
+            today_wins = data.get('todayWin', {}).get(player, 0)
+            # Récupérer total_wins depuis totalWin, ou depuis total.win si absent
+            total_wins = data.get('totalWin', {}).get(player,
+                data.get('total', {}).get(player, {}).get('win', 0))
+
+            player_data = {
+                'today': today_wins,
+                'total': total_wins
+            }
+
+            # Ajouter les stats détaillées si disponibles
+            if has_detailed:
+                today_stats = data.get('today', {}).get(player, {})
+                total_stats = data.get('total', {}).get(player, {})
+
+                if today_stats or total_stats:
+                    player_data['detailed'] = {
+                        'kill': total_stats.get('kill', 0),
+                        'death': total_stats.get('death', 0),
+                        'self': total_stats.get('self', 0),
+                        'killFrom': SessionDataManager._filter_kill_counts(
+                            total_stats.get('killFrom', {}), keep_sources=True
+                        ),
+                        'killBy': SessionDataManager._filter_kill_counts(
+                            total_stats.get('killBy', {}), keep_sources=False
+                        ),
+                    }
+
+            if canonical in players:
+                players[canonical]['today'] += player_data['today']
+                players[canonical]['total'] += player_data['total']
+            else:
+                players[canonical] = player_data
+
         return players
 
     @staticmethod
@@ -506,7 +584,7 @@ class SessionDataManager:
             dictionnaire **joueur → nombre de kills** (entier >= 0).
             L'ordre de la liste est l'ordre chronologique des matchs.
 
-        Les joueurs listés par `should_ignore_player` sont exclus. Les kills
+        Les joueurs absents de PLAYER_TO_COLOR sont exclus. Les kills
         négatifs ou non numériques sont ignorés. Les matchs qui n'ont pas au
         moins 2 joueurs valides restants peuvent être ignorés par l'appelant.
 
@@ -524,7 +602,8 @@ class SessionDataManager:
                 continue
             match: Dict[str, int] = {}
             for name, value in entry.items():
-                if SessionDataManager.should_ignore_player(name):
+                canonical = canonical_player_name(name)
+                if canonical is None:
                     continue
                 if isinstance(value, bool):
                     continue
@@ -532,7 +611,7 @@ class SessionDataManager:
                     k = int(value)
                     if k < 0:
                         continue
-                    match[name] = k
+                    match[canonical] = match.get(canonical, 0) + k
             out.append(match)
         return out
 

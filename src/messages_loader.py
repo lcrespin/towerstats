@@ -5,10 +5,7 @@ import io
 import urllib.request
 from typing import Dict, List
 
-from .config import MESSAGES_CSV_URL
-
-# Optional: map CSV column names to app player names (e.g. ALEXANDRE -> ALEX)
-PLAYER_NAME_ALIASES = {'ALEXANDRE': 'ALEX'}
+from .config import MESSAGES_CSV_URL, PLAYER_NAME_ALIASES
 
 
 def load_win_messages(csv_url: str = None) -> Dict[str, List[str]]:

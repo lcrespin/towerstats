@@ -1,4 +1,4 @@
 id,date,value,,
-ALICE-BOB,2025-01-10,"{""todayWin"":{""ALICE"":2,""BOB"":1},""totalWin"":{""ALICE"":2,""BOB"":1},""mode"":""HeadHunters"",""date"":""2025-01-10-20""}",,
-ALICE-BOB,2025-01-11,"{""todayWin"":{""ALICE"":5,""BOB"":0},""totalWin"":{""ALICE"":5,""BOB"":0},""mode"":""13"",""date"":""2025-01-11-20""}",,
-ALICE-BOB,2025-01-12,"{""todayWin"":{""ALICE"":1,""BOB"":2},""totalWin"":{""ALICE"":3,""BOB"":3},""mode"":""HeadHunters"",""date"":""2025-01-12-20""}",,
+LOUIS-ERIC,2025-01-10,"{""todayWin"":{""LOUIS"":2,""ERIC"":1},""totalWin"":{""LOUIS"":2,""ERIC"":1},""mode"":""HeadHunters"",""date"":""2025-01-10-20""}",,
+LOUIS-ERIC,2025-01-11,"{""todayWin"":{""LOUIS"":5,""ERIC"":0},""totalWin"":{""LOUIS"":5,""ERIC"":0},""mode"":""13"",""date"":""2025-01-11-20""}",,
+LOUIS-ERIC,2025-01-12,"{""todayWin"":{""LOUIS"":1,""ERIC"":2},""totalWin"":{""LOUIS"":3,""ERIC"":3},""mode"":""HeadHunters"",""date"":""2025-01-12-20""}",,

@@ -152,13 +152,13 @@ def test_game_mode_isolates_cumulative_totals():
     hh.sort(key=lambda s: s["date"])
     last_hh = hh[-1]
     players = SessionDataManager.parse_session_data(last_hh)
-    assert players["ALICE"]["total"] == 3
-    assert players["BOB"]["total"] == 3
+    assert players["LOUIS"]["total"] == 3
+    assert players["ERIC"]["total"] == 3
 
     m13 = SessionDataManager.filter_sessions_by_game_mode(manager.get_sessions(), "13")
     players_13 = SessionDataManager.parse_session_data(m13[0])
-    assert players_13["ALICE"]["total"] == 5
-    assert players_13["BOB"]["total"] == 0
+    assert players_13["LOUIS"]["total"] == 5
+    assert players_13["ERIC"]["total"] == 0
 
 
 def test_partial_export_does_not_inflate_cumulative_totals():
@@ -542,15 +542,15 @@ def test_normalize_session_players_adds_zero_win_players_to_today_win():
     """Players in today but missing from todayWin (e.g. 0 wins) are added to todayWin with correct value."""
     session = {
         "data": {
-            "todayWin": {"ALICE": 2},
-            "totalWin": {"ALICE": 2},
+            "todayWin": {"LOUIS": 2},
+            "totalWin": {"LOUIS": 2},
             "today": {
-                "ALICE": {"win": 2, "kill": 5, "death": 1},
-                "BOB": {"win": 0, "kill": 1, "death": 5},
+                "LOUIS": {"win": 2, "kill": 5, "death": 1},
+                "ERIC": {"win": 0, "kill": 1, "death": 5},
             },
             "total": {
-                "ALICE": {"win": 2, "kill": 5, "death": 1},
-                "BOB": {"win": 0, "kill": 1, "death": 5},
+                "LOUIS": {"win": 2, "kill": 5, "death": 1},
+                "ERIC": {"win": 0, "kill": 1, "death": 5},
             },
             "date": "2025-12-08-12",
         }
@@ -558,9 +558,61 @@ def test_normalize_session_players_adds_zero_win_players_to_today_win():
     SessionDataManager.normalize_session_players(session)
     data = session["data"]
     assert "todayWin" in data
-    assert data["todayWin"].get("ALICE") == 2
-    assert data["todayWin"].get("BOB") == 0
-    assert data["totalWin"].get("BOB") == 0
+    assert data["todayWin"].get("LOUIS") == 2
+    assert data["todayWin"].get("ERIC") == 0
+    assert data["totalWin"].get("ERIC") == 0
+
+
+def test_only_declared_players_are_kept():
+    """Sessions stay only when every participant is in PLAYER_TO_COLOR."""
+
+    def session(names):
+        return {
+            "date": "2026-10-02",
+            "data": {
+                "date": "2026-10-02-20",
+                "todayWin": {name: 1 for name in names},
+                "totalWin": {name: 1 for name in names},
+                "today": {name: {"win": 1} for name in names},
+                "total": {name: {"win": 1} for name in names},
+            },
+        }
+
+    declared = session(["LOUIS", "ERIC"])
+    assert SessionDataManager.calculate_session_id_from_players(declared) == "ERIC-LOUIS"
+
+    aliased = session(["ALEXANDRE", "LOUIS"])
+    assert SessionDataManager.calculate_session_id_from_players(aliased) == "ALEX-LOUIS"
+    assert set(SessionDataManager.parse_session_data(aliased)) == {"ALEX", "LOUIS"}
+
+    assert SessionDataManager.calculate_session_id_from_players(session(["LOUIS", "KEPLER 2"])) == ""
+    assert SessionDataManager.calculate_session_id_from_players(session(["NOVA 4", "JIMMY 4"])) == ""
+
+    detailed = {
+        "data": {
+            "todayWin": {"LOUIS": 1, "ERIC": 1},
+            "totalWin": {"LOUIS": 1, "ERIC": 1},
+            "today": {
+                "LOUIS": {
+                    "win": 1,
+                    "killFrom": {"Arrow": 2, "KEPLER 2": 1},
+                    "killBy": {"ERIC": 1, "NOVA 4": 4},
+                },
+            },
+            "total": {
+                "LOUIS": {
+                    "win": 1,
+                    "killFrom": {"Arrow": 2, "KEPLER 2": 1},
+                    "killBy": {"ERIC": 1, "NOVA 4": 4},
+                },
+            },
+        }
+    }
+    SessionDataManager.normalize_session_players(detailed)
+    louis = detailed["data"]["total"]["LOUIS"]
+    assert louis["killFrom"] == {"Arrow": 2}
+    assert louis["killBy"] == {"ERIC": 1}
+    assert SessionDataManager.calculate_session_id_from_players(detailed) == "ERIC-LOUIS"
 
 
 def test_matchs_minimal_parse_and_session_without_field():
@@ -569,7 +621,7 @@ def test_matchs_minimal_parse_and_session_without_field():
     m.load_all()
     sessions = sorted(m.get_sessions(), key=lambda s: s.get("date", ""))
     assert len(sessions) == 3
-    assert SessionDataManager.parse_matchs_results(sessions[0]) == [{"ALICE": 3, "BOB": 1}]
+    assert SessionDataManager.parse_matchs_results(sessions[0]) == [{"LOUIS": 3, "ERIC": 1}]
     assert len(SessionDataManager.parse_matchs_results(sessions[1])) == 3
     assert SessionDataManager.parse_matchs_results(sessions[2]) == []
 
