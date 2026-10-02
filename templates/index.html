@@ -27,6 +27,7 @@
 <body class="txt-base break-words">
     <div class="arcade-bg" aria-hidden="true">
         <div class="arcade-stars"></div>
+        <div class="arcade-stars arcade-stars--near"></div>
         <div class="arcade-platforms"></div>
     </div>
     <div class="scanlines" aria-hidden="true"></div>
@@ -551,7 +552,7 @@
                     {% endfor %}
                     {% else %}
                     <tr>
-                        <td colspan="3" class="text-center" style="color: #ffd700; padding: 20px;">Aucun classement ELO disponible</td>
+                        <td colspan="3" class="text-center" style="color: var(--text); padding: 20px;">Aucun classement ELO disponible</td>
                     </tr>
                     {% endif %}
                 </tbody>
@@ -579,7 +580,7 @@
                         {% endfor %}
                         {% else %}
                         <tr>
-                            <td colspan="2" class="text-center" style="color: #ffd700; padding: 20px;">Aucun classement ELO legacy disponible</td>
+                            <td colspan="2" class="text-center" style="color: var(--text); padding: 20px;">Aucun classement ELO legacy disponible</td>
                         </tr>
                         {% endif %}
                     </tbody>
@@ -622,7 +623,7 @@
             </div>
             {% endif %}
             <div class="mb-3 sm:mb-4 md:mb-5 relative z-10">
-                <label for="group-select" class="block mb-1.5 sm:mb-2 md:mb-2.5 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
+                <label for="group-select" class="block mb-1.5 sm:mb-2 md:mb-2.5 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: var(--text);">
                     Sélectionner un groupe de joueurs:
                 </label>
                 <div class="select-wrapper relative w-full max-w-md">
@@ -677,7 +678,7 @@
                 {% set session = session_data.session %}
                 {% set players = session_data.players %}
                 <div class="session-card p-2 sm:p-4 md:p-[15px]">
-                    <div class="text-[7px] sm:text-[8px] md:text-[10px] mb-3 sm:mb-4" style="color: #ffd700;">
+                    <div class="text-[7px] sm:text-[8px] md:text-[10px] mb-3 sm:mb-4" style="color: var(--text);">
                         Session: {{ session.id }} - {{ session.date }}
                     </div>
                     <div class="overflow-x-auto">
@@ -710,7 +711,7 @@
             <div id="all-sessions-container" class="hidden">
                 <div class="filters-container mb-4 sm:mb-5 flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-5">
                     <div class="filter-group flex-1">
-                        <label for="filter-player" class="block mb-1.5 sm:mb-2 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
+                        <label for="filter-player" class="block mb-1.5 sm:mb-2 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: var(--text);">
                             Filtrer par joueur:
                         </label>
                         <div class="select-wrapper relative w-full">
@@ -721,7 +722,7 @@
                         </div>
                     </div>
                     <div class="filter-group flex-1">
-                        <label for="filter-group" class="block mb-1.5 sm:mb-2 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
+                        <label for="filter-group" class="block mb-1.5 sm:mb-2 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: var(--text);">
                             Filtrer par groupe:
                         </label>
                         <div class="select-wrapper relative w-full">
@@ -732,7 +733,7 @@
                         </div>
                     </div>
                 </div>
-                <div id="sessions-count" class="mb-3 sm:mb-4 text-center" style="color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+                <div id="sessions-count" class="mb-3 sm:mb-4 text-center" style="color: var(--text); text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
                     <span class="text-[6px] sm:text-[7px] md:text-[9px]">Total: <span id="sessions-count-value">0</span> session(s)</span>
                 </div>
                 <div id="all-sessions-list"></div>
@@ -758,8 +759,8 @@
                     <h2 class="txt-heading break-words">🎯 Guerre des flèches</h2>
                     <button class="info-button" data-info="kill-relationships-info">?</button>
                 </div>
-                <div class="flex items-center gap-2" style="color: #ffd700;">
-                    <input type="checkbox" id="kill-relationships-totals-toggle" class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: #8b4513;">
+                <div class="flex items-center gap-2" style="color: var(--text);">
+                    <input type="checkbox" id="kill-relationships-totals-toggle" class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: var(--gold);">
                     <label for="kill-relationships-totals-toggle" class="form-label mb-0 cursor-pointer">Totaux</label>
                 </div>
             </div>
@@ -916,7 +917,7 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-2 mt-2 sm:mt-6">
-                            <input type="checkbox" id="evolution-cumul-checkbox" checked class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: #8b4513;">
+                            <input type="checkbox" id="evolution-cumul-checkbox" checked class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: var(--gold);">
                             <label for="evolution-cumul-checkbox" class="form-label mb-0 cursor-pointer">Cumulé</label>
                         </div>
                     </div>
@@ -929,7 +930,7 @@
             <div class="evolution-tab-panel hidden" data-panel="winrate" role="tabpanel">
                 <div class="evolution-panel-controls">
                     <label>
-                        <input type="checkbox" id="evolution-show-all-players" class="w-4 h-4 cursor-pointer" style="accent-color: #8b4513;">
+                        <input type="checkbox" id="evolution-show-all-players" class="w-4 h-4 cursor-pointer" style="accent-color: var(--gold);">
                         Tous les joueurs
                     </label>
                 </div>
@@ -944,7 +945,7 @@
             <div class="evolution-tab-panel hidden" data-panel="elo-session" role="tabpanel">
                 <div class="evolution-panel-controls">
                     <label>
-                        <input type="checkbox" id="evolution-show-all-players-elo" class="w-4 h-4 cursor-pointer evolution-show-all-players-sync" style="accent-color: #8b4513;">
+                        <input type="checkbox" id="evolution-show-all-players-elo" class="w-4 h-4 cursor-pointer evolution-show-all-players-sync" style="accent-color: var(--gold);">
                         Tous les joueurs
                     </label>
                 </div>
@@ -959,16 +960,16 @@
             <div class="evolution-tab-panel hidden" data-panel="elo-match" role="tabpanel">
                 <div class="evolution-panel-controls">
                     <label>
-                        <input type="checkbox" id="evolution-show-all-players-elo-match" class="w-4 h-4 cursor-pointer evolution-show-all-players-sync" style="accent-color: #8b4513;">
+                        <input type="checkbox" id="evolution-show-all-players-elo-match" class="w-4 h-4 cursor-pointer evolution-show-all-players-sync" style="accent-color: var(--gold);">
                         Tous les joueurs
                     </label>
                     <span class="form-label mb-0">Affichage :</span>
                     <label class="form-label mb-0 inline-flex items-center gap-1.5 cursor-pointer">
-                        <input type="radio" name="elo-match-granularity" id="elo-match-granularity-session" value="session" checked class="w-3 h-3 cursor-pointer" style="accent-color: #8b4513;">
+                        <input type="radio" name="elo-match-granularity" id="elo-match-granularity-session" value="session" checked class="w-3 h-3 cursor-pointer" style="accent-color: var(--gold);">
                         Par session
                     </label>
                     <label class="form-label mb-0 inline-flex items-center gap-1.5 cursor-pointer">
-                        <input type="radio" name="elo-match-granularity" id="elo-match-granularity-match" value="match" class="w-3 h-3 cursor-pointer" style="accent-color: #8b4513;">
+                        <input type="radio" name="elo-match-granularity" id="elo-match-granularity-match" value="match" class="w-3 h-3 cursor-pointer" style="accent-color: var(--gold);">
                         Par match
                     </label>
                 </div>

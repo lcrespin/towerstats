@@ -270,7 +270,7 @@ function renderSessions() {
     }
     
     if (filteredSessions.length === 0) {
-        container.innerHTML = '<div class="session-card p-2 sm:p-4 md:p-[15px] text-center" style="color: #ffd700;">Aucune session trouvée avec ces filtres.</div>';
+        container.innerHTML = '<div class="session-card p-2 sm:p-4 md:p-[15px] text-center" style="color: var(--text);">Aucune session trouvée avec ces filtres.</div>';
         updatePaginationControls();
         updateSessionsCount();
         return;
@@ -291,7 +291,7 @@ function renderSessions() {
             var medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
             tableRows += '<tr><td class="' + rankClass + '" style="color: ' + color + '; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">' + medal + ' ' + p.name + '</td><td class="' + rankClass + '">' + p.today + '</td><td class="' + rankClass + '">' + p.total + '</td></tr>';
         });
-        sessionCard.innerHTML = '<div class="text-[7px] sm:text-[8px] md:text-[10px] mb-3 sm:mb-4" style="color: #ffd700;">Session: ' + session.id + ' - ' + (session.formatted_date || session.date) + '</div><div class="overflow-x-auto"><table class="ranking-table w-full text-[5px] sm:text-[6px] md:text-[9px]"><thead><tr><th>Joueur</th><th>Session</th><th>Total</th></tr></thead><tbody>' + tableRows + '</tbody></table></div>';
+        sessionCard.innerHTML = '<div class="text-[7px] sm:text-[8px] md:text-[10px] mb-3 sm:mb-4" style="color: var(--text);">Session: ' + session.id + ' - ' + (session.formatted_date || session.date) + '</div><div class="overflow-x-auto"><table class="ranking-table w-full text-[5px] sm:text-[6px] md:text-[9px]"><thead><tr><th>Joueur</th><th>Session</th><th>Total</th></tr></thead><tbody>' + tableRows + '</tbody></table></div>';
         container.appendChild(sessionCard);
         var tbl = sessionCard.querySelector('table');
         if (tbl && tbl.querySelectorAll('thead th').length >= 3) makeTableSortable(tbl);
@@ -558,6 +558,9 @@ var SECTION_NAV_MAP = {
 
 var LINE_CHART_TOP_N = 5;
 var showAllLineChartPlayers = false;
+
+var CHART_TEXT_COLOR = '#ece6d8';
+var CHART_TICK_COLOR = '#a89c88';
 
 var CHART_FONT = {
     family: "'Inter', system-ui, sans-serif",
@@ -987,7 +990,7 @@ function initWinRateEvolutionChart() {
                 min: 0,
                 max: yMax,
                 ticks: {
-                    color: '#ffd700',
+                    color: CHART_TICK_COLOR,
                     callback: function(value) { return (value * 100).toFixed(0) + '%'; }
                 }
             },
@@ -1044,7 +1047,7 @@ function initEveningCurveChart() {
                 min: 0,
                 max: yMax,
                 ticks: {
-                    color: '#ffd700',
+                    color: CHART_TICK_COLOR,
                     callback: function(value) { return (value * 100).toFixed(0) + '%'; }
                 }
             },
@@ -1278,7 +1281,7 @@ function buildPlayerLineDatasets(points, playerValuesKey, options) {
 function buildPlayerLineChartOptions(opts) {
     opts = opts || {};
     const xTicks = {
-        color: '#ffd700',
+        color: CHART_TICK_COLOR,
         font: CHART_FONT_SMALL,
         maxRotation: 45,
         autoSkip: true
@@ -1290,17 +1293,17 @@ function buildPlayerLineChartOptions(opts) {
     }
     const hoverChartRef = opts.hoverChartRef;
     const yScale = Object.assign({
-        title: { display: true, text: opts.yTitle || 'ELO', color: '#ffd700', font: CHART_FONT },
-        ticks: { color: '#ffd700', font: CHART_FONT_SMALL }
+        title: { display: true, text: opts.yTitle || 'ELO', color: CHART_TEXT_COLOR, font: CHART_FONT },
+        ticks: { color: CHART_TICK_COLOR, font: CHART_FONT_SMALL }
     }, opts.yScale || {});
     const xScale = Object.assign({
-        title: { display: true, text: opts.xTitle || 'Session', color: '#ffd700', font: CHART_FONT },
+        title: { display: true, text: opts.xTitle || 'Session', color: CHART_TEXT_COLOR, font: CHART_FONT },
         ticks: xTicks
     }, opts.xScale || {});
     const plugins = Object.assign({
         legend: {
             labels: {
-                color: '#ffd700',
+                color: CHART_TEXT_COLOR,
                 font: CHART_FONT,
                 usePointStyle: true,
                 padding: 10
@@ -1732,7 +1735,7 @@ function renderRivalryMap(useTotals) {
         circle.setAttribute('cy', pos.y);
         circle.setAttribute('r', '26');
         circle.setAttribute('fill', color);
-        circle.setAttribute('stroke', '#ffd700');
+        circle.setAttribute('stroke', '#f2c94c');
         circle.setAttribute('stroke-width', '3');
         circle.classList.add('rivalry-node-circle');
 
@@ -1877,7 +1880,34 @@ function initMobileMenu() {
     }
 }
 
+function initBackgroundParallax() {
+    const bg = document.querySelector('.arcade-bg');
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!bg || !finePointer || reducedMotion) {
+        return;
+    }
+    let mouseX = 0;
+    let mouseY = 0;
+    let frame = null;
+
+    function applyPosition() {
+        frame = null;
+        bg.style.setProperty('--parallax-x', (0.5 - mouseX / window.innerWidth).toFixed(3));
+        bg.style.setProperty('--parallax-y', (0.5 - mouseY / window.innerHeight).toFixed(3));
+    }
+
+    document.addEventListener('mousemove', function(e) {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        if (!frame) {
+            frame = requestAnimationFrame(applyPosition);
+        }
+    }, { passive: true });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    initBackgroundParallax();
     initOverlayPortal();
     initRankingTable();
     initEloLegacyToggle();
