@@ -6,6 +6,7 @@ from typing import List, Dict, Any
 
 from .data_manager import SessionDataManager
 from .config import PLAYER_TO_COLOR, game_mode_label, DEFAULT_GAME_MODE
+from .combat_profiles import build_combat_profiles, build_evening_curve
 
 MEDAL_BY_RANK = {1: '🥇', 2: '🥈', 3: '🥉'}
 
@@ -841,42 +842,6 @@ class SessionStatsManager:
             ))
         return sorted(player_stats, key=lambda x: x[4], reverse=True)
     
-    def get_kill_sources_stats(self):
-        """Agrège les sources de kills (Arrow, Explosion, etc.) par joueur (moyenne par partie)
-        et globalement (totaux).
-        
-        Returns:
-            dict: {
-                'by_player': {player: {source: avg_per_game}},
-                'global': {source: total_count}
-            }
-        """
-        by_player_totals = defaultdict(lambda: defaultdict(int))
-        global_sources = defaultdict(int)
-        
-        for session in self.sessions:
-            players = SessionDataManager.parse_session_data(session)
-            for player, stats in players.items():
-                if 'detailed' in stats:
-                    kill_from = stats['detailed'].get('killFrom', {})
-                    for source, count in kill_from.items():
-                        by_player_totals[player][source] += count
-                        global_sources[source] += count
-        
-        player_games = self._get_player_games_played(detailed_only=True)
-        by_player = {}
-        for player, sources in by_player_totals.items():
-            games = player_games.get(player, 0) or 1
-            by_player[player] = {
-                source: round(total / games, 2)
-                for source, total in sources.items()
-            }
-        
-        return {
-            'by_player': by_player,
-            'global': dict(global_sources)
-        }
-    
     def get_kill_relationships(self):
         """Matrice qui tue qui: moyennes et totaux par paire (killer, victim).
 
@@ -1090,7 +1055,7 @@ class SessionStatsManager:
         # Statistiques détaillées (si disponibles)
         has_detailed = self.has_detailed_stats()
         kill_death_ranking = []
-        kill_sources_aggregated = {'by_player': {}, 'global': {}}
+        combat_profiles = []
         kill_relationships = {}
         all_players_for_matrix = []
         top_killers = []
@@ -1108,7 +1073,7 @@ class SessionStatsManager:
             kill_death_ranking = self._add_dense_ranks(
                 self.get_kill_death_stats(), score_index=4, name_index=0
             )
-            kill_sources_aggregated = self.get_kill_sources_stats()
+            combat_profiles = build_combat_profiles(self.sessions, format_date=self.format_date)
             kill_relationships, kill_relationships_totals = self.get_kill_relationships()
 
             all_players_set = set()
@@ -1181,7 +1146,8 @@ class SessionStatsManager:
             'player_colors': PLAYER_TO_COLOR,
             'has_detailed_stats': has_detailed,
             'kill_death_ranking': kill_death_ranking,
-            'kill_sources_aggregated': kill_sources_aggregated,
+            'combat_profiles': combat_profiles,
+            'evening_curve': build_evening_curve(self.sessions),
             'kill_relationships': kill_relationships,
             'kill_relationships_totals': kill_relationships_totals,
             'all_players_for_matrix': all_players_for_matrix,

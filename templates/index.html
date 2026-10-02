@@ -25,13 +25,22 @@
 </head>
 
 <body class="txt-base break-words">
+    <div class="arcade-bg" aria-hidden="true">
+        <div class="arcade-stars"></div>
+        <div class="arcade-platforms"></div>
+    </div>
+    <div class="scanlines" aria-hidden="true"></div>
+
     <header class="gap-2.5 sm:gap-5 pad-section min-h-[35px] sm:min-h-[45px] md:min-h-[80px]">
         <div class="header-characters gap-0.5 sm:gap-2 md:gap-8">
             <img src="/images/pink-portrait-selected.png" alt="Pink Character" class="header-character left header-portrait">
             <img src="/images/green-portrait-selected.png" alt="Green Character" class="header-character left header-portrait">
             <img src="/images/altOrange-portrait-selected.png" alt="Orange Character" class="header-character left header-portrait">
         </div>
-        <h1 class="txt-title-h1 m-0.5 sm:m-0.5 md:m-2.5 lg:m-[10px] h-auto min-h-[16px] sm:min-h-[21px] md:min-h-[40px] lg:min-h-[120px] p-0.5 sm:p-0.5 md:p-0.5 lg:p-0"><span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span> TOWERSTATS <span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span></h1>
+        <div class="header-brand">
+            <h1 class="txt-title-h1 m-0.5 sm:m-0.5 md:m-2.5 lg:m-[10px] h-auto min-h-[16px] sm:min-h-[21px] md:min-h-[40px] lg:min-h-[120px] p-0.5 sm:p-0.5 md:p-0.5 lg:p-0"><span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span> TOWERSTATS <span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span></h1>
+            <p class="header-subtitle">Les stats officielles (plus ou moins) de la soirée TowerFall — saison par saison</p>
+        </div>
         <div class="header-characters gap-0.5 sm:gap-2 md:gap-8">
             <img src="/images/purple-portrait-selected.png" alt="Purple Character" class="header-character right header-portrait">
             <img src="/images/white-portrait-selected.png" alt="White Character" class="header-character right header-portrait">
@@ -39,12 +48,13 @@
         </div>
     </header>
 
-    <nav class="sticky top-0 z-50">
-        <div class="flex flex-col gap-1.5 sm:gap-2.5">
+    <nav class="sticky top-0 z-50 nav-arcade">
+        <div class="nav-lifebar" aria-hidden="true"><span class="nav-lifebar-fill"></span></div>
+        <div class="nav-arcade-inner">
             <div class="season-switcher-wrap">
                 <div class="season-switcher" role="navigation" aria-label="Saisons">
                     {% for item in season_switcher %}
-                    <a href="{{ item.href }}" class="season-pill{% if item.active %} is-active{% endif %}" {% if item.active %}aria-current="page"{% endif %} title="{{ item.label }} — {{ item.period_label }}">
+                    <a href="{{ item.href }}" class="season-pill{% if item.active %} is-active{% endif %}{% if item.id == 'all' %} season-pill-career{% endif %}" {% if item.active %}aria-current="page"{% endif %} title="{{ item.label }} — {{ item.period_label }}">
                         <span class="season-pill-short">{{ item.short }}</span>
                         {% if item.live %}
                         <span class="season-live-badge">LIVE</span>
@@ -54,124 +64,26 @@
                 </div>
                 <div class="season-switcher-caption">{{ season_period_label }}</div>
             </div>
-            <div class="flex items-center justify-between w-full gap-2">
-                <div class="shrink-0 flex items-center justify-start">
-                    <button type="button" id="toggle-date-picker" class="info-button global-info-button txt-xs" title="Filtrer" aria-label="Filtrer">🎚️</button>
-                </div>
-                <button type="button" id="mobile-menu-toggle" class="info-button global-info-button txt-xs sm:hidden" aria-label="Menu" aria-expanded="false">☰</button>
-                <ul class="hidden sm:flex flex-wrap justify-center gap-grid flex-1 min-w-0">
-                    <li class="flex-1 min-w-0"><a href="#leaderboards" class="block text-center">🙌 Leaderboards</a></li>
-                    <li class="flex-1 min-w-0"><a href="#classements" class="block text-center">🏆 Classements</a></li>
-                    <li class="flex-1 min-w-0"><a href="#sessions" class="block text-center">📅 Sessions</a></li>
-                    <li class="flex-1 min-w-0"><a href="#kills" class="block text-center">🎯 Kills</a></li>
-                    <li class="flex-1 min-w-0"><a href="#evolution" class="block text-center">📈 Évolution</a></li>
+            <div class="nav-arcade-bar">
+                <button type="button" id="toggle-date-picker" class="nav-hud-btn filter-toggle-button{% if selected_session_id or selected_group_id or selected_date_start or selected_date_end or selected_game_mode != default_game_mode %} has-filters{% endif %}" title="Filtrer les sessions" aria-label="Filtrer les sessions" aria-expanded="false" aria-controls="date-picker-popover">
+                    <span class="filter-toggle-label">Filtres</span>
+                </button>
+                <button type="button" id="mobile-menu-toggle" class="nav-hud-btn nav-menu-toggle sm:hidden" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
+                <ul class="nav-arcade-links">
+                    <li><a href="#cette-semaine"><span class="nav-link-icon" aria-hidden="true">📊</span><span class="nav-link-label">Records</span></a></li>
+                    <li><a href="#podium"><span class="nav-link-icon" aria-hidden="true">🏆</span><span class="nav-link-label">Podium</span></a></li>
+                    <li><a href="#archives"><span class="nav-link-icon" aria-hidden="true">📅</span><span class="nav-link-label">Archives</span></a></li>
+                    <li><a href="#fleches"><span class="nav-link-icon" aria-hidden="true">🎯</span><span class="nav-link-label">Flèches</span></a></li>
+                    <li><a href="#parcours"><span class="nav-link-icon" aria-hidden="true">📈</span><span class="nav-link-label">Parcours</span></a></li>
                 </ul>
-                <div class="shrink-0 flex items-center justify-end">
-                    <button class="info-button global-info-button txt-xs" data-info="global-data-info">?</button>
-                </div>
+                <button type="button" class="info-button nav-help-button" data-info="global-data-info" aria-label="À propos des données">?</button>
             </div>
             <div id="mobile-menu" class="mobile-menu sm:hidden" aria-hidden="true">
-                <a href="#leaderboards" class="mobile-menu-link">🙌 Leaderboards</a>
-                <a href="#classements" class="mobile-menu-link">🏆 Classements</a>
-                <a href="#sessions" class="mobile-menu-link">📅 Sessions</a>
-                <a href="#kills" class="mobile-menu-link">🎯 Kills</a>
-                <a href="#evolution" class="mobile-menu-link">📈 Évolution</a>
-            </div>
-        </div>
-        <div id="date-picker-popover" class="date-picker-popover" aria-hidden="true">
-            <button type="button" class="date-picker-close" aria-label="Fermer">×</button>
-            <form method="get" class="date-picker-form flex flex-col gap-3">
-                {% if selected_season != current_season_id %}
-                <input type="hidden" name="season" value="{{ selected_season }}">
-                {% endif %}
-                <h3 class="text-center text-[8px] sm:text-[9px] md:text-[11px] lg:text-xs font-bold" style="color: #ffd700;">Filtrer les sessions</h3>
-                <div class="date-picker-field">
-                    <label for="game-mode-select" class="date-picker-label">Mode de jeu</label>
-                    <div class="date-picker-select-wrapper">
-                        <select id="game-mode-select" name="gameMode" class="date-picker-select">
-                            {% for mode_id, mode_info in game_modes.items() %}
-                            <option value="{{ mode_id }}" {% if mode_id == selected_game_mode %}selected{% endif %}>{{ mode_info.label }}</option>
-                            {% endfor %}
-                        </select>
-                        <span class="date-picker-select-arrow">▼</span>
-                    </div>
-                </div>
-                {% set current_start = selected_date_start or date_debut_raw or season_picker_min %}
-                {% set current_end = selected_date_end or date_fin_raw or season_picker_max %}
-                <div class="date-picker-field">
-                    <div class="date-picker-date-row">
-                        <label for="dateStart" class="date-picker-sublabel">Depuis</label>
-                        <input type="date" id="dateStart" name="dateStart" value="{{ current_start }}" class="date-picker-input" {% if season_picker_min %}min="{{ season_picker_min }}"{% endif %} {% if season_picker_max %}max="{{ season_picker_max }}"{% endif %} {% if selected_session_id %}disabled{% endif %}>
-                        <label for="dateEnd" class="date-picker-sublabel">Jusqu'à</label>
-                        <input type="date" id="dateEnd" name="dateEnd" value="{{ current_end }}" class="date-picker-input" {% if season_picker_min %}min="{{ season_picker_min }}"{% endif %} {% if season_picker_max %}max="{{ season_picker_max }}"{% endif %} {% if selected_session_id %}disabled{% endif %}>
-                    </div>
-                </div>
-                <div class="date-picker-field">
-                    <div class="date-picker-select-wrapper">
-                        <select id="session-select" name="sessionId" class="date-picker-select">
-                            <option value="">Toutes les sessions</option>
-                            {% for session in all_sessions_data %}
-                            <option value="{{ session.session_select_id }}" {% if selected_session_id == session.session_select_id or selected_session_id == session.date ~ '|' ~ session.id %}selected{% endif %}>{{ session.formatted_date }} — {{ session.game_mode_label }} ({{ session.players|map(attribute='name')|join(', ') }})</option>
-                            {% endfor %}
-                        </select>
-                        <span class="date-picker-select-arrow">▼</span>
-                    </div>
-                </div>
-                <div class="date-picker-field">
-                    <div class="date-picker-select-wrapper">
-                        <select id="filter-group-select" name="groupId" class="date-picker-select">
-                            <option value="">Tous les groupes</option>
-                            {% for gid in all_groups_for_filter %}
-                            <option value="{{ gid }}" {% if gid == selected_group_id %}selected{% endif %}>{{ gid }}</option>
-                            {% endfor %}
-                        </select>
-                        <span class="date-picker-select-arrow">▼</span>
-                    </div>
-                </div>
-                <div class="date-picker-actions">
-                    <a href="{{ reset_filters_url }}" class="toggle-button toggle-button-secondary text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] px-2 py-1 sm:px-3 sm:py-1.5">Réinitialiser</a>
-                    <button type="submit" class="toggle-button text-[6px] sm:text-[7px] md:text-[8px] lg:text-[10px] px-2 py-1 sm:px-3 sm:py-1.5">Appliquer</button>
-                </div>
-            </form>
-        </div>
-        <div id="global-data-info" class="info-bubble">
-            <div class="info-bubble-title">🔧 Correction des Données</div>
-            <div class="info-bubble-content">
-                <strong>Algorithme de correction des incohérences</strong><br><br>
-                
-                Les données brutes peuvent contenir des incohérences entre TodayWins et TotalWins. Un algorithme corrige automatiquement ces erreurs. Parfois, Eric a dû éditer manuellement certaines entrées pour rattraper des plantages du jeu... qui plante parfois malgré ses améliorations (comme le stockage des stats dans Google Sheets). 😅<br><br>
-                
-                <strong>Principe de correction :</strong><br>
-                Pour chaque groupe de joueurs, les sessions sont traitées dans l'ordre chronologique (de la plus ancienne à la plus récente).<br><br>
-                
-                Pour chaque session et chaque joueur :<br>
-                • On récupère le TotalWins actuel et le TotalWins de la session précédente<br>
-                • On calcule le TodayWins attendu : <code>TodayWins = TotalWins_actuel - TotalWins_précédent</code><br>
-                • Si le TodayWins enregistré ≠ TodayWins attendu ET TodayWins attendu ≥ 0, on corrige TodayWins<br>
-                • On met à jour le TotalWins précédent pour la prochaine session<br>
-                • (Oui, on fait le travail qu'Eric aurait dû faire correctement dès le début, mais bon... 🤷)<br><br>
-                
-                <strong>Normalisation des joueurs :</strong><br>
-                Tous les joueurs présents dans les statistiques détaillées (<code>today</code>/<code>total</code>) sont automatiquement inclus dans <code>todayWin</code> et <code>totalWin</code>, même s'ils ont 0 victoires. Cela garantit que tous les joueurs qui ont participé à une session sont correctement comptabilisés dans le groupe et l'ID de session, même s'ils n'ont gagné aucune partie.<br><br>
-                
-                <strong>Format des données :</strong><br>
-                Les données utilisent le format <code>todayWin[player]</code> et <code>totalWin[player]</code> pour stocker les statistiques de chaque joueur.<br><br>
-                
-                <strong>Exemple :</strong><br>
-                Session 1 : TotalWins = 50, TodayWins = 10<br>
-                Session 2 : TotalWins = 65, TodayWins = 12 (incorrect)<br>
-                → Correction : TodayWins = 65 - 50 = 15<br>
-                → (Eric aurait pu vérifier ça avant de sauvegarder, mais non, il fallait qu'on le fasse après coup)<br><br>
-                
-                <strong>Filtrage :</strong><br>
-                • Sessions passant minuit : si une session se termine après minuit, seule la session du jour suivant (00h-05h) est conservée<br>
-                • Joueurs hors liste : seuls les joueurs déclarés (Mehdi, Julien, Louis, Alex, Eric, Benoit, David, Zaya) sont comptés. Tout autre nom est ignoré, et la session avec lui.<br>
-                • (Parce qu'apparemment, Eric aime bien laisser des traces de debug dans les données de production...)<br><br>
-
-                <strong>Modes de jeu (v4) :</strong><br>
-                Depuis avril 2026, Eric a ajouté un champ <code>mode</code> dans les stats v4. Avant ça, tout le monde jouait Head Hunters sans le savoir — comme si vous aviez le choix. Les anciennes sessions sans <code>mode</code> sont traitées comme Head Hunters.<br>
-                Les cumuls (<code>todayWin</code> / <code>totalWin</code>) et les corrections sont calculés <em>séparément par mode</em>, pour qu'Eric ne mélange pas Head Hunters et Respawn 3 dans la même addition. (Il a fallu qu'on le précise nous-mêmes.)<br>
-                Si une session v4 oublie le champ <code>mode</code>, on assume Head Hunters — parce que TowerStats doit marcher même quand Eric oublie un champ.
+                <a href="#cette-semaine" class="mobile-menu-link">📊 Records</a>
+                <a href="#podium" class="mobile-menu-link">🏆 Podium</a>
+                <a href="#archives" class="mobile-menu-link">📅 Archives</a>
+                <a href="#fleches" class="mobile-menu-link">🎯 Flèches</a>
+                <a href="#parcours" class="mobile-menu-link">📈 Parcours</a>
             </div>
         </div>
     </nav>
@@ -210,9 +122,9 @@
     {% endif %}
 
     <div class="container mx-auto px-2 sm:px-4 md:px-6 lg:px-8 py-2 sm:py-4 md:py-5" style="max-width: 1000px !important;">
-        <section id="statistiques" class="margin-bottom-section pad-section overflow-x-auto">
+        <section id="records-du-moment" class="margin-bottom-section pad-section arcade-panel overflow-x-auto">
             <div class="section-header">
-                <h2 class="txt-heading break-words">🙌 Leaderboard</h2>
+                <h2 class="txt-heading break-words">📊 Records du moment</h2>
                 <button class="info-button" data-info="statistiques-info">?</button>
             </div>
             <div id="statistiques-info" class="info-bubble">
@@ -224,7 +136,7 @@
                     <strong>ELO session (colonne gauche)</strong><br>
                     Le ou les joueurs avec le plus haut ELO calculé <em>par session</em> (une mise à jour batch par session d’après les victoires du jour).<br><br>
                     <strong>ELO match (colonne droite, si affiché)</strong><br>
-                    Le ou les joueurs avec le plus haut ELO calculé <em>match par match</em> d’après les kills par match (champ <code>matchsResults</code> dans les données) : toutes les sessions par ordre de date, puis chaque match dans l’ordre du tableau.<br><br>
+                    Le ou les joueurs avec le plus haut ELO calculé <em>match par match</em> d’après les kills par match (champ <code>matchsResults</code> dans les données) : toutes les sessions par ordre de date, puis chaque match dans l’ordre du tableau.<br><br>
                     
                     <strong>Meilleur Score dans un groupe</strong><br>
                     Le plus haut score par groupe, calculé comme la somme des victoires de chaque session du groupe (selon les filtres appliqués).<br><br>
@@ -233,10 +145,13 @@
                     Nombre de joueurs différents qui ont joué au moins une fois, et nombre total de sessions de jeu enregistrées depuis le début.
                 </div>
             </div>
+            <p class="section-tagline">Le high score — {{ taglines.records }}</p>
+            <h3 class="subsection-title">🏆 Victoires</h3>
             <div class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-grid">
                 {% if best_percentage_players %}
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Meilleur % Victoires</div>
+                    <div class="stat-flavor">Roi de la soirée</div>
                     <div class="stat-value txt-title-h2">{{ "%.2f" % best_percentage }}%</div>
                     <div class="flex flex-wrap justify-center gap-1.5 mt-1 pb-[2px]">
                         {% for player in best_percentage_players %}
@@ -353,26 +268,25 @@
                 <div>Depuis le {{ date_debut }}</div>
                 <div>Dernière session jouée le {{ date_fin }}</div>
             </div>
-        </section>
 
         {% if has_detailed_stats %}
-        <section id="combat-stats" class="margin-bottom-section pad-section overflow-x-auto">
-            <div class="section-header">
-                <h2 class="txt-heading break-words">🏹 Leaderboard de combat</h2>
-                <button class="info-button" data-info="combat-stats-info">?</button>
-            </div>
+            <h3 class="subsection-title subsection-title-row">
+                <span>🏹 Combat</span>
+                <button type="button" class="info-button info-button-inline" data-info="combat-stats-info" aria-label="Aide combat">?</button>
+            </h3>
             <div id="combat-stats-info" class="info-bubble">
-                <div class="info-bubble-title">⚔️ Leaderboard de combat</div>
+                <div class="info-bubble-title">⚔️ Combat</div>
                 <div class="info-bubble-content">
                     <strong>K/D Ratio :</strong> Ratio Kills/Deaths. Plus le ratio est élevé, meilleur est le joueur en combat.<br><br>
                     <strong>Plus de Kills / Moins de Deaths / Moins d'Auto-Kills :</strong> Moyennes par partie jouée (total divisé par le nombre de parties).<br><br>
-                    <strong>Nombre de parties (tableau détail) :</strong> Pour chaque joueur, on ne compte que les parties jouées dans les sessions où les stats de combat existent. Par session, le nombre de parties = somme des victoires du jour de tous les joueurs (chaque partie a un vainqueur). Ce même nombre de parties est utilisé pour calculer les moyennes Kills/partie, Deaths/partie et Auto-Kills/partie ; les totaux Kills, Deaths et Self affichés sont aussi limités à ces mêmes sessions (incréments cumulés par session).
+                    <strong>Nombre de parties (tableau détail) :</strong> Pour chaque joueur, on ne compte que les parties jouées dans les sessions où les stats de combat existent.
                 </div>
             </div>
             <div class="stats-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-grid">
                 {% if best_kd_ratio %}
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Meilleur Ratio K/D</div>
+                    <div class="stat-flavor">Serial killer</div>
                     <div class="stat-value txt-title-h2">{{ "%.2f" % best_kd_value }}</div>
                     <div class="flex flex-wrap justify-center gap-1.5 mt-1 pb-[2px]">
                         {% for player in best_kd_ratio %}
@@ -389,6 +303,7 @@
                 {% if top_killers %}
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Plus de Kills (moy./partie)</div>
+                    <div class="stat-flavor">Chasseur de têtes</div>
                     <div class="stat-value txt-title-h2">{{ "%.2f" % top_killers[0][7] }}</div>
                     <div class="flex flex-wrap justify-center gap-1.5 mt-1 pb-[2px]">
                         <div class="inline-flex flex-col items-center">
@@ -403,6 +318,7 @@
                 {% if least_deaths_row %}
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Moins de Deaths (moy./partie)</div>
+                    <div class="stat-flavor">Survivant du canapé</div>
                     <div class="stat-value txt-title-h2">{{ "%.2f" % least_deaths_row[8] }}</div>
                     <div class="flex justify-center mt-1 pb-[2px]">
                         <div class="inline-flex flex-col items-center">
@@ -422,6 +338,7 @@
                 {% if least_self_kills_row %}
                 <div class="stat-card stat-card-align pad-card">
                     <div class="stat-label txt-xs">Moins d'Auto-Kills (moy./partie)</div>
+                    <div class="stat-flavor">Friendly fire champion (ironique)</div>
                     <div class="stat-value txt-title-h2">{{ "%.2f" % least_self_kills_row[9] }}</div>
                     <div class="flex justify-center mt-1 pb-[2px]">
                         <div class="inline-flex flex-col items-center">
@@ -443,7 +360,7 @@
             <button id="toggle-ranking-table" class="toggle-button w-full sm:w-auto text-[6px] sm:text-[7px] md:text-[9px] p-2 sm:p-2.5 md:p-3 lg:p-[12px] lg:px-5">
                 ▼ Voir le détail des kills
             </button>            
-            <div id="ranking-table" class="hidden overflow-x-auto mt-4">
+            <div id="kill-detail-wrapper" class="hidden overflow-x-auto mt-4">
                 <table class="ranking-table w-full txt-xs kill-detail-table-mobile" id="kill-detail-table">
                     <thead>
                         <tr>
@@ -478,14 +395,31 @@
             <div class="stats-dates">
                 <div>Depuis le {{ date_debut_detailed }}</div>
             </div>
-        </section>
         {% endif %}
+        </section>
 
-        <section id="pourcentage-victoires" class="margin-bottom-section pad-section overflow-x-auto">
+        <div class="zone-divider" aria-hidden="true">
+            <div class="zone-divider-inner">
+                <span class="zone-divider-line"></span>
+                <span class="zone-divider-label">🏆 Le Podium</span>
+                <span class="zone-divider-line"></span>
+            </div>
+        </div>
+
+        <section id="podium" class="margin-bottom-section pad-section arcade-panel overflow-x-auto">
             <div class="section-header">
-                <h2 class="txt-heading break-words">🏆 Classement par Pourcentage de Victoires</h2>
+                <h2 class="txt-heading break-words">🏆 Le Podium</h2>
                 <button class="info-button" data-info="pourcentage-victoires-info">?</button>
             </div>
+            <p class="section-tagline">Qui domine{% if is_career_view %} sur la carrière{% else %} cette saison{% endif %} ? {{ taglines.podium }}</p>
+
+            <div class="podium-tabs evolution-tabs" role="tablist" aria-label="Classements">
+                <button type="button" class="evolution-tab podium-tab active" role="tab" aria-selected="true" data-tab="winpct">% Victoires</button>
+                <button type="button" class="evolution-tab podium-tab" role="tab" aria-selected="false" data-tab="elo">ELO</button>
+                <button type="button" class="evolution-tab podium-tab" role="tab" aria-selected="false" data-tab="group">Par groupe</button>
+            </div>
+
+            <div class="podium-tab-panel evolution-tab-panel" data-panel="winpct" role="tabpanel">
             <div id="pourcentage-victoires-info" class="info-bubble">
                 <div class="info-bubble-title">🏆 Pourcentage de Victoires</div>
                 <div class="info-bubble-content">
@@ -502,6 +436,24 @@
                     <em>Exemple :</em> Si un joueur a 50 victoires sur 100 parties, son pourcentage est de 50%.
                 </div>
             </div>
+            {% if win_percentage_ranking|length >= 1 %}
+            <div class="pixel-podium">
+                {% set podium_order = [2, 1, 3] %}
+                {% for p_rank in podium_order %}
+                {% set item = win_percentage_ranking[p_rank - 1] if win_percentage_ranking|length >= p_rank else none %}
+                <div class="pixel-podium-slot pixel-podium-slot--{{ p_rank }}{% if not item %} pixel-podium-slot--empty{% endif %}">
+                    {% if item %}
+                    {% set rank, player, victories, games_played, win_percentage = item[0], item[1], item[2], item[3], item[4] %}
+                    <div class="pixel-podium-medal">{{ stats_manager.get_medal(rank) }}</div>
+                    <div class="player-avatar" style="--player-color: {{ get_player_color(player) }};">{{ player[0] }}</div>
+                    <div class="pixel-podium-name" style="color: {{ get_player_color(player) }};">{{ player }}</div>
+                    <div class="pixel-podium-value led-value">{{ "%.1f" % win_percentage }}%</div>
+                    <div class="pixel-podium-detail">{{ victories }}/{{ games_played }}</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             <div class="overflow-x-auto">
                 <table class="ranking-table w-full txt-xs">
                 <thead>
@@ -523,12 +475,11 @@
                 </tbody>
             </table>
             </div>
-        </section>
+            </div>
 
-        <section id="elo-ranking" class="margin-bottom-section pad-section overflow-x-auto">
-            <div class="section-header">
-                <h2 class="txt-heading break-words">🏆 Classement ELO score</h2>
-                <button class="info-button" data-info="elo-ranking-info">?</button>
+            <div class="podium-tab-panel evolution-tab-panel hidden" data-panel="elo" role="tabpanel">
+            <div class="panel-info-row">
+                <button type="button" class="info-button info-button-inline" data-info="elo-ranking-info" aria-label="Aide ELO">?</button>
             </div>
             <div id="elo-ranking-info" class="info-bubble">
                 <div class="info-bubble-title">🏆 Classement ELO score</div>
@@ -561,6 +512,24 @@
                     Détermine la vitesse de changement. Plus K est élevé, plus les scores changent rapidement après chaque session (ELO session) ou après chaque match (ELO match).
                 </div>
             </div>
+            {% if elo_ranking and elo_ranking|length >= 1 %}
+            <div class="pixel-podium">
+                {% set podium_order = [2, 1, 3] %}
+                {% for p_rank in podium_order %}
+                {% set item = elo_ranking[p_rank - 1] if elo_ranking|length >= p_rank else none %}
+                <div class="pixel-podium-slot pixel-podium-slot--{{ p_rank }}{% if not item %} pixel-podium-slot--empty{% endif %}">
+                    {% if item %}
+                    {% set rank, player, elo = item[0], item[1], item[2] %}
+                    <div class="pixel-podium-medal">{{ stats_manager.get_medal(rank) }}</div>
+                    <div class="player-avatar" style="--player-color: {{ get_player_color(player) }};">{{ player[0] }}</div>
+                    <div class="pixel-podium-name" style="color: {{ get_player_color(player) }};">{{ player }}</div>
+                    <div class="pixel-podium-value led-value">{{ "%.0f" % elo }}</div>
+                    <div class="pixel-podium-detail">ELO session</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             <div class="overflow-x-auto">
             <table class="ranking-table w-full txt-xs">
                 <thead>
@@ -616,12 +585,11 @@
                     </tbody>
                 </table>
             </div>
-        </section>
+            </div>
 
-        <section id="classement" class="margin-bottom-section pad-section overflow-x-auto">
-            <div class="section-header">
-                <h2 class="txt-heading break-words">🏆 Classement par Groupe</h2>
-                <button class="info-button" data-info="classement-info">?</button>
+            <div class="podium-tab-panel evolution-tab-panel hidden" data-panel="group" role="tabpanel">
+            <div class="panel-info-row">
+                <button type="button" class="info-button info-button-inline" data-info="classement-info" aria-label="Aide classement groupe">?</button>
             </div>
             <div id="classement-info" class="info-bubble">
                 <div class="info-bubble-title">🏆 Classement par Groupe</div>
@@ -635,6 +603,24 @@
                     <em>Exemple :</em> Si un joueur a eu 50, 75 et 60 victoires dans trois sessions du groupe, son score groupe est 50+75+60 = 185.
                 </div>
             </div>
+            {% if default_ranking|length >= 1 %}
+            <div class="pixel-podium" id="group-podium">
+                {% set podium_order = [2, 1, 3] %}
+                {% for p_rank in podium_order %}
+                {% set item = default_ranking[p_rank - 1] if default_ranking|length >= p_rank else none %}
+                <div class="pixel-podium-slot pixel-podium-slot--{{ p_rank }}{% if not item %} pixel-podium-slot--empty{% endif %}">
+                    {% if item %}
+                    {% set rank, player, total = item[0], item[1], item[2] %}
+                    <div class="pixel-podium-medal">{{ stats_manager.get_medal(rank) }}</div>
+                    <div class="player-avatar" style="--player-color: {{ get_player_color(player) }};">{{ player[0] }}</div>
+                    <div class="pixel-podium-name" style="color: {{ get_player_color(player) }};">{{ player }}</div>
+                    <div class="pixel-podium-value led-value">{{ total }}</div>
+                    <div class="pixel-podium-detail">victoires</div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
             <div class="mb-3 sm:mb-4 md:mb-5 relative z-10">
                 <label for="group-select" class="block mb-1.5 sm:mb-2 md:mb-2.5 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
                     Sélectionner un groupe de joueurs:
@@ -649,7 +635,7 @@
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table class="ranking-table w-full txt-xs" id="ranking-table">
+                <table class="ranking-table w-full txt-xs" id="group-ranking-table">
                 <thead>
                     <tr>
                         <th class="player-column">Joueur</th>
@@ -667,12 +653,25 @@
                 </tbody>
             </table>
             </div>
+            </div>
         </section>
 
-        <section id="derniere-soiree" class="margin-bottom-section pad-section">
-            <h2 class="txt-heading break-words">📅 Dernière Session de Jeu</h2>
+        <div class="zone-divider" aria-hidden="true">
+            <div class="zone-divider-inner">
+                <span class="zone-divider-line"></span>
+                <span class="zone-divider-label">📅 Archives</span>
+                <span class="zone-divider-line"></span>
+            </div>
+        </div>
+
+        <section id="derniere-soiree" class="margin-bottom-section pad-section arcade-panel">
+            <h2 class="txt-heading break-words">📅 Archives</h2>
+            <p class="section-tagline">{{ taglines.archives }}</p>
             <div id="derniere-soiree-content">
             {% if latest_date and latest_sessions_parsed %}
+            <div class="session-badge">
+                Soirée #{{ total_sessions }} · {{ selected_game_mode_label }} · {{ latest_sessions_parsed[0].players|length }} joueur(s)
+            </div>
             <div class="session-date">Date: {{ stats_manager.format_date(latest_date) }}</div>
             {% for session_data in latest_sessions_parsed %}
                 {% set session = session_data.session %}
@@ -746,35 +745,41 @@
         </section>
 
         {% if has_detailed_stats %}
-        <section id="kill-relationships" class="margin-bottom-section pad-section overflow-x-auto">
+        <div class="zone-divider" aria-hidden="true">
+            <div class="zone-divider-inner">
+                <span class="zone-divider-line"></span>
+                <span class="zone-divider-label">🎯 Guerre des flèches</span>
+                <span class="zone-divider-line"></span>
+            </div>
+        </div>
+        <section id="guerre-des-fleches" class="margin-bottom-section pad-section arcade-panel overflow-x-auto">
             <div class="section-header flex flex-wrap items-center justify-between gap-2">
                 <div class="flex items-center gap-2">
-                    <h2 class="txt-heading break-words">🔗 Relations de Kills</h2>
+                    <h2 class="txt-heading break-words">🎯 Guerre des flèches</h2>
                     <button class="info-button" data-info="kill-relationships-info">?</button>
                 </div>
-                <div class="flex items-center gap-2" style="color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
+                <div class="flex items-center gap-2" style="color: #ffd700;">
                     <input type="checkbox" id="kill-relationships-totals-toggle" class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: #8b4513;">
-                    <label for="kill-relationships-totals-toggle" class="text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px] cursor-pointer">Totaux</label>
+                    <label for="kill-relationships-totals-toggle" class="form-label mb-0 cursor-pointer">Totaux</label>
                 </div>
             </div>
-            <div class="text-center mb-3 sm:mb-4" style="color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-                <p id="kill-relationships-subtitle" class="text-[6px] sm:text-[7px] md:text-[9px] lg:text-[10px]">Moyenne de kills par partie</p>
+            <p class="section-tagline">Qui cible qui ? {{ taglines.fleches }}</p>
+            <div class="text-center mb-3 sm:mb-4">
+                <p id="kill-relationships-subtitle" class="form-label mb-0">Moyenne de kills par partie — survolez une flèche pour le détail</p>
             </div>
             <div id="kill-relationships-info" class="info-bubble">
-                <div class="info-bubble-title">🔗 Relations de Kills</div>
+                <div class="info-bubble-title">🎯 Guerre des flèches</div>
                 <div class="info-bubble-content">
-                    <strong>Matrice de Kills :</strong> Ce tableau montre qui tue qui. Les lignes représentent les tueurs, les colonnes les victimes.<br><br>
-                    
-                    <strong>Moyenne par partie :</strong> Les valeurs affichées représentent la moyenne de kills par partie entre deux joueurs. Cette moyenne est calculée en divisant le nombre total de kills d'un joueur sur un autre par le nombre total de parties où ils ont joué ensemble.<br><br>
-                    
-                    <strong>Exemple :</strong> Si le joueur A a tué le joueur B 25 fois au total sur 10 parties où ils ont joué ensemble, la moyenne affichée sera de 2.50 (25 ÷ 10 = 2.5). Cela signifie qu'en moyenne, A tue B 2.5 fois par partie.<br><br>
-                    
-                    <strong>Lecture visuelle :</strong> Vert = peu de kills, rouge = beaucoup de kills. Cela permet d'identifier rapidement quels joueurs sont les prédateurs de qui.<br><br>
-                    
-                    <strong>Avantage de la moyenne :</strong> Utiliser une moyenne plutôt qu'un total permet de comparer les performances entre joueurs indépendamment du nombre de parties jouées ensemble. Un joueur qui tue souvent un autre sur peu de parties aura une moyenne élevée, tandis qu'un joueur qui tue rarement mais sur beaucoup de parties aura une moyenne faible.
+                    <strong>Carte des rivalités :</strong> chaque flèche va du tueur vers sa victime préférée. Plus la flèche est épaisse et rouge, plus le carnage est régulier.<br><br>
+                    <strong>Matrice détaillée :</strong> disponible via le bouton « Voir la matrice » pour les statisticiens acharnés.
                 </div>
             </div>
-            <div class="overflow-x-auto">
+            <div id="rivalry-map-container" class="rivalry-map-container">
+                <svg id="rivalry-map" class="rivalry-map" role="img" aria-label="Carte des rivalités entre joueurs"></svg>
+                <div id="rivalry-map-tooltip" class="rivalry-map-tooltip hidden" role="tooltip"></div>
+            </div>
+            <button id="toggle-kill-matrix" class="toggle-button w-full sm:w-auto">▼ Voir la matrice détaillée</button>
+            <div id="kill-matrix-container" class="hidden overflow-x-auto mt-4">
                 <table class="ranking-table w-full txt-xs" id="kill-relationships-table">
                     <thead>
                         <tr>
@@ -807,143 +812,282 @@
             <div class="stats-dates">
                 <div>Depuis le {{ date_debut }}</div>
             </div>
-        </section>
-        {% endif %}
 
-        {% if has_detailed_stats %}
-        <section id="kill-analysis" class="margin-bottom-section pad-section overflow-x-auto">
-            <div class="section-header">
-                <h2 class="txt-heading break-words">🎯 Analyse des Kills</h2>
-                <button class="info-button" data-info="kill-analysis-info">?</button>
-            </div>
-            <div id="kill-analysis-info" class="info-bubble">
-                <div class="info-bubble-title">🎯 Analyse des Kills</div>
+            <h3 class="subsection-title subsection-title-row">
+                <span>🃏 Fiches de combat</span>
+                <button type="button" class="info-button info-button-inline" data-info="combat-profiles-info" aria-label="Aide fiches de combat">?</button>
+            </h3>
+            <div id="combat-profiles-info" class="info-bubble">
+                <div class="info-bubble-title">🃏 Fiches de combat</div>
                 <div class="info-bubble-content">
-                    <strong>Sources de Kills :</strong> Répartition des éliminations par type (Arrow, Explosion, JumpedOn, etc.).<br><br>
-                    <strong>Graphique global :</strong> Répartition de toutes les sources de kills, tous joueurs confondus.<br><br>
-                    <strong>Graphique par joueur :</strong> Moyenne de kills par source et par partie pour chaque joueur.
+                    <strong>Badge :</strong> le trait où le joueur se démarque le plus du groupe (suicides, K/D, forme en fin de session, matchs serrés). Un badge par joueur ; « Réglementaire » si rien ne ressort.<br><br>
+                    <strong>Bête noire :</strong> l'adversaire qui le tue le plus, en kills par match joué ensemble. <strong>Souffre-douleur :</strong> l'inverse.<br><br>
+                    <strong>Matchs serrés :</strong> matchs gagnés ou perdus d'un seul kill. <strong>Meilleure série :</strong> victoires d'affilée dans une même session. Ces deux lignes ne couvrent que les sessions avec le score de chaque match.
                 </div>
             </div>
-            <div class="mb-3 sm:mb-4 md:mb-5">
-                <div class="text-center mb-3 sm:mb-4" style="color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-                    <p class="text-[6px] sm:text-[7px] md:text-[9px] lg:text-[10px]">Répartition Globale des Sources de Kills</p>
-                </div>
-                <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
-                    <canvas id="kill-sources-global-chart"></canvas>
-                </div>
-            </div>
-            <div class="mb-3 sm:mb-4 md:mb-5">
-                <div class="flex flex-row items-center justify-between gap-3 mb-3 sm:mb-4" style="color: #ffd700; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-                    <div class="flex items-center gap-2">
-                        <input type="checkbox" id="kill-sources-percent-toggle" class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: #8b4513;">
-                        <label id="kill-sources-percent-toggle-label" for="kill-sources-percent-toggle" class="text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px] cursor-pointer" style="color: #ffd700;">Pourcentages</label>
+            <p class="section-tagline">{{ taglines.kills }}</p>
+            {% if combat_profiles %}
+            <div class="combat-profiles">
+                {% for profile in combat_profiles %}
+                <article class="combat-card" style="--player-color: {{ profile.color }};">
+                    <div class="combat-card-header">
+                        <span class="combat-card-name">{{ profile.player }}</span>
+                        <span class="combat-card-meta">{{ profile.matches }} matchs · K/D {{ profile.kd }}</span>
                     </div>
-                    <p class="text-[6px] sm:text-[7px] md:text-[9px] lg:text-[10px] flex-1 text-center">Top Sources de Kills par Joueur</p>
-                </div>
-                <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
-                    <canvas id="kill-sources-by-player-chart"></canvas>
-                </div>
-            </div>
-            <div class="stats-dates">
-                <div>Depuis le {{ date_debut }}</div>
-            </div>
-        </section>
-        {% endif %}
-
-        <section id="evolution-scores" class="margin-bottom-section pad-section overflow-x-auto">
-            <div class="section-header">
-                <h2 class="txt-heading break-words">📊 Évolution des Scores par Groupe</h2>
-                <button class="info-button" data-info="evolution-scores-info">?</button>
-            </div>
-            <div id="evolution-scores-info" class="info-bubble">
-                <div class="info-bubble-title">📊 Évolution des Scores</div>
-                <div class="info-bubble-content">
-                    <strong>Ce que vous voyez :</strong><br><br>
-                    
-                    Ce graphique montre comment le score total de chaque joueur évolue dans le temps pour le groupe sélectionné.<br><br>
-                    
-                    <strong>Lecture du graphique :</strong><br>
-                    • <strong>Axe horizontal (bas) :</strong> Les dates des sessions, de la plus ancienne (gauche) à la plus récente (droite)<br>
-                    • <strong>Axe vertical (gauche) :</strong> Le score total cumulé<br>
-                    • <strong>Les barres :</strong> Chaque barre représente le score total d'un joueur à une date donnée. La couleur correspond au joueur.<br><br>
-                    
-                    <em>Astuce :</em> Plus la barre est haute, meilleur était le score total du joueur à cette date.
-                </div>
-            </div>
-            <div class="mb-3 sm:mb-4 md:mb-5 relative z-10">
-                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 md:gap-5">
-                    <div class="flex-1 w-full sm:w-auto">
-                        <label for="evolution-group-select" class="block mb-1.5 sm:mb-2 md:mb-2.5 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: #ffd700;">
-                            Sélectionner un groupe de joueurs:
-                        </label>
-                        <div class="select-wrapper relative w-full max-w-md">
-                            <select id="evolution-group-select" class="group-select w-full p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
-                                <option value="">Sélectionner un groupe</option>
-                            </select>
-                            <span class="select-arrow">▼</span>
+                    <div class="combat-card-badge">
+                        <span class="combat-card-badge-emoji" aria-hidden="true">{{ profile.badge.emoji }}</span>
+                        <div>
+                            <div class="combat-card-badge-title">{{ profile.badge.title }}</div>
+                            <div class="combat-card-badge-detail">{{ profile.badge.detail }}</div>
                         </div>
                     </div>
-                    <div class="flex items-center gap-2 mt-4 sm:mt-0">
-                        <input type="checkbox" id="evolution-cumul-checkbox" checked class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: #8b4513;">
-                        <label for="evolution-cumul-checkbox" class="text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px] cursor-pointer" style="color: #ffd700;">Cumulé</label>
-                    </div>
+                    <dl class="combat-card-stats">
+                        <div>
+                            <dt>😈 Bête noire</dt>
+                            <dd>{% if profile.nemesis %}<span style="color: {{ profile.nemesis.color }};">{{ profile.nemesis.player }}</span> · {{ profile.nemesis.per_match }} kill/match{% else %}—{% endif %}</dd>
+                        </div>
+                        <div>
+                            <dt>🎯 Souffre-douleur</dt>
+                            <dd>{% if profile.victim %}<span style="color: {{ profile.victim.color }};">{{ profile.victim.player }}</span> · {{ profile.victim.per_match }} kill/match{% else %}—{% endif %}</dd>
+                        </div>
+                        <div>
+                            <dt>😬 Matchs à 1 kill</dt>
+                            <dd>{% if profile.scored_matches %}{{ profile.close_wins }} gagnés · {{ profile.heartbreaks }} perdus{% else %}—{% endif %}</dd>
+                        </div>
+                        <div>
+                            <dt>🔥 Meilleure série</dt>
+                            <dd>{% if profile.best_streak and profile.best_streak.length > 1 %}{{ profile.best_streak.length }} d'affilée · {{ profile.best_streak.date }}{% else %}—{% endif %}</dd>
+                        </div>
+                    </dl>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="form-label text-center">Pas encore assez de matchs détaillés sur cette période.</p>
+            {% endif %}
+            <div class="stats-dates">
+                <div>Depuis le {{ date_debut }}</div>
+            </div>
+        </section>
+        {% endif %}
+
+        <div class="zone-divider" aria-hidden="true">
+            <div class="zone-divider-inner">
+                <span class="zone-divider-line"></span>
+                <span class="zone-divider-label">📈 Le Parcours</span>
+                <span class="zone-divider-line"></span>
+            </div>
+        </div>
+
+        <section id="parcours" class="margin-bottom-section pad-section arcade-panel overflow-x-auto">
+            <div class="section-header">
+                <h2 class="txt-heading break-words">📈 Le Parcours</h2>
+                <button class="info-button" data-info="evolution-scores-info">?</button>
+            </div>
+            <p class="section-tagline">{{ taglines.parcours }}</p>
+            <div id="evolution-scores-info" class="info-bubble">
+                <div class="info-bubble-title">📈 Le Parcours</div>
+                <div class="info-bubble-content">
+                    <strong>Niveaux (scores) :</strong> chaque plateforme = une soirée de jeu. Les barres montrent qui était en tête à ce moment.<br><br>
+                    <strong>% de victoires / ELO :</strong> courbes par joueur. Par défaut, seuls les 5 meilleurs joueurs (dernière valeur) sont affichés — cochez « Tous les joueurs » pour tout voir.<br><br>
+                    <strong>ELO match :</strong> choisissez « Par session » (dernier ELO de la session) ou « Par match » (chaque match).<br><br>
+                    <strong>La soirée :</strong> % de victoires par tranche de matchs (1 à 5, 6 à 10…) au fil d'une session.
                 </div>
             </div>
-            <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
-                <canvas id="evolution-chart"></canvas>
-            </div>
-        </section>
 
-        <section id="win-rate-evolution-chart" class="margin-bottom-section pad-section overflow-x-auto">
-            <div class="section-header">
-                <h2 class="txt-heading break-words">📈 Évolution % de victoires</h2>
+            <div class="evolution-tabs" role="tablist" aria-label="Graphiques d'évolution">
+                <button type="button" class="evolution-tab active" role="tab" aria-selected="true" data-tab="scores">Scores</button>
+                <button type="button" class="evolution-tab" role="tab" aria-selected="false" data-tab="winrate">% Victoires</button>
+                <button type="button" class="evolution-tab" role="tab" aria-selected="false" data-tab="elo-session">ELO session</button>
+                <button type="button" class="evolution-tab" role="tab" aria-selected="false" data-tab="elo-match">ELO match</button>
+                <button type="button" class="evolution-tab" role="tab" aria-selected="false" data-tab="soiree">La soirée</button>
             </div>
-            <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
-                <canvas id="win-rate-evolution-chart-canvas"></canvas>
-            </div>
-            <div class="stats-dates">
-                <div>Depuis le {{ date_debut }}</div>
-            </div>
-        </section>
 
-        <section id="elo-evolution-chart" class="margin-bottom-section pad-section overflow-x-auto">
-            <div class="section-header">
-                <h2 class="txt-heading break-words">📈 Évolution ELO (session)</h2>
+            <div class="evolution-tab-panel" data-panel="scores" role="tabpanel">
+                <div class="mb-3 sm:mb-4 md:mb-5 relative z-10">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 md:gap-5">
+                        <div class="flex-1 w-full sm:w-auto">
+                            <label for="evolution-group-select" class="form-label">Sélectionner un groupe de joueurs</label>
+                            <div class="select-wrapper relative w-full max-w-md">
+                                <select id="evolution-group-select" class="group-select w-full p-1.5 sm:p-2 md:p-2.5 lg:p-[10px] lg:px-[15px]">
+                                    <option value="">Sélectionner un groupe</option>
+                                </select>
+                                <span class="select-arrow">▼</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 mt-2 sm:mt-6">
+                            <input type="checkbox" id="evolution-cumul-checkbox" checked class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: #8b4513;">
+                            <label for="evolution-cumul-checkbox" class="form-label mb-0 cursor-pointer">Cumulé</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container level-timeline-wrapper" style="position: relative; min-height: 420px; width: 100%;">
+                    <div id="level-timeline" class="level-timeline" aria-label="Évolution des scores par session"></div>
+                </div>
             </div>
-            <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
-                <canvas id="elo-evolution-chart-canvas"></canvas>
-            </div>
-            <div class="stats-dates">
-                <div>Depuis le {{ date_debut }}</div>
-            </div>
-        </section>
 
-        <section id="elo-match-evolution-chart" class="margin-bottom-section pad-section overflow-x-auto">
-            <div class="section-header">
-                <h2 class="txt-heading break-words">📈 Évolution ELO (match)</h2>
+            <div class="evolution-tab-panel hidden" data-panel="winrate" role="tabpanel">
+                <div class="evolution-panel-controls">
+                    <label>
+                        <input type="checkbox" id="evolution-show-all-players" class="w-4 h-4 cursor-pointer" style="accent-color: #8b4513;">
+                        Tous les joueurs
+                    </label>
+                </div>
+                <div class="chart-container" style="position: relative; height: 450px; width: 100%;">
+                    <canvas id="win-rate-evolution-chart-canvas"></canvas>
+                </div>
+                <div class="stats-dates">
+                    <div>Depuis le {{ date_debut }}</div>
+                </div>
             </div>
-            <div class="flex flex-wrap items-center gap-3 mb-2">
-                <span class="txt-xs" style="color: #ffd700;">Affichage :</span>
-                <label class="inline-flex items-center gap-1.5 cursor-pointer txt-xs" style="color: #ffd700;">
-                    <input type="radio" name="elo-match-granularity" id="elo-match-granularity-session" value="session" checked class="w-3 h-3 cursor-pointer" style="accent-color: #8b4513;">
-                    Par session
-                </label>
-                <label class="inline-flex items-center gap-1.5 cursor-pointer txt-xs" style="color: #ffd700;">
-                    <input type="radio" name="elo-match-granularity" id="elo-match-granularity-match" value="match" class="w-3 h-3 cursor-pointer" style="accent-color: #8b4513;">
-                    Par match
-                </label>
+
+            <div class="evolution-tab-panel hidden" data-panel="elo-session" role="tabpanel">
+                <div class="evolution-panel-controls">
+                    <label>
+                        <input type="checkbox" id="evolution-show-all-players-elo" class="w-4 h-4 cursor-pointer evolution-show-all-players-sync" style="accent-color: #8b4513;">
+                        Tous les joueurs
+                    </label>
+                </div>
+                <div class="chart-container" style="position: relative; height: 450px; width: 100%;">
+                    <canvas id="elo-evolution-chart-canvas"></canvas>
+                </div>
+                <div class="stats-dates">
+                    <div>Depuis le {{ date_debut }}</div>
+                </div>
             </div>
-            <div class="chart-container" style="position: relative; height: 400px; width: 100%;">
-                <canvas id="elo-match-evolution-chart-canvas"></canvas>
+
+            <div class="evolution-tab-panel hidden" data-panel="elo-match" role="tabpanel">
+                <div class="evolution-panel-controls">
+                    <label>
+                        <input type="checkbox" id="evolution-show-all-players-elo-match" class="w-4 h-4 cursor-pointer evolution-show-all-players-sync" style="accent-color: #8b4513;">
+                        Tous les joueurs
+                    </label>
+                    <span class="form-label mb-0">Affichage :</span>
+                    <label class="form-label mb-0 inline-flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name="elo-match-granularity" id="elo-match-granularity-session" value="session" checked class="w-3 h-3 cursor-pointer" style="accent-color: #8b4513;">
+                        Par session
+                    </label>
+                    <label class="form-label mb-0 inline-flex items-center gap-1.5 cursor-pointer">
+                        <input type="radio" name="elo-match-granularity" id="elo-match-granularity-match" value="match" class="w-3 h-3 cursor-pointer" style="accent-color: #8b4513;">
+                        Par match
+                    </label>
+                </div>
+                <div class="chart-container" style="position: relative; height: 450px; width: 100%;">
+                    <canvas id="elo-match-evolution-chart-canvas"></canvas>
+                </div>
+                <div class="stats-dates">
+                    <div>Par session : dernier ELO match de chaque session · Par match : tous les matchs · point de départ aligné sur l'ELO session (1500)</div>
+                </div>
             </div>
-            <div class="stats-dates">
-                <div>Par session : dernier ELO match de chaque session · Par match : tous les matchs · point de départ aligné sur l'ELO session (1500)</div>
+
+            <div class="evolution-tab-panel hidden" data-panel="soiree" role="tabpanel">
+                <p class="form-label text-center">% de victoires selon le rang du match dans la session : qui démarre fort, qui s'écroule après minuit ?</p>
+                {% if evening_curve.players %}
+                <div class="chart-container" style="position: relative; height: 450px; width: 100%;">
+                    <canvas id="evening-curve-chart-canvas"></canvas>
+                </div>
+                {% else %}
+                <p class="form-label text-center">Pas encore assez de matchs détaillés sur cette période.</p>
+                {% endif %}
+                <div class="stats-dates">
+                    <div>Sessions avec le score de chaque match uniquement · une tranche apparaît dès 5 matchs joués</div>
+                </div>
             </div>
         </section>
 
     </div>
 
-    
+    <div id="app-overlays">
+        <div id="overlay-backdrop" class="overlay-backdrop" aria-hidden="true"></div>
+
+        <div id="date-picker-popover" class="date-picker-popover arcade-overlay" aria-hidden="true" role="dialog" aria-labelledby="date-picker-title">
+            <button type="button" class="date-picker-close" aria-label="Fermer">×</button>
+            <form method="get" class="date-picker-form flex flex-col gap-3">
+                {% if selected_season != current_season_id %}
+                <input type="hidden" name="season" value="{{ selected_season }}">
+                {% endif %}
+                <h3 id="date-picker-title" class="overlay-title">🎚️ Filtrer les sessions</h3>
+                <div class="date-picker-field">
+                    <label for="game-mode-select" class="form-label">Mode de jeu</label>
+                    <div class="date-picker-select-wrapper">
+                        <select id="game-mode-select" name="gameMode" class="date-picker-select group-select">
+                            {% for mode_id, mode_info in game_modes.items() %}
+                            <option value="{{ mode_id }}" {% if mode_id == selected_game_mode %}selected{% endif %}>{{ mode_info.label }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="date-picker-select-arrow">▼</span>
+                    </div>
+                </div>
+                {% set current_start = selected_date_start or date_debut_raw or season_picker_min %}
+                {% set current_end = selected_date_end or date_fin_raw or season_picker_max %}
+                <div class="date-picker-field">
+                    <div class="date-picker-date-row">
+                        <label for="dateStart" class="form-label mb-0">Depuis</label>
+                        <input type="date" id="dateStart" name="dateStart" value="{{ current_start }}" class="date-picker-input" {% if season_picker_min %}min="{{ season_picker_min }}"{% endif %} {% if season_picker_max %}max="{{ season_picker_max }}"{% endif %} {% if selected_session_id %}disabled{% endif %}>
+                        <label for="dateEnd" class="form-label mb-0">Jusqu'à</label>
+                        <input type="date" id="dateEnd" name="dateEnd" value="{{ current_end }}" class="date-picker-input" {% if season_picker_min %}min="{{ season_picker_min }}"{% endif %} {% if season_picker_max %}max="{{ season_picker_max }}"{% endif %} {% if selected_session_id %}disabled{% endif %}>
+                    </div>
+                </div>
+                <div class="date-picker-field">
+                    <label for="session-select" class="form-label">Session</label>
+                    <div class="date-picker-select-wrapper">
+                        <select id="session-select" name="sessionId" class="date-picker-select group-select">
+                            <option value="">Toutes les sessions</option>
+                            {% for session in all_sessions_data %}
+                            <option value="{{ session.session_select_id }}" {% if selected_session_id == session.session_select_id or selected_session_id == session.date ~ '|' ~ session.id %}selected{% endif %}>{{ session.formatted_date }} — {{ session.game_mode_label }} ({{ session.players|map(attribute='name')|join(', ') }})</option>
+                            {% endfor %}
+                        </select>
+                        <span class="date-picker-select-arrow">▼</span>
+                    </div>
+                </div>
+                <div class="date-picker-field">
+                    <label for="filter-group-select" class="form-label">Groupe</label>
+                    <div class="date-picker-select-wrapper">
+                        <select id="filter-group-select" name="groupId" class="date-picker-select group-select">
+                            <option value="">Tous les groupes</option>
+                            {% for gid in all_groups_for_filter %}
+                            <option value="{{ gid }}" {% if gid == selected_group_id %}selected{% endif %}>{{ gid }}</option>
+                            {% endfor %}
+                        </select>
+                        <span class="date-picker-select-arrow">▼</span>
+                    </div>
+                </div>
+                <div class="date-picker-actions">
+                    <a href="{{ reset_filters_url }}" class="toggle-button toggle-button-secondary">Réinitialiser</a>
+                    <button type="submit" class="toggle-button">Appliquer</button>
+                </div>
+            </form>
+        </div>
+
+        <div id="global-data-info" class="info-bubble arcade-overlay">
+            <div class="info-bubble-title">🔧 Correction des Données</div>
+            <div class="info-bubble-content">
+                <strong>Algorithme de correction des incohérences</strong><br><br>
+                Les données brutes peuvent contenir des incohérences entre TodayWins et TotalWins. Un algorithme corrige automatiquement ces erreurs. Parfois, Eric a dû éditer manuellement certaines entrées pour rattraper des plantages du jeu... qui plante parfois malgré ses améliorations (comme le stockage des stats dans Google Sheets). 😅<br><br>
+                <strong>Principe de correction :</strong><br>
+                Pour chaque groupe de joueurs, les sessions sont traitées dans l'ordre chronologique (de la plus ancienne à la plus récente).<br><br>
+                Pour chaque session et chaque joueur :<br>
+                • On récupère le TotalWins actuel et le TotalWins de la session précédente<br>
+                • On calcule le TodayWins attendu : <code>TodayWins = TotalWins_actuel - TotalWins_précédent</code><br>
+                • Si le TodayWins enregistré ≠ TodayWins attendu ET TodayWins attendu ≥ 0, on corrige TodayWins<br>
+                • On met à jour le TotalWins précédent pour la prochaine session<br><br>
+                <strong>Normalisation des joueurs :</strong><br>
+                Tous les joueurs présents dans les statistiques détaillées (<code>today</code>/<code>total</code>) sont automatiquement inclus dans <code>todayWin</code> et <code>totalWin</code>, même s'ils ont 0 victoires.<br><br>
+                <strong>Format des données :</strong><br>
+                Les données utilisent le format <code>todayWin[player]</code> et <code>totalWin[player]</code> pour stocker les statistiques de chaque joueur.<br><br>
+                <strong>Filtrage :</strong><br>
+                • Sessions passant minuit : si une session se termine après minuit, seule la session du jour suivant (00h-05h) est conservée<br>
+                • Joueurs invalides : AIJIMMY, P1, P2, A, BB, etc. sont ignorés<br><br>
+                <strong>Modes de jeu (v4) :</strong><br>
+                Depuis avril 2026, Eric a ajouté un champ <code>mode</code> dans les stats v4. Les anciennes sessions sans <code>mode</code> sont traitées comme Head Hunters. Les cumuls sont calculés <em>séparément par mode</em>.
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer arcade-panel">
+        <p>Données corrigées avec amour par l'algo — quand Eric ne plante pas le jeu (ni la Google Sheet).</p>
+        <p class="site-footer-sub">TowerStats · Soirée hebdo · Quarantenaires armés de flèches · {{ total_sessions }} sessions{% if not is_career_view %} · {{ season_period_label }}{% endif %}</p>
+    </footer>
 
     <!-- Injection des données JSON pour JavaScript -->
     <script>
@@ -952,10 +1096,14 @@
         const playerColors = {{ player_colors|tojson }};
         const allSessions = {{ all_sessions_data|tojson }};
         const hasDetailedStats = {{ has_detailed_stats|tojson }};
-        const killSourcesAggregated = {{ kill_sources_aggregated|tojson }};
+        const eveningCurveData = {{ evening_curve|tojson }};
         const eloEvolutionData = {{ elo_evolution|tojson }};
         const eloMatchEvolutionData = {{ elo_match_evolution|tojson }};
         const winRateEvolutionData = {{ win_rate_evolution|tojson }};
+        const killRelationshipsData = {{ kill_relationships|tojson }};
+        const killRelationshipsTotalsData = {{ kill_relationships_totals|tojson }};
+        const allPlayersForMatrix = {{ all_players_for_matrix|tojson }};
+        const maxKillsInMatrix = {{ max_kills_in_matrix|tojson }};
         let currentPage = 1;
         const sessionsPerPage = 10;
         // Initialiser filteredSessions avec toutes les sessions au chargement
@@ -970,3 +1118,12 @@
 </body>
 
 </html>
+
+
+</html>
+
+</html>
+
+
+
+

@@ -30,6 +30,7 @@ from .seasons import (
     build_season_switcher,
 )
 from .messages_loader import load_win_messages
+from .taglines import pick_taglines
 
 
 def _filter_sessions_by_session_id(sessions, session_id):
@@ -141,6 +142,7 @@ def flask_display_stats(path):
     template_data['selected_game_mode_label'] = game_mode_label(game_mode)
     template_data['all_groups_for_filter'] = all_groups_for_filter
     template_data['win_messages_by_player'] = load_win_messages()
+    template_data['taglines'] = pick_taglines()
     template_data['selected_season'] = selected_season
     template_data['current_season_id'] = current_season_id
     template_data['is_career_view'] = selected_season == CAREER_SEASON_ID
