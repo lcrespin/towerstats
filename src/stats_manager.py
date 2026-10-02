@@ -787,20 +787,14 @@ class SessionStatsManager:
         return dict(player_games)
 
     def _get_kill_death_totals_in_detailed_sessions_only(self):
-        """Kills/deaths/self_kills only from sessions that have detailed stats.
+        """Kills/deaths/self_kills summed over sessions that have detailed stats.
 
-        Uses cumulative deltas: sessions are processed in chronological order;
-        for each session with detailed stats, we add (current_cumulative - previous_cumulative)
-        per player so numerator and denominator (Parties) refer to the same period.
+        Same sessions as "Parties", so numerator and denominator refer to the same period.
         """
-        sessions_chrono = sorted(self.sessions, key=lambda s: s.get('date', ''))
         player_kills = defaultdict(int)
         player_deaths = defaultdict(int)
         player_self_kills = defaultdict(int)
-        prev_kill = defaultdict(int)
-        prev_death = defaultdict(int)
-        prev_self = defaultdict(int)
-        for session in sessions_chrono:
+        for session in self.sessions:
             if not SessionDataManager.has_detailed_stats(session):
                 continue
             players = SessionDataManager.parse_session_data(session)
@@ -808,15 +802,9 @@ class SessionStatsManager:
                 if 'detailed' not in stats:
                     continue
                 d = stats['detailed']
-                cur_k = d.get('kill', 0)
-                cur_d = d.get('death', 0)
-                cur_s = d.get('self', 0)
-                player_kills[player] += max(0, cur_k - prev_kill[player])
-                player_deaths[player] += max(0, cur_d - prev_death[player])
-                player_self_kills[player] += max(0, cur_s - prev_self[player])
-                prev_kill[player] = cur_k
-                prev_death[player] = cur_d
-                prev_self[player] = cur_s
+                player_kills[player] += d.get('kill', 0)
+                player_deaths[player] += d.get('death', 0)
+                player_self_kills[player] += d.get('self', 0)
         return player_kills, player_deaths, player_self_kills
 
     def get_kill_death_stats(self):

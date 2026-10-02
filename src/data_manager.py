@@ -134,12 +134,12 @@ class SessionDataManager:
             
             # Dictionnaire pour stocker le total précédent de chaque joueur
             previous_totals = {}
+            kinds = SessionDataManager._cumulative_row_kinds(group_sessions)
             
             # Parcourir les sessions dans l'ordre chronologique
-            for session in group_sessions:
-                # Normaliser les joueurs pour s'assurer que tous sont dans todayWin/totalWin
-                SessionDataManager.normalize_session_players(session)
-                
+            for session, kind in zip(group_sessions, kinds):
+                if kind == 'partial':
+                    continue
                 players = SessionDataManager.parse_session_data(session)
                 data = session['data']
                 
@@ -149,7 +149,7 @@ class SessionDataManager:
                     current_today = stats['today']
                     
                     # Si on a un total précédent pour ce joueur
-                    if player in previous_totals:
+                    if player in previous_totals and kind != 'reset':
                         previous_total = previous_totals[player]
                         # Calculer la différence attendue
                         expected_today = current_total - previous_total
@@ -160,9 +160,39 @@ class SessionDataManager:
                             if 'todayWin' in data and player in data['todayWin']:
                                 data['todayWin'][player] = expected_today
 
-                    # Ignore partial exports that reset totalWin below the running cumulative.
-                    if current_total >= previous_totals.get(player, 0):
-                        previous_totals[player] = current_total
+                    previous_totals[player] = current_total
+
+    @staticmethod
+    def _cumulative_row_kinds(group_sessions: List[Dict[str, Any]]) -> List[str]:
+        """Classify each chronological row of a group by its source totalWin: normal, reset or partial.
+
+        When totals drop below the source cumulative, the row is a real reset if the next row
+        builds on it (or there is no next row); otherwise it is a partial export to ignore.
+        """
+        for session in group_sessions:
+            SessionDataManager.normalize_session_players(session)
+        parsed = [SessionDataManager.parse_session_data(s) for s in group_sessions]
+        kinds: List[str] = []
+        source_totals: Dict[str, int] = {}
+        for index, players in enumerate(parsed):
+            dropped = any(
+                stats['total'] < source_totals[player]
+                for player, stats in players.items()
+                if player in source_totals
+            )
+            kind = 'normal'
+            if dropped:
+                next_players = parsed[index + 1] if index + 1 < len(parsed) else None
+                builds_on = not next_players or all(
+                    player in players
+                    and stats['total'] - stats['today'] == players[player]['total']
+                    for player, stats in next_players.items()
+                )
+                kind = 'reset' if builds_on else 'partial'
+            kinds.append(kind)
+            if kind != 'partial':
+                source_totals.update({p: s['total'] for p, s in players.items()})
+        return kinds
 
     def recompute_totals_from_today(self) -> None:
         """Recompute totalWin from cumulative sum of todayWin per group (fixes source inconsistencies)."""
@@ -173,17 +203,13 @@ class SessionDataManager:
         for _group_mode_key, group_sessions in sessions_by_group.items():
             group_sessions.sort(key=lambda x: x['date'])
             cumulative = defaultdict(int)
-            for session in group_sessions:
-                SessionDataManager.normalize_session_players(session)
+            kinds = SessionDataManager._cumulative_row_kinds(group_sessions)
+            for session, kind in zip(group_sessions, kinds):
                 data = session['data']
                 if 'todayWin' not in data:
                     continue
                 players = SessionDataManager.parse_session_data(session)
-                if any(
-                    players[p]['total'] < cumulative[p]
-                    for p in players
-                    if p in cumulative
-                ):
+                if kind == 'partial':
                     if 'totalWin' not in data:
                         data['totalWin'] = {}
                     for player in players:
@@ -549,21 +575,20 @@ class SessionDataManager:
                 'total': total_wins
             }
 
-            # Ajouter les stats détaillées si disponibles
+            # Detailed `total` is cumulative per group in the source; only `today` is per session.
             if has_detailed:
                 today_stats = data.get('today', {}).get(player, {})
-                total_stats = data.get('total', {}).get(player, {})
 
-                if today_stats or total_stats:
+                if isinstance(today_stats, dict) and today_stats:
                     player_data['detailed'] = {
-                        'kill': total_stats.get('kill', 0),
-                        'death': total_stats.get('death', 0),
-                        'self': total_stats.get('self', 0),
+                        'kill': today_stats.get('kill', 0),
+                        'death': today_stats.get('death', 0),
+                        'self': today_stats.get('self', 0),
                         'killFrom': SessionDataManager._filter_kill_counts(
-                            total_stats.get('killFrom', {}), keep_sources=True
+                            today_stats.get('killFrom', {}), keep_sources=True
                         ),
                         'killBy': SessionDataManager._filter_kill_counts(
-                            total_stats.get('killBy', {}), keep_sources=False
+                            today_stats.get('killBy', {}), keep_sources=False
                         ),
                     }
 
@@ -588,6 +613,9 @@ class SessionDataManager:
         négatifs ou non numériques sont ignorés. Les matchs qui n'ont pas au
         moins 2 joueurs valides restants peuvent être ignorés par l'appelant.
 
+        La source garde en tête de liste les matchs des sessions précédentes du
+        groupe : seuls les N derniers sont conservés, N = victoires de la session.
+
         Returns:
             Liste de dictionnaires ``{joueur: kills}`` (un par match, dans l'ordre),
             chaque dict ne contenant que des joueurs valides et des kills >= 0.
@@ -596,6 +624,11 @@ class SessionDataManager:
         raw = data.get('matchsResults')
         if not raw or not isinstance(raw, list):
             return []
+        session_wins = sum(
+            stats['today'] for stats in SessionDataManager.parse_session_data(session).values()
+        )
+        if session_wins < len(raw):
+            raw = raw[len(raw) - session_wins:]
         out: List[Dict[str, int]] = []
         for entry in raw:
             if not isinstance(entry, dict):

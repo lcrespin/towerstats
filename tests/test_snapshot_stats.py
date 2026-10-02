@@ -7,13 +7,13 @@ if BASE_DIR not in sys.path:
 
 from src.data_manager import SessionDataManager
 from src.stats_manager import SessionStatsManager
-from src.config import DEFAULT_GAME_MODE
+from src.config import DEFAULT_GAME_MODE, PLAYER_TO_COLOR
 
 DATA_DIR = os.path.join(BASE_DIR, "tests", "data")
 SNAPSHOT_2025 = os.path.join(DATA_DIR, "TowerFallStat_snapshot_2025-02-25.csv")
 SNAPSHOT_2026 = os.path.join(DATA_DIR, "TowerFallStat_snapshot_2026-04-24.csv")
-SNAPSHOT_2026_LIVE = os.path.join(DATA_DIR, "TowerFallStat_snapshot_2026-06-30.csv")
-SNAPSHOT_PATHS_INTEGRATION = (SNAPSHOT_2025, SNAPSHOT_2026)
+SNAPSHOT_2026_LIVE = os.path.join(DATA_DIR, "TowerFallStat_snapshot_2026-10-03.csv")
+SNAPSHOT_PATHS_INTEGRATION = (SNAPSHOT_2025, SNAPSHOT_2026, SNAPSHOT_2026_LIVE)
 SNAPSHOT_PATH = SNAPSHOT_2025
 MATCHS_MINIMAL = os.path.join(DATA_DIR, "TowerFallStat_matchs_minimal.csv")
 MATCHS_MODES = os.path.join(DATA_DIR, "TowerFallStat_matchs_modes.csv")
@@ -216,6 +216,32 @@ def test_partial_export_does_not_inflate_cumulative_totals():
     players = SessionDataManager.parse_session_data(last)
     assert players["LOUIS"]["today"] == 10
     assert players["LOUIS"]["total"] == 314
+
+
+def test_source_total_reset_keeps_today_wins():
+    """A row resetting totalWin that the next row builds on is a real reset, not a partial export."""
+    def row(day, today, total):
+        return {
+            "id": "DAVID-LOUIS",
+            "date": day,
+            "mode": "HeadHunters",
+            "data": {"date": f"{day}-23", "todayWin": today, "totalWin": total},
+        }
+
+    dm = SessionDataManager()
+    dm.sessions = [
+        row("2025-11-19", {"LOUIS": 7, "DAVID": 12}, {"LOUIS": 7, "DAVID": 12}),
+        row("2025-12-18", {"LOUIS": 6, "DAVID": 5}, {"LOUIS": 6, "DAVID": 5}),
+        row("2026-02-14", {"LOUIS": 6, "DAVID": 8}, {"LOUIS": 12, "DAVID": 13}),
+        row("2026-02-25", {"LOUIS": 16, "DAVID": 10}, {"LOUIS": 28, "DAVID": 23}),
+    ]
+    dm.correct_sessions()
+    dm.recompute_totals_from_today()
+    by_day = {s["date"]: SessionDataManager.parse_session_data(s) for s in dm.sessions}
+    assert by_day["2026-02-14"]["DAVID"]["today"] == 8
+    assert by_day["2026-02-14"]["LOUIS"]["today"] == 6
+    assert by_day["2026-02-25"]["LOUIS"]["total"] == 7 + 6 + 6 + 16
+    assert by_day["2026-02-25"]["DAVID"]["total"] == 12 + 5 + 8 + 10
 
 
 def test_midnight_filter_does_not_cross_game_modes():
@@ -495,22 +521,22 @@ def test_top_killers_deaths_and_kd_from_snapshot():
     # Top killers: rows are (rank, player, ...); player at index 1
     top_killers = ctx["top_killers"]
     assert len(top_killers) == 5
-    assert [t[1] for t in top_killers] == ["DAVID", "LOUIS", "ERIC", "MEHDI", "BENOIT"]
+    assert [t[1] for t in top_killers] == ["DAVID", "LOUIS", "ERIC", "BENOIT", "JULIEN"]
 
     # Top deaths: same structure
     top_deaths = ctx["top_deaths"]
     assert len(top_deaths) == 5
-    assert [t[1] for t in top_deaths] == ["MEHDI", "ERIC", "DAVID", "LOUIS", "JULIEN"]
+    assert [t[1] for t in top_deaths] == ["MEHDI", "JULIEN", "BENOIT", "LOUIS", "ERIC"]
 
     # Top self-kills: (player, total_self_kills, self_kills_per_game), sorted by per_game desc
     top_self_kills = ctx["top_self_kills"]
     assert len(top_self_kills) == 5
-    assert [t[0] for t in top_self_kills] == ["DAVID", "ERIC", "LOUIS", "MEHDI", "BENOIT"]
+    assert [t[0] for t in top_self_kills] == ["DAVID", "MEHDI", "LOUIS", "ERIC", "JULIEN"]
     for row in top_self_kills:
         assert len(row) == 3
 
     assert ctx["best_kd_ratio"] == ["DAVID"]
-    assert round(ctx["best_kd_value"], 4) == 1.0161
+    assert round(ctx["best_kd_value"], 4) == 1.1294
     assert ctx["max_kills_in_matrix"] > 1
     assert len(ctx["all_players_for_matrix"]) == 6
 
@@ -629,6 +655,50 @@ def test_matchs_minimal_parse_and_session_without_field():
     r = sm.calculate_elo_match_ratings()
     assert isinstance(r, dict)
     _ = sm.prepare_template_data()
+
+
+def test_matchs_results_drop_matches_from_previous_sessions():
+    manager = SessionDataManager(local_file=SNAPSHOT_2026_LIVE)
+    manager.load_all()
+    session = next(
+        s for s in manager.get_sessions()
+        if s["data"].get("date") == "2026-06-24-23" and s["id"] == "BENOIT-DAVID-ERIC-LOUIS"
+    )
+    assert len(session["data"]["matchsResults"]) == 83
+    wins = sum(p["today"] for p in SessionDataManager.parse_session_data(session).values())
+    assert wins == 17
+    assert SessionDataManager.parse_matchs_results(session) == session["data"]["matchsResults"][-17:]
+
+
+def test_detailed_stats_use_per_session_values_not_cumulative_total():
+    stats = build_stats_from_path(SNAPSHOT_2026_LIVE)
+    expected_kills = {}
+    expected_deaths = {}
+    expected_killed_by = {}
+    for session in stats.sessions:
+        if not SessionDataManager.has_detailed_stats(session):
+            continue
+        for player, st in session["data"]["today"].items():
+            if not isinstance(st, dict):
+                continue
+            expected_kills[player] = expected_kills.get(player, 0) + st.get("kill", 0)
+            expected_deaths[player] = expected_deaths.get(player, 0) + st.get("death", 0)
+            expected_killed_by[player] = expected_killed_by.get(player, 0) + sum(
+                v for k, v in st.get("killBy", {}).items() if k in PLAYER_TO_COLOR
+            )
+
+    rows = {row[0]: row for row in stats.get_kill_death_stats()}
+    for player, row in rows.items():
+        assert row[1] == expected_kills[player], player
+        assert row[2] == expected_deaths[player], player
+
+    _avg, totals = stats.get_kill_relationships()
+    killed_by = {}
+    for victims in totals.values():
+        for victim, count in victims.items():
+            killed_by[victim] = killed_by.get(victim, 0) + count
+    for player, count in killed_by.items():
+        assert count == expected_killed_by[player], player
 
 
 if __name__ == "__main__":
