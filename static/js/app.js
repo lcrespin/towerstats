@@ -585,7 +585,7 @@ function openSessionInArchives(sessionKey) {
 }
 
 function initRecordLinks() {
-    document.querySelectorAll('#records-du-moment .record-card').forEach(function(card) {
+    document.querySelectorAll('#records .record-card').forEach(function(card) {
         card.addEventListener('click', function(e) {
             var target = e.target.closest('[data-session-key]');
             if (target) {
@@ -597,24 +597,26 @@ function initRecordLinks() {
 
 // Short hash names -> section ids (for clean URLs like /#sessions or /#evolution)
 var ANCHOR_HASH_MAP = {
-    'cette-semaine': 'records-du-moment',
+    'records': 'records',
+    'cette-semaine': 'records',
     'podium': 'podium',
     'archives': 'derniere-soiree',
-    'fleches': 'guerre-des-fleches',
+    'combat': 'combat',
+    'fleches': 'combat',
     'parcours': 'parcours',
     'saison': 'parcours',
-    'leaderboards': 'records-du-moment',
+    'leaderboards': 'records',
     'classements': 'podium',
     'sessions': 'derniere-soiree',
-    'kills': 'guerre-des-fleches',
+    'kills': 'combat',
     'evolution': 'parcours'
 };
 
 var SECTION_NAV_MAP = {
-    'records-du-moment': 'cette-semaine',
+    'records': 'records',
     'podium': 'podium',
     'derniere-soiree': 'archives',
-    'guerre-des-fleches': 'fleches',
+    'combat': 'combat',
     'parcours': 'parcours'
 };
 

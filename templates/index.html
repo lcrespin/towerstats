@@ -72,8 +72,8 @@
                 <button type="button" id="mobile-menu-toggle" class="nav-hud-btn nav-menu-toggle sm:hidden" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
                 <ul class="nav-arcade-links">
                     <li><a href="#podium"><span class="nav-link-icon" aria-hidden="true">🏆</span><span class="nav-link-label">Leaders</span></a></li>
-                    <li><a href="#cette-semaine"><span class="nav-link-icon" aria-hidden="true">⭐</span><span class="nav-link-label">Records</span></a></li>
-                    <li><a href="#fleches"><span class="nav-link-icon" aria-hidden="true">🎯</span><span class="nav-link-label">Flèches</span></a></li>
+                    <li><a href="#records"><span class="nav-link-icon" aria-hidden="true">⭐</span><span class="nav-link-label">Records</span></a></li>
+                    <li><a href="#combat"><span class="nav-link-icon" aria-hidden="true">🃏</span><span class="nav-link-label">Combat</span></a></li>
                     <li><a href="#parcours"><span class="nav-link-icon" aria-hidden="true">📈</span><span class="nav-link-label">Parcours</span></a></li>
                     <li><a href="#archives"><span class="nav-link-icon" aria-hidden="true">📅</span><span class="nav-link-label">Archives</span></a></li>
                 </ul>
@@ -81,8 +81,8 @@
             </div>
             <div id="mobile-menu" class="mobile-menu sm:hidden" aria-hidden="true">
                 <a href="#podium" class="mobile-menu-link">🏆 Leaders</a>
-                <a href="#cette-semaine" class="mobile-menu-link">⭐ Records</a>
-                <a href="#fleches" class="mobile-menu-link">🎯 Flèches</a>
+                <a href="#records" class="mobile-menu-link">⭐ Records</a>
+                <a href="#combat" class="mobile-menu-link">🃏 Combat</a>
                 <a href="#parcours" class="mobile-menu-link">📈 Parcours</a>
                 <a href="#archives" class="mobile-menu-link">📅 Archives</a>
             </div>
@@ -163,11 +163,11 @@
 
         <section id="podium" class="margin-bottom-section pad-section arcade-panel">
             <div class="section-header">
-                <h2 class="txt-heading break-words">🏆 Qui domine ?</h2>
+                <h2 class="txt-heading break-words">🏆 Leaders</h2>
                 <button class="info-button" data-info="leaders-info">?</button>
             </div>
             <div id="leaders-info" class="info-bubble">
-                <div class="info-bubble-title">🏆 Qui domine ?</div>
+                <div class="info-bubble-title">🏆 Leaders</div>
                 <div class="info-bubble-content">
                     Les leaders {% if is_career_view %}de la carrière{% else %}de la saison{% endif %} sur les classements qui comptent. Touchez une carte pour afficher son podium et le classement complet juste en dessous.<br><br>
                     <strong>Par groupe</strong> : classement des victoires cumulées dans un groupe de joueurs précis.
@@ -293,7 +293,7 @@
                         </tbody>
                     </table>
                 </div>
-                <button id="toggle-elo-legacy" class="toggle-button w-full sm:w-auto text-[6px] sm:text-[7px] md:text-[9px] p-2 sm:p-2.5 md:p-3 lg:p-[12px] lg:px-5">
+                <button id="toggle-elo-legacy" class="toggle-button w-full sm:w-auto">
                     ▼ ELO legacy
                 </button>
                 <div id="elo-legacy-container" class="hidden overflow-x-auto mt-4">
@@ -504,7 +504,7 @@
             </div>
         </div>
 
-        <section id="records-du-moment" class="margin-bottom-section pad-section arcade-panel">
+        <section id="records" class="margin-bottom-section pad-section arcade-panel">
             <div class="section-header">
                 <h2 class="txt-heading break-words">⭐ Records à battre</h2>
                 <button class="info-button" data-info="records-info">?</button>
@@ -548,16 +548,72 @@
         <div class="zone-divider" aria-hidden="true">
             <div class="zone-divider-inner">
                 <span class="zone-divider-line"></span>
-                <span class="zone-divider-label">🎯 Guerre des flèches</span>
+                <span class="zone-divider-label">🃏 Fiches de combat</span>
                 <span class="zone-divider-line"></span>
             </div>
         </div>
-        <section id="guerre-des-fleches" class="margin-bottom-section pad-section arcade-panel overflow-x-auto">
-            <div class="section-header flex flex-wrap items-center justify-between gap-2">
-                <div class="flex items-center gap-2">
-                    <h2 class="txt-heading break-words">🎯 Guerre des flèches</h2>
-                    <button class="info-button" data-info="kill-relationships-info">?</button>
+        <section id="combat" class="margin-bottom-section pad-section arcade-panel overflow-x-auto">
+            <div class="section-header">
+                <h2 class="txt-heading break-words">🃏 Fiches de combat</h2>
+                <button class="info-button" data-info="combat-profiles-info">?</button>
+            </div>
+            <div id="combat-profiles-info" class="info-bubble">
+                <div class="info-bubble-title">🃏 Fiches de combat</div>
+                <div class="info-bubble-content">
+                    <strong>Badge :</strong> le trait où le joueur se démarque le plus du groupe (suicides, K/D, forme en fin de session, matchs serrés). Un badge par joueur ; « Réglementaire » si rien ne ressort.<br><br>
+                    <strong>Bête noire :</strong> l'adversaire qui le tue le plus, en kills par match joué ensemble. <strong>Souffre-douleur :</strong> l'inverse.<br><br>
+                    <strong>Matchs serrés :</strong> matchs gagnés ou perdus d'un seul kill. <strong>Meilleure série :</strong> victoires d'affilée dans une même session. Ces deux lignes ne couvrent que les sessions avec le score de chaque match.
                 </div>
+            </div>
+            <p class="section-tagline">{{ taglines.kills }}</p>
+            {% if combat_profiles %}
+            <div class="combat-profiles">
+                {% for profile in combat_profiles %}
+                <article class="combat-card" style="--player-color: {{ profile.color }};">
+                    <div class="combat-card-header">
+                        <span class="combat-card-name">{{ profile.player }}</span>
+                        <span class="combat-card-meta">{{ profile.matches }} matchs · K/D {{ profile.kd }}</span>
+                    </div>
+                    <div class="combat-card-badge">
+                        <span class="combat-card-badge-emoji" aria-hidden="true">{{ profile.badge.emoji }}</span>
+                        <div>
+                            <div class="combat-card-badge-title">{{ profile.badge.title }}</div>
+                            <div class="combat-card-badge-detail">{{ profile.badge.detail }}</div>
+                        </div>
+                    </div>
+                    <dl class="combat-card-stats">
+                        <div>
+                            <dt>😈 Bête noire</dt>
+                            <dd>{% if profile.nemesis %}<span style="color: {{ profile.nemesis.color }};">{{ profile.nemesis.player }}</span> · {{ profile.nemesis.per_match }} kill/match{% else %}—{% endif %}</dd>
+                        </div>
+                        <div>
+                            <dt>🎯 Souffre-douleur</dt>
+                            <dd>{% if profile.victim %}<span style="color: {{ profile.victim.color }};">{{ profile.victim.player }}</span> · {{ profile.victim.per_match }} kill/match{% else %}—{% endif %}</dd>
+                        </div>
+                        <div>
+                            <dt>😬 Matchs à 1 kill</dt>
+                            <dd>{% if profile.scored_matches %}{{ profile.close_wins }} gagnés · {{ profile.heartbreaks }} perdus{% else %}—{% endif %}</dd>
+                        </div>
+                        <div>
+                            <dt>🔥 Meilleure série</dt>
+                            <dd>{% if profile.best_streak and profile.best_streak.length > 1 %}{{ profile.best_streak.length }} d'affilée · {{ profile.best_streak.date }}{% else %}—{% endif %}</dd>
+                        </div>
+                    </dl>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="form-label text-center">Pas encore assez de matchs détaillés sur cette période.</p>
+            {% endif %}
+            <div class="stats-dates">
+                <div>Depuis le {{ date_debut }}</div>
+            </div>
+
+            <div class="subsection-title-row subsection-title-row--spread">
+                <h3 class="subsection-title subsection-title-row">
+                    <span>🎯 Guerre des flèches</span>
+                    <button type="button" class="info-button info-button-inline" data-info="kill-relationships-info" aria-label="Aide guerre des flèches">?</button>
+                </h3>
                 <div class="flex items-center gap-2" style="color: var(--text);">
                     <input type="checkbox" id="kill-relationships-totals-toggle" class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: var(--gold);">
                     <label for="kill-relationships-totals-toggle" class="form-label mb-0 cursor-pointer">Totaux</label>
@@ -613,61 +669,6 @@
                 <div>Depuis le {{ date_debut }}</div>
             </div>
 
-            <h3 class="subsection-title subsection-title-row">
-                <span>🃏 Fiches de combat</span>
-                <button type="button" class="info-button info-button-inline" data-info="combat-profiles-info" aria-label="Aide fiches de combat">?</button>
-            </h3>
-            <div id="combat-profiles-info" class="info-bubble">
-                <div class="info-bubble-title">🃏 Fiches de combat</div>
-                <div class="info-bubble-content">
-                    <strong>Badge :</strong> le trait où le joueur se démarque le plus du groupe (suicides, K/D, forme en fin de session, matchs serrés). Un badge par joueur ; « Réglementaire » si rien ne ressort.<br><br>
-                    <strong>Bête noire :</strong> l'adversaire qui le tue le plus, en kills par match joué ensemble. <strong>Souffre-douleur :</strong> l'inverse.<br><br>
-                    <strong>Matchs serrés :</strong> matchs gagnés ou perdus d'un seul kill. <strong>Meilleure série :</strong> victoires d'affilée dans une même session. Ces deux lignes ne couvrent que les sessions avec le score de chaque match.
-                </div>
-            </div>
-            <p class="section-tagline">{{ taglines.kills }}</p>
-            {% if combat_profiles %}
-            <div class="combat-profiles">
-                {% for profile in combat_profiles %}
-                <article class="combat-card" style="--player-color: {{ profile.color }};">
-                    <div class="combat-card-header">
-                        <span class="combat-card-name">{{ profile.player }}</span>
-                        <span class="combat-card-meta">{{ profile.matches }} matchs · K/D {{ profile.kd }}</span>
-                    </div>
-                    <div class="combat-card-badge">
-                        <span class="combat-card-badge-emoji" aria-hidden="true">{{ profile.badge.emoji }}</span>
-                        <div>
-                            <div class="combat-card-badge-title">{{ profile.badge.title }}</div>
-                            <div class="combat-card-badge-detail">{{ profile.badge.detail }}</div>
-                        </div>
-                    </div>
-                    <dl class="combat-card-stats">
-                        <div>
-                            <dt>😈 Bête noire</dt>
-                            <dd>{% if profile.nemesis %}<span style="color: {{ profile.nemesis.color }};">{{ profile.nemesis.player }}</span> · {{ profile.nemesis.per_match }} kill/match{% else %}—{% endif %}</dd>
-                        </div>
-                        <div>
-                            <dt>🎯 Souffre-douleur</dt>
-                            <dd>{% if profile.victim %}<span style="color: {{ profile.victim.color }};">{{ profile.victim.player }}</span> · {{ profile.victim.per_match }} kill/match{% else %}—{% endif %}</dd>
-                        </div>
-                        <div>
-                            <dt>😬 Matchs à 1 kill</dt>
-                            <dd>{% if profile.scored_matches %}{{ profile.close_wins }} gagnés · {{ profile.heartbreaks }} perdus{% else %}—{% endif %}</dd>
-                        </div>
-                        <div>
-                            <dt>🔥 Meilleure série</dt>
-                            <dd>{% if profile.best_streak and profile.best_streak.length > 1 %}{{ profile.best_streak.length }} d'affilée · {{ profile.best_streak.date }}{% else %}—{% endif %}</dd>
-                        </div>
-                    </dl>
-                </article>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="form-label text-center">Pas encore assez de matchs détaillés sur cette période.</p>
-            {% endif %}
-            <div class="stats-dates">
-                <div>Depuis le {{ date_debut }}</div>
-            </div>
         </section>
         {% endif %}
 
@@ -843,7 +844,7 @@
             {% endfor %}
             {% endif %}
             </div>
-            <button id="toggle-all-sessions" class="toggle-button w-full sm:w-auto text-[6px] sm:text-[7px] md:text-[9px] p-2 sm:p-2.5 md:p-3 lg:p-[12px] lg:px-5">
+            <button id="toggle-all-sessions" class="toggle-button w-full sm:w-auto">
                 ▼ Voir toutes les sessions
             </button>
             <div id="all-sessions-container" class="hidden">
