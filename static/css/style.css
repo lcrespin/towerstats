@@ -718,83 +718,288 @@ section h2 {
     z-index: 1;
 }
 
-.stat-card-align {
-    display: flex;
-    flex-direction: column;
-    min-height: 120px;
-}
-
-.stat-card-align .stat-value {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.stat-card-align .stat-value + div {
-    margin-top: auto;
-}
-
-.stat-card-elo-dual {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.stat-card-elo-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    width: 100%;
-}
-
-.stat-card-elo-grid--split {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0;
-}
-
-.stat-card-elo-col {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    padding: 0 4px;
-    min-width: 0;
-}
-
-.stat-card-elo-grid--split .stat-card-elo-col + .stat-card-elo-col {
-    border-left: 1px solid rgba(110, 90, 150, 0.45);
-}
-
-.stat-value-elo-dual {
-    font-size: clamp(6px, 3vw, 18px);
-    margin: 4px 0;
-    line-height: 1.2;
-}
-
-.stat-card-elo-players {
+.season-summary {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 6px;
-    margin-top: 2px;
-    padding-bottom: 2px;
+    gap: 4px 0;
+    list-style: none;
+    margin: 0 0 14px;
+    padding: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11px;
+    color: var(--text-muted);
+    position: relative;
+    z-index: 1;
 }
 
-.stat-card-elo-players--merged {
-    margin-top: auto;
-    padding-top: 4px;
+.season-summary li + li::before {
+    content: '·';
+    margin: 0 8px;
+    color: var(--border);
 }
 
-.stat-card-elo-quote {
-    display: none;
+@media (max-width: 639px) {
+    .season-summary-period { flex-basis: 100%; text-align: center; }
+    .season-summary li.season-summary-period::before { display: none; }
+}
+
+.season-summary strong {
+    color: var(--gold);
+    font-weight: 700;
+}
+
+@media (min-width: 768px) {
+    .season-summary { font-size: 13px; }
+}
+
+.leader-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+.leader-grid--odd > :first-child {
+    grid-column: span 2;
 }
 
 @media (min-width: 640px) {
-    .stat-card-elo-quote {
-        display: block;
+    .leader-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
     }
+    .leader-grid--odd > :first-child { grid-column: auto; }
+}
+
+@media (min-width: 1024px) {
+    .leader-grid { grid-template-columns: repeat(var(--leader-count), minmax(0, 1fr)); }
+}
+
+.leader-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+    padding: 10px 6px;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.leader-card:hover {
+    border-color: var(--gold);
+}
+
+.leader-card.active {
+    border-color: var(--gold);
+    background: rgba(110, 90, 150, 0.35);
+    box-shadow: inset 0 0 0 1px rgba(242, 201, 76, 0.35), 0 0 10px rgba(242, 201, 76, 0.2);
+}
+
+.leader-card:focus-visible,
+.leader-group-tab:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+}
+
+.leader-card .stat-flavor {
+    margin-bottom: 0;
+}
+
+.leader-card-value {
+    margin: 4px 0;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 14px;
+    line-height: 1.3;
+}
+
+@media (min-width: 768px) {
+    .leader-card-value { font-size: 16px; }
+}
+
+.leader-card-unit {
+    margin-left: 3px;
+    font-size: 0.55em;
+    color: var(--text-muted);
+    text-shadow: none;
+}
+
+.leader-card-players {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 4px 8px;
+    margin-top: 2px;
+}
+
+.leader-card-player {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+}
+
+.leader-card-name {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: rgba(0, 0, 0, 0.25);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.leader-card-quote {
+    display: none;
+    margin-top: 2px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 9px;
+    color: #8d8d8d;
+}
+
+@media (min-width: 640px) {
+    .leader-card-quote { display: block; }
+}
+
+.leader-group-row {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0 4px;
+    position: relative;
+    z-index: 1;
+}
+
+.leader-group-tab {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    color: #c0c0c0;
+    background: rgba(26, 26, 46, 0.6);
+    border: 2px solid rgba(110, 90, 150, 0.5);
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.leader-group-tab:hover,
+.leader-group-tab.active {
+    color: var(--gold);
+    border-color: var(--gold);
+}
+
+.leader-group-tab.active {
+    background: rgba(110, 90, 150, 0.45);
+}
+
+.leader-panel {
+    position: relative;
+    z-index: 1;
+}
+
+.records-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    position: relative;
+    z-index: 1;
+}
+
+@media (min-width: 640px) {
+    .records-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+}
+
+.record-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 0;
+    padding: 10px 6px;
+}
+
+.record-card {
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+}
+
+.record-card:hover {
+    border-color: var(--gold);
+    background: rgba(110, 90, 150, 0.2);
+}
+
+.record-card .stat-flavor {
+    margin-bottom: 0;
+}
+
+.record-card-link {
+    padding: 2px 4px;
+    border: 0;
+    border-radius: 3px;
+    background: none;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+}
+
+.record-card-link:hover,
+.record-card-link:focus-visible {
+    color: var(--gold);
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.record-card-link:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+}
+
+.session-card--highlight {
+    border-color: var(--gold) !important;
+    box-shadow: 0 0 0 2px rgba(242, 201, 76, 0.35), 0 0 16px rgba(242, 201, 76, 0.25);
+}
+
+.record-card-value {
+    margin: 6px 0 0;
+    font-family: 'Press Start 2P', cursive;
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    .record-card-value { font-size: 16px; }
+}
+
+.record-card-unit,
+.record-card-holders {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.record-card-unit {
+    margin: 4px 0 8px;
+}
+
+.record-card-holders {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-top: auto;
+}
+
+.record-card-holders strong {
+    font-weight: 700;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+@media (min-width: 768px) {
+    .record-card-unit,
+    .record-card-holders { font-size: 11px; }
 }
 
 .stat-value {

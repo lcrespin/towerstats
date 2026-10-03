@@ -190,6 +190,7 @@ if (typeof filteredSessions === 'undefined') {
 }
 let currentPlayerFilter = '';
 let currentGroupFilter = '';
+let highlightedSessionKey = null;
 
 // Handlers pour les filtres (stockés pour pouvoir les supprimer)
 let playerFilterHandler = null;
@@ -283,6 +284,10 @@ function renderSessions() {
     pageSessions.forEach(function(session) {
         const sessionCard = document.createElement('div');
         sessionCard.className = 'session-card p-2 sm:p-4 md:p-[15px]';
+        sessionCard.dataset.sessionKey = session.session_select_id;
+        if (highlightedSessionKey && session.session_select_id === highlightedSessionKey) {
+            sessionCard.classList.add('session-card--highlight');
+        }
         var tableRows = '';
         session.players.forEach(function(p) {
             var rank = p.rank != null ? p.rank : 0;
@@ -533,6 +538,63 @@ function initSessionsPagination() {
     }
 }
 
+function openSessionInArchives(sessionKey) {
+    if (typeof allSessions === 'undefined' || !sessionKey) {
+        return;
+    }
+    var container = document.getElementById('all-sessions-container');
+    if (!container) {
+        return;
+    }
+    if (container.classList.contains('hidden')) {
+        container.classList.remove('hidden');
+        var toggleBtn = document.getElementById('toggle-all-sessions');
+        if (toggleBtn) {
+            toggleBtn.textContent = '▲ Masquer toutes les sessions';
+        }
+        initFilters();
+    }
+
+    currentPlayerFilter = '';
+    currentGroupFilter = '';
+    ['filter-player', 'filter-group'].forEach(function(id) {
+        var select = document.getElementById(id);
+        if (select) { select.value = ''; }
+    });
+    filteredSessions = allSessions.slice();
+    var index = filteredSessions.findIndex(function(s) {
+        return s.session_select_id === sessionKey;
+    });
+    if (index < 0) {
+        return;
+    }
+    updatePagination();
+    updateSessionsCount();
+    currentPage = Math.floor(index / sessionsPerPage) + 1;
+    highlightedSessionKey = sessionKey;
+    renderSessions();
+
+    var card = Array.prototype.find.call(
+        container.querySelectorAll('.session-card'),
+        function(el) { return el.dataset.sessionKey === sessionKey; }
+    );
+    if (card) {
+        var top = card.getBoundingClientRect().top + window.scrollY - getScrollOffsetTop();
+        window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }
+}
+
+function initRecordLinks() {
+    document.querySelectorAll('#records-du-moment .record-card').forEach(function(card) {
+        card.addEventListener('click', function(e) {
+            var target = e.target.closest('[data-session-key]');
+            if (target) {
+                openSessionInArchives(target.getAttribute('data-session-key'));
+            }
+        });
+    });
+}
+
 // Short hash names -> section ids (for clean URLs like /#sessions or /#evolution)
 var ANCHOR_HASH_MAP = {
     'cette-semaine': 'records-du-moment',
@@ -665,9 +727,9 @@ function initScrollSpy() {
     });
 }
 
-function initPodiumTabs() {
-    var tabs = document.querySelectorAll('.podium-tab');
-    var panels = document.querySelectorAll('#podium .podium-tab-panel');
+function initLeaderTabs() {
+    var tabs = document.querySelectorAll('#podium .leader-card, #podium .leader-group-tab');
+    var panels = document.querySelectorAll('#podium .leader-panel');
     if (!tabs.length) {
         return;
     }
@@ -679,9 +741,16 @@ function initPodiumTabs() {
                 t.classList.toggle('active', isActive);
                 t.setAttribute('aria-selected', isActive ? 'true' : 'false');
             });
+            var activePanel = null;
             panels.forEach(function(panel) {
-                panel.classList.toggle('hidden', panel.getAttribute('data-panel') !== target);
+                var isActive = panel.getAttribute('data-panel') === target;
+                panel.classList.toggle('hidden', !isActive);
+                if (isActive) { activePanel = panel; }
             });
+            if (activePanel && window.matchMedia('(max-width: 639px)').matches) {
+                var top = activePanel.getBoundingClientRect().top + window.scrollY - getScrollOffsetTop();
+                window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+            }
         });
     });
 }
@@ -1918,7 +1987,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initSortableTables();
     initSmoothScroll();
     initScrollSpy();
-    initPodiumTabs();
+    initLeaderTabs();
+    initRecordLinks();
     initEvolutionTabs();
     initShowAllPlayersToggle();
     initToggleKillMatrix();

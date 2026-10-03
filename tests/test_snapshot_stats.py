@@ -480,6 +480,8 @@ EXPECTED_TEMPLATE_KEYS = frozenset({
     "top_killers", "top_deaths", "top_self_kills",
     "least_deaths_row", "least_self_kills_row",
     "best_kd_ratio", "best_kd_value",
+    "kills_per_game_ranking", "best_kills_players", "best_kills_value",
+    "total_games", "session_records",
 })
 
 

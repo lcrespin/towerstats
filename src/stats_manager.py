@@ -7,6 +7,7 @@ from typing import List, Dict, Any
 from .data_manager import SessionDataManager
 from .config import PLAYER_TO_COLOR, game_mode_label, DEFAULT_GAME_MODE
 from .combat_profiles import build_combat_profiles, build_evening_curve
+from .session_records import build_session_records
 
 MEDAL_BY_RANK = {1: '🥇', 2: '🥈', 3: '🥉'}
 
@@ -305,7 +306,18 @@ class SessionStatsManager:
         avec les ratings au début de la session puis appliqués en batch.
         """
         elo_ratings = defaultdict(lambda: initial_elo)
+        for _session, session_deltas in self.get_elo_session_deltas(initial_elo, k_factor):
+            for player, delta in session_deltas.items():
+                elo_ratings[player] += delta
+
+        sorted_elo = sorted(elo_ratings.items(), key=lambda x: x[1], reverse=True)
+        return dict(sorted_elo)
+
+    def get_elo_session_deltas(self, initial_elo=1500, k_factor=32) -> List[tuple]:
+        """Batch ELO delta per player for each session, in date order: [(session, {player: delta})]."""
+        elo_ratings = defaultdict(lambda: initial_elo)
         sorted_sessions = sorted(self.sessions, key=lambda x: x.get('date', ''))
+        out = []
 
         for session in sorted_sessions:
             players = SessionDataManager.parse_session_data(session)
@@ -342,9 +354,9 @@ class SessionStatsManager:
 
             for player, delta in session_deltas.items():
                 elo_ratings[player] += delta
+            out.append((session, dict(session_deltas)))
 
-        sorted_elo = sorted(elo_ratings.items(), key=lambda x: x[1], reverse=True)
-        return dict(sorted_elo)
+        return out
 
     def get_elo_ranking(self, initial_elo=1500, k_factor=32):
         """Retourne le classement ELO des joueurs.
@@ -909,10 +921,12 @@ class SessionStatsManager:
         
         # Statistiques supplémentaires
         total_sessions = len(self.sessions)
+        total_games = 0
         unique_players = set()
         for session in self.sessions:
             players = SessionDataManager.parse_session_data(session)
             unique_players.update(players.keys())
+            total_games += sum(stats['today'] for stats in players.values())
         
         # Meilleur joueur (parmi tous les groupes)
         all_player_totals = defaultdict(int)
@@ -1065,6 +1079,9 @@ class SessionStatsManager:
         least_self_kills_row = None
         best_kd_ratio = []
         best_kd_value = 0.0
+        kills_per_game_ranking = []
+        best_kills_players = []
+        best_kills_value = 0.0
         max_kills_in_matrix = 1
         max_kills_in_matrix_totals = 1
         kill_relationships_totals = {}
@@ -1106,6 +1123,22 @@ class SessionStatsManager:
                 least_self_kills_row = by_self[-1]
                 best_kd_value = kill_death_ranking[0][5]
                 best_kd_ratio = [row[1] for row in kill_death_ranking if row[5] == best_kd_value]
+                kills_per_game_ranking = self._add_dense_ranks(
+                    [(row[1], row[7], row[6]) for row in kill_death_ranking],
+                    score_index=1, name_index=0,
+                )
+                best_kills_value = kills_per_game_ranking[0][2]
+                best_kills_players = [
+                    row[1] for row in kills_per_game_ranking if row[2] == best_kills_value
+                ]
+
+        try:
+            elo_session_deltas = self.get_elo_session_deltas()
+        except Exception:
+            elo_session_deltas = []
+        session_records = build_session_records(
+            self.sessions, elo_session_deltas, format_date=self.format_date
+        )
         
         return {
             'unique_groups': unique_groups,
@@ -1160,5 +1193,10 @@ class SessionStatsManager:
             'least_self_kills_row': least_self_kills_row,
             'best_kd_ratio': best_kd_ratio,
             'best_kd_value': best_kd_value,
+            'kills_per_game_ranking': kills_per_game_ranking,
+            'best_kills_players': best_kills_players,
+            'best_kills_value': best_kills_value,
+            'total_games': total_games,
+            'session_records': session_records,
         }
 
