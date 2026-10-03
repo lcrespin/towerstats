@@ -779,7 +779,9 @@ function initEvolutionTabs() {
     }
 
     var chartResizers = {
-        scores: function() { /* level timeline is CSS-based */ },
+        scores: function() {
+            if (evolutionChart) { evolutionChart.resize(); }
+        },
         winrate: function() {
             if (winRateEvolutionChart) { winRateEvolutionChart.resize(); }
         },
@@ -964,65 +966,67 @@ function updateEvolutionChart(groupId, isCumul) {
     // Trier les dates par date originale (format YYYY-MM-DD)
     // pour avoir la plus ancienne à gauche, la plus récente à droite
     const sortedOriginalDates = Object.keys(dataByDate).sort();
+    const sortedDates = sortedOriginalDates.map(function(originalDate) {
+        return dateMapping[originalDate];
+    });
     const sortedPlayers = Array.from(allPlayers).sort();
 
-    renderLevelTimeline(sortedOriginalDates, dateMapping, dataByDate, sortedPlayers, isCumul);
-}
-
-function renderLevelTimeline(sortedOriginalDates, dateMapping, dataByDate, sortedPlayers, isCumul) {
-    var container = document.getElementById('level-timeline');
-    if (!container) {
-        return;
-    }
-    container.innerHTML = '';
-
-    if (!sortedOriginalDates.length) {
-        container.innerHTML = '<p class="form-label">Aucune session pour ce groupe.</p>';
-        return;
-    }
-
-    sortedOriginalDates.forEach(function(originalDate) {
-        var sessionData = dataByDate[originalDate] || {};
-        var maxVal = 1;
-        sortedPlayers.forEach(function(player) {
-            var v = sessionData[player] || 0;
-            if (v > maxVal) { maxVal = v; }
-        });
-
-        var platform = document.createElement('div');
-        platform.className = 'level-platform';
-        platform.title = dateMapping[originalDate];
-
-        var top = document.createElement('div');
-        top.className = 'level-platform-top';
-
-        var bars = document.createElement('div');
-        bars.className = 'level-bars';
-
-        sortedPlayers.forEach(function(player) {
-            var val = sessionData[player] || 0;
-            if (val <= 0) { return; }
-            var bar = document.createElement('div');
-            bar.className = 'level-bar';
-            bar.style.setProperty('--bar-height', ((val / maxVal) * 100) + '%');
-            bar.style.backgroundColor = getPlayerColor(player);
-            bar.title = player + ': ' + val + (isCumul ? ' pts total' : ' pts session');
-            var label = document.createElement('span');
-            label.className = 'level-bar-label';
-            label.textContent = val;
-            bar.appendChild(label);
-            bars.appendChild(bar);
-        });
-
-        var dateLabel = document.createElement('div');
-        dateLabel.className = 'level-date';
-        dateLabel.textContent = dateMapping[originalDate];
-
-        platform.appendChild(top);
-        platform.appendChild(bars);
-        platform.appendChild(dateLabel);
-        container.appendChild(platform);
+    const datasets = sortedPlayers.map(function(player) {
+        const color = getPlayerColor(player);
+        return {
+            label: player,
+            data: sortedOriginalDates.map(function(originalDate) {
+                return dataByDate[originalDate][player] || 0;
+            }),
+            _baseColor: color,
+            _baseBackgroundColor: color,
+            _baseBorderColor: color,
+            _baseBorderWidth: 1,
+            backgroundColor: color,
+            borderColor: color,
+            borderWidth: 1,
+            borderRadius: 2,
+            maxBarThickness: 22
+        };
     });
+
+    const canvas = document.getElementById('evolution-chart');
+    if (!canvas) {
+        return;
+    }
+
+    if (evolutionChart) {
+        evolutionChart.destroy();
+    }
+
+    evolutionChart = new Chart(canvas.getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: sortedDates,
+            datasets: datasets
+        },
+        options: buildPlayerLineChartOptions({
+            xTitle: 'Dates',
+            yTitle: isCumul ? 'Points totaux' : 'Points par session',
+            hoverChartRef: function() { return evolutionChart; },
+            yScale: {
+                beginAtZero: true,
+                grid: { color: 'rgba(168, 156, 136, 0.22)' }
+            },
+            xScale: {
+                ticks: {
+                    color: CHART_TICK_COLOR,
+                    font: CHART_FONT_SMALL,
+                    maxRotation: 45,
+                    minRotation: 45,
+                    autoSkip: true
+                },
+                grid: { color: 'rgba(168, 156, 136, 0.12)' }
+            }
+        })
+    });
+    evolutionChart._hoverDatasetIndex = null;
+    bindMultiSeriesChartHoverReset(canvas, function() { return evolutionChart; });
 }
 
 // Graphique d'évolution moyenne de victoires par session

@@ -689,7 +689,7 @@
             <div id="evolution-scores-info" class="info-bubble">
                 <div class="info-bubble-title">📈 Le Parcours</div>
                 <div class="info-bubble-content">
-                    <strong>Niveaux (scores) :</strong> chaque plateforme = une soirée de jeu. Les barres montrent qui était en tête à ce moment.<br><br>
+                    <strong>Scores :</strong> une barre par joueur et par soirée, sur une échelle commune. En mode cumulé, les barres grandissent avec le total de points.<br><br>
                     <strong>% de victoires / ELO :</strong> courbes par joueur. Par défaut, seuls les 5 meilleurs joueurs (dernière valeur) sont affichés — cochez « Tous les joueurs » pour tout voir.<br><br>
                     <strong>ELO match :</strong> choisissez « Par session » (dernier ELO de la session) ou « Par match » (chaque match).<br><br>
                     <strong>La soirée :</strong> % de victoires par tranche de matchs (1 à 5, 6 à 10…) au fil d'une session.
@@ -722,8 +722,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="chart-container level-timeline-wrapper" style="position: relative; min-height: 420px; width: 100%;">
-                    <div id="level-timeline" class="level-timeline" aria-label="Évolution des scores par session"></div>
+                <div class="chart-container" style="position: relative; height: 450px; width: 100%;">
+                    <canvas id="evolution-chart" aria-label="Évolution des scores par session"></canvas>
                 </div>
             </div>
 
