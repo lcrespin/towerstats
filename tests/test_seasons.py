@@ -1,4 +1,6 @@
+import json
 import os
+import re
 import sys
 from datetime import date
 from unittest.mock import patch
@@ -22,6 +24,11 @@ from src.seasons import (
 )
 from src.data_manager import SessionDataManager
 from src.stats_manager import SessionStatsManager, leaderboard_career_deltas
+
+
+def _latest_session_keys(html: str) -> list:
+    match = re.search(r'const latestSessions = (.*?);\n', html)
+    return [s['session_select_id'] for s in json.loads(match.group(1))]
 
 
 def _session(day: str, wins: dict, group: str = 'ERIC-LOUIS', mode: str = 'HeadHunters'):
@@ -202,8 +209,7 @@ def test_default_route_uses_current_season(_messages):
     assert 'compteurs à zéro' in html
     assert 'Filtres appliqués' not in html
     assert 'name="season"' not in html
-    assert 'Session: ERIC-LOUIS - 2026-08-14' not in html
-    assert 'Session: ERIC-LOUIS - 2026-08-26' in html
+    assert _latest_session_keys(html) == ['2026-08-26|ERIC-LOUIS|HeadHunters']
     assert 'depuis le 26 août 2026' in html
 
 
@@ -233,9 +239,7 @@ def test_season_1_route_stops_before_august_15(_messages):
     assert 'min="2025-06-01"' in html
     assert 'max="2026-08-14"' in html
     assert 'close' in html
-    assert 'Session: ERIC-LOUIS - 2026-08-14' in html
-    assert 'Session: ERIC-LOUIS - 2026-08-26' not in html
-    assert 'Session: ERIC-LOUIS - 2025-05-31' not in html
+    assert _latest_session_keys(html) == ['2026-08-14|ERIC-LOUIS|HeadHunters']
     assert '2025-06-03' in html
     assert 'Depuis le 03/06/25' in html
     assert 'juin 2025 → août 2026' in html

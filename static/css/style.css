@@ -964,6 +964,140 @@ section h2 {
     box-shadow: 0 0 0 2px rgba(242, 201, 76, 0.35), 0 0 16px rgba(242, 201, 76, 0.25);
 }
 
+.session-card-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 8px;
+    color: var(--gold);
+    word-break: break-word;
+}
+
+.session-card-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin: 6px 0 12px;
+}
+
+@media (min-width: 768px) {
+    .session-card-title { font-size: 10px; }
+    .session-card-meta { font-size: 12px; }
+}
+
+.session-details {
+    margin-top: 12px;
+    border-top: 1px dashed var(--grid);
+    padding-top: 10px;
+}
+
+.session-details-summary {
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: #c0c0c0;
+    list-style: none;
+}
+
+.session-details-summary::-webkit-details-marker { display: none; }
+.session-details-summary::before { content: '▼ '; }
+.session-details[open] > .session-details-summary::before { content: '▲ '; }
+.session-details-summary:hover { color: var(--gold); }
+
+.session-details-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-top: 12px;
+}
+
+.session-detail-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+}
+
+.session-detail-hint {
+    font-weight: 400;
+    color: var(--text-muted);
+}
+
+.session-awards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 8px;
+}
+
+.session-award {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    background: var(--surface);
+    border: 1px solid var(--grid);
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 11px;
+}
+
+.session-award-emoji { font-size: 18px; line-height: 1; }
+.session-award-title { font-weight: 700; color: var(--gold); }
+.session-award-holders { font-weight: 600; }
+.session-award-value { color: var(--text-muted); }
+
+.session-duel-table td,
+.session-match-table td {
+    text-align: center;
+}
+
+.ranking-table.session-duel-table td.session-duel-self {
+    background: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.05) 4px, rgba(255, 255, 255, 0.05) 8px);
+    color: var(--text-muted);
+}
+
+.session-match-scroll {
+    max-height: 320px;
+    overflow-y: auto;
+}
+
+.session-match-table td.session-match-winner {
+    color: #1a1a2e;
+    background: var(--gold) !important;
+    font-weight: 700;
+}
+
+.session-cause-row {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 2px 10px;
+    align-items: center;
+    font-size: 11px;
+    margin-bottom: 8px;
+}
+
+.session-cause-name { font-weight: 600; grid-row: span 2; }
+
+.session-cause-bar {
+    display: flex;
+    height: 10px;
+    border: 1px solid var(--grid);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.session-cause-segment--0 { background: #e2b04a; }
+.session-cause-segment--1 { background: #c0504d; }
+.session-cause-segment--2 { background: #6aa84f; }
+.session-cause-segment--3 { background: #4a86c5; }
+.session-cause-segment--4 { background: #8e7cc3; }
+
+.session-cause-legend { color: var(--text-muted); }
+
+.session-cause-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-right: 4px;
+    border-radius: 1px;
+}
+
 .record-card-value {
     margin: 6px 0 0;
     font-family: 'Press Start 2P', cursive;

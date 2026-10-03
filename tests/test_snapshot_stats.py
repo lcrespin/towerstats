@@ -473,7 +473,7 @@ EXPECTED_TEMPLATE_KEYS = frozenset({
     "elo_legacy_ranking", "best_elo_legacy_players", "best_elo_legacy",
     "elo_match_ranking", "elo_match_by_player", "best_elo_match", "best_elo_match_players",
     "latest_date",
-    "latest_sessions_parsed", "sessions_by_date", "all_sessions_data",
+    "latest_sessions_parsed", "latest_sessions_data", "sessions_by_date", "all_sessions_data",
     "player_colors", "has_detailed_stats", "kill_death_ranking",
     "combat_profiles", "evening_curve", "kill_relationships", "kill_relationships_totals",
     "all_players_for_matrix", "max_kills_in_matrix", "max_kills_in_matrix_totals",

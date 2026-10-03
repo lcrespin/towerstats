@@ -813,35 +813,7 @@
                 Soirée #{{ total_sessions }} · {{ selected_game_mode_label }} · {{ latest_sessions_parsed[0].players|length }} joueur(s)
             </div>
             <div class="session-date">Date: {{ stats_manager.format_date(latest_date) }}</div>
-            {% for session_data in latest_sessions_parsed %}
-                {% set session = session_data.session %}
-                {% set players = session_data.players %}
-                <div class="session-card p-2 sm:p-4 md:p-[15px]">
-                    <div class="text-[7px] sm:text-[8px] md:text-[10px] mb-3 sm:mb-4" style="color: var(--text);">
-                        Session: {{ session.id }} - {{ session.date }}
-                    </div>
-                    <div class="overflow-x-auto">
-                    <table class="ranking-table w-full txt-xs">
-                        <thead>
-                            <tr>
-                                <th class="player-column">Joueur</th>
-                                <th>Session</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for rank, player, stats in players %}
-                            <tr>
-                                <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
-                                <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ stats.today }}</td>
-                                <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ stats.total }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                    </div>
-                </div>
-            {% endfor %}
+            <div id="latest-sessions-list"></div>
             {% endif %}
             </div>
             <button id="toggle-all-sessions" class="toggle-button w-full sm:w-auto">
@@ -984,6 +956,7 @@
         const rankingsByGroup = {{ rankings_by_group|tojson }};
         const playerColors = {{ player_colors|tojson }};
         const allSessions = {{ all_sessions_data|tojson }};
+        const latestSessions = {{ latest_sessions_data|tojson }};
         const hasDetailedStats = {{ has_detailed_stats|tojson }};
         const eveningCurveData = {{ evening_curve|tojson }};
         const eloEvolutionData = {{ elo_evolution|tojson }};

@@ -8,6 +8,7 @@ from .data_manager import SessionDataManager
 from .config import PLAYER_TO_COLOR, game_mode_label, DEFAULT_GAME_MODE
 from .combat_profiles import build_combat_profiles, build_evening_curve
 from .session_records import build_session_records
+from .session_details import build_session_details
 
 MEDAL_BY_RANK = {1: '🥇', 2: '🥈', 3: '🥉'}
 
@@ -1047,24 +1048,33 @@ class SessionStatsManager:
             if players_list:
                 latest_sessions_parsed.append({'session': session, 'players': players_list})
 
+        def session_entry(session, date, players_list):
+            return {
+                'id': session['id'],
+                'group': session['id'],
+                'date': session['date'],
+                'formatted_date': self.format_date(date),
+                'game_mode': session.get('mode', DEFAULT_GAME_MODE),
+                'game_mode_label': game_mode_label(session.get('mode', DEFAULT_GAME_MODE)),
+                'session_select_id': SessionDataManager.format_session_select_id(session),
+                'players': [
+                    {'rank': r, 'name': p, 'today': s['today'], 'total': s['total']}
+                    for r, p, s in players_list
+                ],
+                'details': build_session_details(session),
+            }
+
+        latest_sessions_data = [
+            session_entry(entry['session'], latest_date, entry['players'])
+            for entry in latest_sessions_parsed
+        ]
+
         all_sessions_data = []
         for date, date_sessions in sessions_by_date.items():
             for session in date_sessions:
                 players_list = session_players_with_dense_rank(session)
                 if players_list:
-                    all_sessions_data.append({
-                        'id': session['id'],
-                        'group': session['id'],
-                        'date': session['date'],
-                        'formatted_date': self.format_date(date),
-                        'game_mode': session.get('mode', DEFAULT_GAME_MODE),
-                        'game_mode_label': game_mode_label(session.get('mode', DEFAULT_GAME_MODE)),
-                        'session_select_id': SessionDataManager.format_session_select_id(session),
-                        'players': [
-                            {'rank': r, 'name': p, 'today': s['today'], 'total': s['total']}
-                            for r, p, s in players_list
-                        ]
-                    })
+                    all_sessions_data.append(session_entry(session, date, players_list))
         
         # Statistiques détaillées (si disponibles)
         has_detailed = self.has_detailed_stats()
@@ -1174,6 +1184,7 @@ class SessionStatsManager:
             'best_elo_match_players': best_elo_match_players,
             'latest_date': latest_date,
             'latest_sessions_parsed': latest_sessions_parsed,
+            'latest_sessions_data': latest_sessions_data,
             'sessions_by_date': sessions_by_date,
             'all_sessions_data': all_sessions_data,
             'player_colors': PLAYER_TO_COLOR,

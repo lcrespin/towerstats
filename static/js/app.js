@@ -282,27 +282,181 @@ function renderSessions() {
     const pageSessions = filteredSessions.slice(start, end);
     
     pageSessions.forEach(function(session) {
-        const sessionCard = document.createElement('div');
-        sessionCard.className = 'session-card p-2 sm:p-4 md:p-[15px]';
-        sessionCard.dataset.sessionKey = session.session_select_id;
-        if (highlightedSessionKey && session.session_select_id === highlightedSessionKey) {
-            sessionCard.classList.add('session-card--highlight');
-        }
-        var tableRows = '';
-        session.players.forEach(function(p) {
-            var rank = p.rank != null ? p.rank : 0;
-            var rankClass = rank <= 3 ? 'rank-' + rank : '';
-            var color = getPlayerColor(p.name);
-            var medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '';
-            tableRows += '<tr><td class="' + rankClass + '" style="color: ' + color + '; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">' + medal + ' ' + p.name + '</td><td class="' + rankClass + '">' + p.today + '</td><td class="' + rankClass + '">' + p.total + '</td></tr>';
-        });
-        sessionCard.innerHTML = '<div class="text-[7px] sm:text-[8px] md:text-[10px] mb-3 sm:mb-4" style="color: var(--text);">Session: ' + session.id + ' - ' + (session.formatted_date || session.date) + '</div><div class="overflow-x-auto"><table class="ranking-table w-full text-[5px] sm:text-[6px] md:text-[9px]"><thead><tr><th>Joueur</th><th>Session</th><th>Total</th></tr></thead><tbody>' + tableRows + '</tbody></table></div>';
-        container.appendChild(sessionCard);
-        var tbl = sessionCard.querySelector('table');
-        if (tbl && tbl.querySelectorAll('thead th').length >= 3) makeTableSortable(tbl);
+        var highlight = !!highlightedSessionKey && session.session_select_id === highlightedSessionKey;
+        container.appendChild(buildSessionCard(session, highlight));
     });
     
     updatePaginationControls();
+}
+
+function renderLatestSessions() {
+    var container = document.getElementById('latest-sessions-list');
+    if (!container || typeof latestSessions === 'undefined') return;
+    container.innerHTML = '';
+    latestSessions.forEach(function(session) {
+        container.appendChild(buildSessionCard(session, false));
+    });
+}
+
+var KILL_SOURCE_LABELS = {
+    'Arrow': 'Flèche',
+    'JumpedOn': 'Écrasé',
+    'Explosion': 'Explosion',
+    'Brambles': 'Ronces',
+    'Squish': 'Aplati',
+    'Lava': 'Lave',
+    'Miasma': 'Miasme',
+    'FallingObject': 'Chute d\'objet',
+    'SpikeBall': 'Boule à pics',
+    'Shock': 'Électrocuté'
+};
+
+function playerLabel(name) {
+    return '<span style="color: ' + getPlayerColor(name) + ';">' + name + '</span>';
+}
+
+function formatRatio(value) {
+    return value.toFixed(2).replace('.', ',');
+}
+
+function buildSessionHeader(session) {
+    var details = session.details || {};
+    var parts = [session.formatted_date || session.date];
+    if (details.hour != null) parts.push('fin vers ' + details.hour + 'h');
+    parts.push(session.game_mode_label || session.game_mode);
+    if (details.match_count) parts.push(details.match_count + ' match' + (details.match_count > 1 ? 's' : ''));
+    parts.push(session.players.length + ' joueur' + (session.players.length > 1 ? 's' : ''));
+    return '<div class="session-card-title">' + session.id + '</div>' +
+        '<div class="session-card-meta">' + parts.join(' · ') + '</div>';
+}
+
+function buildSessionTable(session) {
+    var combat = (session.details && session.details.combat) || {};
+    var hasCombat = Object.keys(combat).length > 0;
+    var sessionWins = session.players.reduce(function(sum, p) { return sum + p.today; }, 0);
+    var head = '<th>Joueur</th><th>Session</th><th>%</th><th>Total</th>';
+    if (hasCombat) head += '<th>Kills</th><th>Morts</th><th>Auto</th><th>K/D</th>';
+    var rows = '';
+    session.players.forEach(function(p) {
+        var rank = p.rank != null ? p.rank : 0;
+        var rankClass = rank <= 3 ? 'rank-' + rank : '';
+        var cell = '<td class="' + rankClass + '">';
+        var pct = sessionWins > 0 ? Math.round(100 * p.today / sessionWins) + '%' : '-';
+        rows += '<tr><td class="' + rankClass + '" style="color: ' + getPlayerColor(p.name) + '; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">' + getMedal(rank) + ' ' + p.name + '</td>' +
+            cell + p.today + '</td>' + cell + pct + '</td>' + cell + p.total + '</td>';
+        if (hasCombat) {
+            var c = combat[p.name];
+            if (c) {
+                var kd = c.death > 0 ? formatRatio(c.kill / c.death) : (c.kill > 0 ? '∞' : '-');
+                rows += cell + c.kill + '</td>' + cell + c.death + '</td>' + cell + c.self + '</td>' + cell + kd + '</td>';
+            } else {
+                rows += cell + '-</td>' + cell + '-</td>' + cell + '-</td>' + cell + '-</td>';
+            }
+        }
+        rows += '</tr>';
+    });
+    return '<div class="overflow-x-auto"><table class="ranking-table w-full text-[5px] sm:text-[6px] md:text-[9px]"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+}
+
+function buildSessionAwards(awards) {
+    if (!awards || awards.length === 0) return '';
+    var items = awards.map(function(award) {
+        var holders = award.holders.map(function(chain) {
+            return chain.map(playerLabel).join(' → ');
+        }).join(', ');
+        return '<div class="session-award"><span class="session-award-emoji" aria-hidden="true">' + award.emoji + '</span>' +
+            '<div><div class="session-award-title">' + award.title + '</div>' +
+            '<div class="session-award-holders">' + holders + '</div>' +
+            '<div class="session-award-value">' + award.value + ' ' + award.unit + '</div></div></div>';
+    }).join('');
+    return '<div class="session-awards">' + items + '</div>';
+}
+
+function buildDuelMatrix(players, combat) {
+    var names = players.map(function(p) { return p.name; }).filter(function(n) { return combat[n]; });
+    if (names.length < 2) return '';
+    var max = 0;
+    names.forEach(function(victim) {
+        names.forEach(function(killer) {
+            if (killer !== victim) max = Math.max(max, combat[victim].killBy[killer] || 0);
+        });
+    });
+    var head = '<th>Tueur → Victime</th>' + names.map(function(n) { return '<th>' + playerLabel(n) + '</th>'; }).join('');
+    var rows = names.map(function(killer) {
+        var cells = names.map(function(victim) {
+            var count = combat[victim].killBy[killer] || 0;
+            if (killer === victim) {
+                return '<td class="session-duel-self" title="Auto-kills">' + (count || '-') + '</td>';
+            }
+            var intensity = max > 0 ? count / max : 0;
+            var hue = (1 - intensity) * 120;
+            return '<td style="background-color: hsla(' + hue + ', 70%, 52%, 0.40);">' + (count || '-') + '</td>';
+        }).join('');
+        return '<tr><td>' + playerLabel(killer) + '</td>' + cells + '</tr>';
+    }).join('');
+    return '<div class="session-detail-block"><h4 class="session-detail-title">🎯 Duels</h4>' +
+        '<div class="overflow-x-auto"><table class="ranking-table session-duel-table w-full text-[5px] sm:text-[6px] md:text-[9px]"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+}
+
+function buildDeathCauses(players, combat) {
+    var rows = players.filter(function(p) { return combat[p.name]; }).map(function(p) {
+        var causes = combat[p.name].killFrom || {};
+        var total = Object.keys(causes).reduce(function(sum, k) { return sum + causes[k]; }, 0);
+        if (total === 0) return '';
+        var sorted = Object.keys(causes).sort(function(a, b) { return causes[b] - causes[a]; });
+        var segments = sorted.map(function(source, i) {
+            var label = KILL_SOURCE_LABELS[source] || source;
+            return '<span class="session-cause-segment session-cause-segment--' + Math.min(i, 4) + '" style="width: ' + (100 * causes[source] / total) + '%;" title="' + label + ' : ' + causes[source] + '"></span>';
+        }).join('');
+        var legend = sorted.slice(0, 3).map(function(source, i) {
+            return '<span class="session-cause-dot session-cause-segment--' + i + '"></span>' +
+                (KILL_SOURCE_LABELS[source] || source) + ' ' + Math.round(100 * causes[source] / total) + '%';
+        }).join(' · ');
+        return '<div class="session-cause-row"><div class="session-cause-name">' + playerLabel(p.name) + '</div>' +
+            '<div class="session-cause-bar">' + segments + '</div>' +
+            '<div class="session-cause-legend">' + legend + '</div></div>';
+    }).join('');
+    if (!rows) return '';
+    return '<div class="session-detail-block"><h4 class="session-detail-title">☠️ Causes de mort</h4>' + rows + '</div>';
+}
+
+function buildMatchTimeline(players, matches) {
+    if (!matches || matches.length === 0) return '';
+    var names = players.map(function(p) { return p.name; });
+    var head = '<th>#</th>' + names.map(function(n) { return '<th>' + playerLabel(n) + '</th>'; }).join('');
+    var rows = matches.map(function(match, i) {
+        var cells = names.map(function(n) {
+            var score = match.scores[n];
+            var cls = n === match.winner ? ' class="session-match-winner"' : '';
+            return '<td' + cls + '>' + (score != null ? score : '-') + '</td>';
+        }).join('');
+        return '<tr><td>' + (i + 1) + '</td>' + cells + '</tr>';
+    }).join('');
+    return '<div class="session-detail-block"><h4 class="session-detail-title">📜 Match par match <span class="session-detail-hint">(kills, vainqueur surligné)</span></h4>' +
+        '<div class="overflow-x-auto session-match-scroll"><table class="ranking-table session-match-table w-full text-[5px] sm:text-[6px] md:text-[9px]"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+}
+
+function buildSessionDetails(session) {
+    var details = session.details || {};
+    var combat = details.combat || {};
+    var body = buildSessionAwards(details.awards) +
+        buildDuelMatrix(session.players, combat) +
+        buildDeathCauses(session.players, combat) +
+        buildMatchTimeline(session.players, details.matches);
+    if (!body) return '';
+    return '<details class="session-details"><summary class="session-details-summary">Détails de la soirée</summary>' +
+        '<div class="session-details-body">' + body + '</div></details>';
+}
+
+function buildSessionCard(session, highlight) {
+    var card = document.createElement('div');
+    card.className = 'session-card p-2 sm:p-4 md:p-[15px]';
+    card.dataset.sessionKey = session.session_select_id;
+    if (highlight) card.classList.add('session-card--highlight');
+    card.innerHTML = buildSessionHeader(session) + buildSessionTable(session) + buildSessionDetails(session);
+    var tbl = card.querySelector('table');
+    if (tbl) makeTableSortable(tbl);
+    return card;
 }
 
 // Mettre à jour les contrôles de pagination
@@ -1989,6 +2143,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initDatePickerToggle();
     initMobileMenu();
     initGroupSelector();
+    renderLatestSessions();
     initSessionsPagination();
     initSortableTables();
     initSmoothScroll();
