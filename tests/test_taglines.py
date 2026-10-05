@@ -38,6 +38,24 @@ def test_pick_taglines_repeats_when_pool_is_small():
     assert all(value == "only" for value in picked.values())
 
 
+def test_pick_taglines_favors_first_lines():
+    pool = [f"fav{i}" for i in range(40)] + [f"other{i}" for i in range(40)]
+    rng = random.Random(42)
+    total = 0
+    favorites = 0
+    for _ in range(2000):
+        values = pick_taglines(mashups=pool, rng=rng).values()
+        total += len(values)
+        favorites += sum(value.startswith("fav") for value in values)
+    assert 0.87 < favorites / total < 0.93
+
+
+def test_pick_taglines_falls_back_when_favorites_exhausted():
+    pool = ["fav0", "fav1", "other0", "other1", "other2", "other3"]
+    picked = pick_taglines(mashups=pool, rng=random.Random(1), favorite_count=2)
+    assert sorted(picked.values()) == sorted(pool)
+
+
 def test_pick_taglines_empty_pool():
     picked = pick_taglines(mashups=[])
     assert picked == {slot: "" for slot in TAGLINE_SLOTS}

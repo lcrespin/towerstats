@@ -927,7 +927,7 @@ class SessionStatsManager:
                 relationships_avg[killer][victim] = (kills / games) if games > 0 else 0.0
 
         return dict(relationships_avg), dict(relationships_totals)
-    
+
     def prepare_template_data(self):
         """Prépare toutes les données nécessaires pour le template HTML."""
         # Calculer les données

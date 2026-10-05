@@ -2763,15 +2763,19 @@ section.arcade-panel::before { opacity: 0.3; }
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: flex-end;
+    justify-content: space-between;
     gap: 8px;
     margin-bottom: 8px;
+}
+
+.rivalry-controls .evolution-tabs {
+    margin-bottom: 0;
 }
 
 .rivalry-map-container {
     position: relative;
     width: 100%;
-    min-height: 360px;
+    min-height: 400px;
     margin: 16px 0;
     background: rgba(0, 0, 0, 0.35);
     border: 2px solid rgba(110, 90, 150, 0.6);
@@ -2781,7 +2785,7 @@ section.arcade-panel::before { opacity: 0.3; }
 
 .rivalry-map {
     width: 100%;
-    min-height: 360px;
+    min-height: 400px;
     display: block;
 }
 
@@ -2800,6 +2804,25 @@ section.arcade-panel::before { opacity: 0.3; }
 }
 
 .rivalry-map-tooltip.hidden { display: none; }
+
+.rivalry-node { cursor: pointer; }
+.rivalry-map--focused .rivalry-node:not(.is-selected) { opacity: 0.45; }
+
+.rivalry-edge-group { transition: opacity 0.15s; }
+.rivalry-map--focused .rivalry-edge-group:not(.is-focused) { opacity: 0.06; }
+
+.rivalry-edge-label {
+    display: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    fill: var(--text);
+    stroke: #0d0b16;
+    stroke-width: 3px;
+    paint-order: stroke;
+    pointer-events: none;
+}
+.rivalry-edge-group.is-focused .rivalry-edge-label { display: inline; }
 
 .combat-profiles {
     display: grid;
@@ -2953,6 +2976,8 @@ section.arcade-panel::before { opacity: 0.3; }
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
+    overscroll-behavior: none;
+    touch-action: none;
 }
 
 #app-overlays .date-picker-popover.active,
@@ -3069,11 +3094,8 @@ section.arcade-panel::before { opacity: 0.3; }
     color: var(--gold);
 }
 
-.live-button {
-    position: fixed;
-    right: max(16px, env(safe-area-inset-right));
-    bottom: max(16px, env(safe-area-inset-bottom));
-    z-index: 10003;
+.live-button,
+.live-popin-title {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -3082,12 +3104,40 @@ section.arcade-panel::before { opacity: 0.3; }
     border: 3px solid #c0392b;
     color: #fff7f7;
     font-family: 'Press Start 2P', cursive;
-    cursor: pointer;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55), 0 0 18px rgba(192, 57, 43, 0.35);
 }
 
-.live-button.is-hidden {
+.live-button {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 10003;
+    cursor: pointer;
+}
+
+.live-button.is-hidden,
+html.live-popin-open #live-button {
     display: none;
+}
+
+html.live-popin-open {
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
+html.live-popin-open body {
+    position: fixed;
+    left: 0;
+    right: 0;
+    width: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+}
+
+.live-popin-title {
+    width: fit-content;
+    margin: 0 auto 12px;
+    cursor: default;
 }
 
 .live-button-dot {
@@ -3135,6 +3185,7 @@ section.arcade-panel::before { opacity: 0.3; }
     width: min(1100px, 94vw);
     max-height: 88vh;
     overflow-y: auto;
+    overscroll-behavior: contain;
     background: rgba(20, 12, 35, 0.98);
     border: 4px solid var(--border);
     padding: 32px 20px 20px;

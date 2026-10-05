@@ -1074,6 +1074,7 @@ var ANCHOR_HASH_MAP = {
     'cette-semaine': 'records',
     'podium': 'podium',
     'archives': 'derniere-soiree',
+    'fiches': 'fiches',
     'combat': 'combat',
     'fleches': 'combat',
     'parcours': 'parcours',
@@ -1089,6 +1090,7 @@ var SECTION_NAV_MAP = {
     'records': 'records',
     'podium': 'podium',
     'derniere-soiree': 'archives',
+    'fiches': 'fiches',
     'combat': 'combat',
     'parcours': 'parcours'
 };
@@ -1179,18 +1181,19 @@ function initScrollSpy() {
     }
 
     var offset = getScrollOffsetTop();
+    var visibleHeights = {};
     var observer = new IntersectionObserver(function(entries) {
-        var visible = entries.filter(function(entry) {
-            return entry.isIntersecting;
-        }).sort(function(a, b) {
-            return b.intersectionRatio - a.intersectionRatio;
+        entries.forEach(function(entry) {
+            visibleHeights[entry.target.id] = entry.isIntersecting ? entry.intersectionRect.height : 0;
         });
-        if (!visible.length) {
-            return;
-        }
-        var navHash = SECTION_NAV_MAP[visible[0].target.id];
-        if (navHash) {
-            setActiveNav(navHash);
+        var bestId = null;
+        Object.keys(visibleHeights).forEach(function(id) {
+            if (visibleHeights[id] > 0 && (!bestId || visibleHeights[id] > visibleHeights[bestId])) {
+                bestId = id;
+            }
+        });
+        if (bestId && SECTION_NAV_MAP[bestId]) {
+            setActiveNav(SECTION_NAV_MAP[bestId]);
         }
     }, {
         rootMargin: '-' + offset + 'px 0px -55% 0px',
@@ -1245,7 +1248,7 @@ function initToggleKillMatrix() {
 }
 
 function initEvolutionTabs() {
-    var tabs = document.querySelectorAll('.evolution-tab');
+    var tabs = document.querySelectorAll('.evolution-tab[data-tab]');
     var panels = document.querySelectorAll('.evolution-tab-panel');
     if (!tabs.length) {
         return;
@@ -2031,7 +2034,38 @@ function initOverlayPortal() {
         backdrop.addEventListener('click', function() {
             closeAllOverlays();
         });
+        backdrop.addEventListener('wheel', function(e) {
+            if (document.documentElement.classList.contains('live-popin-open')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        backdrop.addEventListener('touchmove', function(e) {
+            if (document.documentElement.classList.contains('live-popin-open')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     }
+}
+
+var liveScrollLockY = null;
+
+function setLivePageScrollLocked(locked) {
+    if (locked) {
+        if (liveScrollLockY == null) {
+            liveScrollLockY = window.scrollY;
+        }
+        document.documentElement.classList.add('live-popin-open');
+        document.body.style.top = '-' + liveScrollLockY + 'px';
+        return;
+    }
+    document.documentElement.classList.remove('live-popin-open');
+    if (liveScrollLockY == null) {
+        return;
+    }
+    var y = liveScrollLockY;
+    liveScrollLockY = null;
+    document.body.style.top = '';
+    window.scrollTo(0, y);
 }
 
 function updateOverlayBackdrop() {
@@ -2045,6 +2079,13 @@ function updateOverlayBackdrop() {
         document.getElementById('live-popin').classList.contains('active');
     var infoOpen = document.querySelector('.info-bubble.active');
     var open = popoverOpen || liveOpen || infoOpen;
+    setLivePageScrollLocked(!!liveOpen);
+    var liveBtn = document.getElementById('live-button');
+    if (liveBtn) {
+        var liveVisible = !!liveState.session && !liveOpen;
+        liveBtn.classList.toggle('is-hidden', !liveVisible);
+        liveBtn.setAttribute('aria-hidden', liveVisible ? 'false' : 'true');
+    }
     backdrop.classList.toggle('active', !!open);
     backdrop.setAttribute('aria-hidden', open ? 'false' : 'true');
 }
@@ -2147,36 +2188,165 @@ function initInfoBubbles() {
     });
 }
 
-function updateKillRelationshipsTable(useTotals) {
+var KILL_MODE_SUBTITLES = {
+    avg: 'Moyenne de kills par partie',
+    totals: 'Nombre total de kills'
+};
+var killMode = 'avg';
+
+function formatKillValue(mode, value) {
+    if (mode === 'totals') { return String(value); }
+    return value.toFixed(2);
+}
+
+function updateKillRelationshipsTable(mode) {
     const subtitle = document.getElementById('kill-relationships-subtitle');
     if (subtitle) {
-        subtitle.textContent = useTotals ? 'Nombre total de kills' : 'Moyenne de kills par partie';
+        subtitle.textContent = KILL_MODE_SUBTITLES[mode] + ' — survolez un joueur pour voir ses flèches';
     }
     const cells = document.querySelectorAll('#kill-relationships-table .kill-cell');
     cells.forEach(function(cell) {
-        const avg = parseFloat(cell.getAttribute('data-avg')) || 0;
-        const total = parseInt(cell.getAttribute('data-total'), 10) || 0;
-        const maxAvg = parseFloat(cell.getAttribute('data-max-avg')) || 1;
-        const maxTotal = parseInt(cell.getAttribute('data-max-total'), 10) || 1;
-        const value = useTotals ? total : avg;
-        const maxVal = useTotals ? maxTotal : maxAvg;
-        cell.textContent = value > 0 ? (useTotals ? String(value) : value.toFixed(2)) : '-';
+        const useTotals = mode === 'totals';
+        const value = useTotals
+            ? parseInt(cell.getAttribute('data-total'), 10) || 0
+            : parseFloat(cell.getAttribute('data-avg')) || 0;
+        const maxVal = useTotals
+            ? parseInt(cell.getAttribute('data-max-total'), 10) || 1
+            : parseFloat(cell.getAttribute('data-max-avg')) || 1;
         const intensity = maxVal > 0 ? Math.min(value / maxVal, 1) : 0;
+        cell.textContent = value > 0 ? formatKillValue(mode, value) : '-';
         const hue = (1 - intensity) * 120;
         cell.style.backgroundColor = 'hsla(' + hue + ', 70%, 52%, 0.40)';
     });
 }
 
-function initKillRelationshipsTotalsToggle() {
-    const toggle = document.getElementById('kill-relationships-totals-toggle');
-    if (!toggle) return;
-    toggle.addEventListener('change', function() {
-        updateKillRelationshipsTable(toggle.checked);
-        renderRivalryMap(toggle.checked);
+function initKillModeTabs() {
+    var tabs = document.querySelectorAll('.evolution-tab[data-kill-mode]');
+    tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+            killMode = tab.getAttribute('data-kill-mode');
+            tabs.forEach(function(t) {
+                var active = t === tab;
+                t.classList.toggle('active', active);
+                t.setAttribute('aria-selected', active ? 'true' : 'false');
+            });
+            updateKillRelationshipsTable(killMode);
+            renderRivalryMap(killMode);
+        });
     });
 }
 
-function renderRivalryMap(useTotals) {
+var rivalryLockedPlayer = null;
+var rivalryLayout = null;
+var rivalryPull = {};
+var rivalryAnim = null;
+var RIVALRY_NS = 'http://www.w3.org/2000/svg';
+var RIVALRY_NODE_R = 28;
+var RIVALRY_FOCUS_BUMP = 58;
+var RIVALRY_ANIM_MS = 320;
+
+function rivalryEase(t) {
+    return 1 - Math.pow(1 - t, 3);
+}
+
+function rivalryNodePos(player, amounts) {
+    var p = rivalryLayout && rivalryLayout.positions[player];
+    if (!p) { return { x: 0, y: 0, r: RIVALRY_NODE_R, scale: 1 }; }
+    var t = (amounts && amounts[player]) || 0;
+    var dx = p.x - rivalryLayout.cx;
+    var dy = p.y - rivalryLayout.cy;
+    var len = Math.sqrt(dx * dx + dy * dy) || 1;
+    return {
+        x: p.x + dx / len * RIVALRY_FOCUS_BUMP * t,
+        y: p.y + dy / len * RIVALRY_FOCUS_BUMP * t,
+        r: RIVALRY_NODE_R * (1 + 0.15 * t),
+        scale: 1 + 0.12 * t
+    };
+}
+
+function setRivalryEdgeGeometry(edge, amounts) {
+    var killer = edge.getAttribute('data-killer');
+    var victim = edge.getAttribute('data-victim');
+    var width = parseFloat(edge.getAttribute('data-width')) || 2;
+    var from = rivalryNodePos(killer, amounts);
+    var to = rivalryNodePos(victim, amounts);
+    var dx = to.x - from.x;
+    var dy = to.y - from.y;
+    var len = Math.sqrt(dx * dx + dy * dy) || 1;
+    var shift = width / 2 + 1.5;
+    var px = -(dy / len) * shift;
+    var py = (dx / len) * shift;
+    var x1 = from.x + (dx / len) * from.r + px;
+    var y1 = from.y + (dy / len) * from.r + py;
+    var x2 = to.x - (dx / len) * (to.r + 4) + px;
+    var y2 = to.y - (dy / len) * (to.r + 4) + py;
+    var line = edge.querySelector('line');
+    var label = edge.querySelector('.rivalry-edge-label');
+    if (line) {
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+    }
+    if (label) {
+        label.setAttribute('x', x1 + (x2 - x1) * 0.6 - (dy / len) * (width / 2 + 8));
+        label.setAttribute('y', y1 + (y2 - y1) * 0.6 + (dx / len) * (width / 2 + 8) + 4);
+    }
+}
+
+function paintRivalryLayout(svg, amounts) {
+    if (!rivalryLayout || !svg) { return; }
+    svg.querySelectorAll('.rivalry-node').forEach(function(node) {
+        var name = node.getAttribute('data-player');
+        var pos = rivalryNodePos(name, amounts);
+        node.setAttribute('transform', 'translate(' + pos.x + ',' + pos.y + ') scale(' + pos.scale + ')');
+    });
+    svg.querySelectorAll('.rivalry-edge-group').forEach(function(edge) {
+        setRivalryEdgeGeometry(edge, amounts);
+    });
+}
+
+function applyRivalryLayout(svg, pulled, instant) {
+    if (!rivalryLayout || !svg) { return; }
+    var from = {};
+    var to = {};
+    Object.keys(rivalryLayout.positions).forEach(function(name) {
+        from[name] = rivalryPull[name] || 0;
+        to[name] = name === pulled ? 1 : 0;
+    });
+    var unchanged = Object.keys(to).every(function(name) {
+        return Math.abs(from[name] - to[name]) < 0.001;
+    });
+    if (rivalryAnim) {
+        cancelAnimationFrame(rivalryAnim);
+        rivalryAnim = null;
+    }
+    if (instant || unchanged) {
+        rivalryPull = to;
+        paintRivalryLayout(svg, rivalryPull);
+        return;
+    }
+    var start = performance.now();
+    function frame(now) {
+        var t = Math.min(1, (now - start) / RIVALRY_ANIM_MS);
+        var e = rivalryEase(t);
+        var amounts = {};
+        Object.keys(to).forEach(function(name) {
+            amounts[name] = from[name] + (to[name] - from[name]) * e;
+        });
+        rivalryPull = amounts;
+        paintRivalryLayout(svg, amounts);
+        if (t < 1) {
+            rivalryAnim = requestAnimationFrame(frame);
+        } else {
+            rivalryAnim = null;
+            rivalryPull = to;
+        }
+    }
+    rivalryAnim = requestAnimationFrame(frame);
+}
+
+function renderRivalryMap(mode) {
     if (typeof hasDetailedStats !== 'undefined' && !hasDetailedStats) {
         return;
     }
@@ -2190,26 +2360,33 @@ function renderRivalryMap(useTotals) {
         return;
     }
 
-    var avgData = typeof killRelationshipsData !== 'undefined' ? killRelationshipsData : {};
-    var totalData = typeof killRelationshipsTotalsData !== 'undefined' ? killRelationshipsTotalsData : {};
-    var data = useTotals ? totalData : avgData;
-    var valueLabel = useTotals ? ' kills total' : '/partie';
+    var dataByMode = {
+        avg: typeof killRelationshipsData !== 'undefined' ? killRelationshipsData : {},
+        totals: typeof killRelationshipsTotalsData !== 'undefined' ? killRelationshipsTotalsData : {}
+    };
+    var data = dataByMode[mode] || dataByMode.avg;
+    var valueLabel = { avg: '/partie', totals: ' kills total' }[mode] || '';
 
     var w = Math.max(mapContainer.clientWidth || 600, 320);
-    var h = Math.max(360, players.length * 55);
+    var h = Math.max(400, players.length * 58);
     svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
     svg.innerHTML = '';
+    if (rivalryAnim) {
+        cancelAnimationFrame(rivalryAnim);
+        rivalryAnim = null;
+    }
 
     var defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
     var marker = document.createElementNS('http://www.w3.org/2000/svg', 'marker');
     marker.setAttribute('id', 'arrowhead');
-    marker.setAttribute('markerWidth', '8');
-    marker.setAttribute('markerHeight', '6');
-    marker.setAttribute('refX', '7');
-    marker.setAttribute('refY', '3');
+    marker.setAttribute('markerUnits', 'userSpaceOnUse');
+    marker.setAttribute('markerWidth', '14');
+    marker.setAttribute('markerHeight', '12');
+    marker.setAttribute('refX', '12');
+    marker.setAttribute('refY', '6');
     marker.setAttribute('orient', 'auto');
     var arrowPoly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    arrowPoly.setAttribute('points', '0 0, 8 3, 0 6');
+    arrowPoly.setAttribute('points', '0 0, 14 6, 0 12');
     arrowPoly.setAttribute('fill', 'context-stroke');
     marker.appendChild(arrowPoly);
     defs.appendChild(marker);
@@ -2217,7 +2394,7 @@ function renderRivalryMap(useTotals) {
 
     var cx = w / 2;
     var cy = h / 2;
-    var radius = Math.min(w, h) * 0.34;
+    var radius = Math.min(w, h) * 0.30;
     var positions = {};
     var n = players.length;
 
@@ -2228,6 +2405,7 @@ function renderRivalryMap(useTotals) {
             y: cy + radius * Math.sin(angle)
         };
     });
+    rivalryLayout = { cx: cx, cy: cy, positions: positions };
 
     var maxVal = 0;
     players.forEach(function(killer) {
@@ -2247,32 +2425,20 @@ function renderRivalryMap(useTotals) {
             var val = (data[killer] && data[killer][victim]) || 0;
             if (val <= 0) { return; }
 
-            var from = positions[killer];
-            var to = positions[victim];
-            var intensity = val / maxVal;
-            var dx = to.x - from.x;
-            var dy = to.y - from.y;
-            var len = Math.sqrt(dx * dx + dy * dy) || 1;
-            var nodeR = 28;
-            var x1 = from.x + (dx / len) * nodeR;
-            var y1 = from.y + (dy / len) * nodeR;
-            var x2 = to.x - (dx / len) * (nodeR + 4);
-            var y2 = to.y - (dy / len) * (nodeR + 4);
+            var intensity = Math.min(val / maxVal, 1);
             var hue = (1 - intensity) * 120;
+            var alpha = 0.35 + intensity * 0.55;
+            var width = 1 + intensity * 5;
 
-            var line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            line.setAttribute('x1', x1);
-            line.setAttribute('y1', y1);
-            line.setAttribute('x2', x2);
-            line.setAttribute('y2', y2);
-            line.setAttribute('stroke', 'hsla(' + hue + ', 80%, 50%, ' + (0.35 + intensity * 0.55) + ')');
-            line.setAttribute('stroke-width', (1 + intensity * 5).toFixed(1));
+            var line = document.createElementNS(RIVALRY_NS, 'line');
+            line.setAttribute('stroke', 'hsla(' + hue + ', 85%, 52%, ' + alpha + ')');
+            line.setAttribute('stroke-width', width.toFixed(1));
             line.setAttribute('marker-end', 'url(#arrowhead)');
             line.classList.add('rivalry-edge');
             line.addEventListener('mouseenter', function(e) {
                 if (tooltip) {
                     tooltip.classList.remove('hidden');
-                    tooltip.textContent = killer + ' → ' + victim + ': ' + (useTotals ? val : val.toFixed(2)) + valueLabel;
+                    tooltip.textContent = killer + ' → ' + victim + ': ' + formatKillValue(mode, val) + valueLabel;
                     tooltip.style.left = (e.offsetX + 12) + 'px';
                     tooltip.style.top = (e.offsetY + 12) + 'px';
                 }
@@ -2280,58 +2446,104 @@ function renderRivalryMap(useTotals) {
             line.addEventListener('mouseleave', function() {
                 if (tooltip) { tooltip.classList.add('hidden'); }
             });
-            svg.appendChild(line);
+
+            var label = document.createElementNS(RIVALRY_NS, 'text');
+            label.setAttribute('text-anchor', 'middle');
+            label.classList.add('rivalry-edge-label');
+            label.textContent = formatKillValue(mode, val);
+
+            var edge = document.createElementNS(RIVALRY_NS, 'g');
+            edge.classList.add('rivalry-edge-group');
+            edge.setAttribute('data-killer', killer);
+            edge.setAttribute('data-victim', victim);
+            edge.setAttribute('data-width', width.toFixed(1));
+            edge.appendChild(line);
+            edge.appendChild(label);
+            svg.appendChild(edge);
+            setRivalryEdgeGeometry(edge, rivalryPull);
         });
     });
 
     players.forEach(function(player) {
-        var pos = positions[player];
         var color = getPlayerColor(player);
-        var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        var g = document.createElementNS(RIVALRY_NS, 'g');
+        g.classList.add('rivalry-node');
+        g.setAttribute('data-player', player);
+        g.addEventListener('mouseenter', function() { applyRivalryFocus(svg, player); });
+        g.addEventListener('mouseleave', function() { applyRivalryFocus(svg, rivalryLockedPlayer); });
+        g.addEventListener('click', function(e) {
+            e.stopPropagation();
+            rivalryLockedPlayer = rivalryLockedPlayer === player ? null : player;
+            applyRivalryFocus(svg, rivalryLockedPlayer || player);
+        });
 
-        var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', pos.x);
-        circle.setAttribute('cy', pos.y);
+        var hit = document.createElementNS(RIVALRY_NS, 'circle');
+        hit.setAttribute('r', '34');
+        hit.setAttribute('fill', 'transparent');
+        g.appendChild(hit);
+
+        var circle = document.createElementNS(RIVALRY_NS, 'circle');
         circle.setAttribute('r', '26');
         circle.setAttribute('fill', color);
         circle.setAttribute('stroke', '#f2c94c');
         circle.setAttribute('stroke-width', '3');
         circle.classList.add('rivalry-node-circle');
+        g.appendChild(circle);
 
-        var text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        text.setAttribute('x', pos.x);
-        text.setAttribute('y', pos.y + 5);
-        text.setAttribute('text-anchor', 'middle');
-        text.setAttribute('fill', '#1a1a2e');
-        text.setAttribute('font-family', 'Press Start 2P, cursive');
-        text.setAttribute('font-size', '14');
-        text.textContent = player.charAt(0);
+        var letter = document.createElementNS(RIVALRY_NS, 'text');
+        letter.setAttribute('y', '5');
+        letter.setAttribute('text-anchor', 'middle');
+        letter.setAttribute('fill', '#1a1a2e');
+        letter.setAttribute('font-family', 'Press Start 2P, cursive');
+        letter.setAttribute('font-size', '14');
+        letter.textContent = player.charAt(0);
+        g.appendChild(letter);
 
-        var name = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-        name.setAttribute('x', pos.x);
-        name.setAttribute('y', pos.y + 42);
+        var name = document.createElementNS(RIVALRY_NS, 'text');
+        name.setAttribute('y', '42');
         name.setAttribute('text-anchor', 'middle');
         name.setAttribute('fill', color);
         name.setAttribute('font-family', 'Inter, sans-serif');
         name.setAttribute('font-size', '11');
         name.setAttribute('font-weight', 'bold');
+        name.classList.add('rivalry-node-name');
         name.textContent = player.length > 8 ? player.substring(0, 7) + '…' : player;
-
-        g.appendChild(circle);
-        g.appendChild(text);
         g.appendChild(name);
         svg.appendChild(g);
     });
+
+    applyRivalryFocus(svg, rivalryLockedPlayer, true);
+}
+
+function applyRivalryFocus(svg, player, instant) {
+    svg.classList.toggle('rivalry-map--focused', !!player);
+    svg.querySelectorAll('.rivalry-edge-group').forEach(function(edge) {
+        var involved = edge.getAttribute('data-killer') === player
+            || edge.getAttribute('data-victim') === player;
+        edge.classList.toggle('is-focused', involved);
+        edge.classList.toggle('is-outgoing', edge.getAttribute('data-killer') === player);
+        edge.classList.toggle('is-incoming', edge.getAttribute('data-victim') === player);
+    });
+    svg.querySelectorAll('.rivalry-node').forEach(function(node) {
+        node.classList.toggle('is-selected', node.getAttribute('data-player') === player);
+    });
+    applyRivalryLayout(svg, rivalryLockedPlayer, instant);
 }
 
 function initRivalryMap() {
     if (typeof hasDetailedStats !== 'undefined' && !hasDetailedStats) {
         return;
     }
-    var toggle = document.getElementById('kill-relationships-totals-toggle');
-    renderRivalryMap(toggle ? toggle.checked : false);
+    var svg = document.getElementById('rivalry-map');
+    if (svg) {
+        svg.addEventListener('click', function() {
+            rivalryLockedPlayer = null;
+            applyRivalryFocus(svg, null);
+        });
+    }
+    renderRivalryMap(killMode);
     window.addEventListener('resize', function() {
-        renderRivalryMap(toggle ? toggle.checked : false);
+        renderRivalryMap(killMode);
     });
 }
 
@@ -2475,17 +2687,18 @@ var liveState = {
 };
 
 function setLiveButtonVisible(session) {
+    document.querySelectorAll('#live-button .live-button-group, #live-popin-title .live-button-group').forEach(function(group) {
+        group.textContent = session ? (session.id || '') : '';
+    });
     var btn = document.getElementById('live-button');
     if (!btn) {
         return;
     }
-    var visible = !!session;
+    var popin = document.getElementById('live-popin');
+    var popinOpen = popin && popin.classList.contains('active');
+    var visible = !!session && !popinOpen;
     btn.classList.toggle('is-hidden', !visible);
     btn.setAttribute('aria-hidden', visible ? 'false' : 'true');
-    var group = btn.querySelector('.live-button-group');
-    if (group) {
-        group.textContent = session ? (session.id || '') : '';
-    }
 }
 
 function formatLiveUpdated(session, from) {
@@ -2656,7 +2869,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initInfoBubbles();
     initLiveSession();
     if (hasDetailedStats) {
-        initKillRelationshipsTotalsToggle();
+        initKillModeTabs();
         initRivalryMap();
     }
     initAnchorOnLoad();
