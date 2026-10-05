@@ -17,7 +17,6 @@ AWARDS = (
 
 CLOSE_MARGIN = 1
 BLOWOUT_MARGIN = 3
-HEADLINE_MIN_MARGIN = 2
 
 
 def _session_hour(session: Dict[str, Any]) -> Optional[int]:
@@ -115,21 +114,6 @@ def _ahead_matrix(matches: List[Dict[str, Any]]) -> Dict[str, Dict[str, int]]:
     return matrix
 
 
-def _headline(matches: List[Dict[str, Any]]) -> Optional[Dict[str, Any]]:
-    best = None
-    for index, match in enumerate(matches, start=1):
-        if not match['winner'] or match['margin'] < HEADLINE_MIN_MARGIN:
-            continue
-        if best is None or match['margin'] > best['margin']:
-            best = {
-                'index': index,
-                'winner': match['winner'],
-                'margin': match['margin'],
-                'scores': match['scores'],
-            }
-    return best
-
-
 def _target(matches: List[Dict[str, Any]]) -> Optional[int]:
     """Points needed to win: the source has no field, so use the most common winning score."""
     counts: Dict[int, int] = {}
@@ -211,6 +195,5 @@ def build_session_details(session: Dict[str, Any]) -> Dict[str, Any]:
         'scoreboard': scoreboard,
         'lead_changes': lead_changes,
         'ahead_matrix': _ahead_matrix(matches),
-        'headline': _headline(matches),
         'target': _target(matches),
     }

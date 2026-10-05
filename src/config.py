@@ -43,6 +43,15 @@ PLAYER_TO_COLOR = {
     'ZAYA': '#FF3333',
 }
 
+PLAYER_TO_PORTRAIT = {
+    'BENOIT': '/images/altCyan-portrait-selected.png',
+    'MEHDI': '/images/pink-portrait-selected.png',
+    'LOUIS': '/images/altOrange-portrait-selected.png',
+    'ERIC': '/images/purple-portrait-selected.png',
+    'DAVID': '/images/white-portrait-selected.png',
+    'JULIEN': '/images/green-portrait-selected.png',
+}
+
 # Sheet names that should display as a declared player.
 PLAYER_NAME_ALIASES = {
     'ALEXANDRE': 'ALEX',
@@ -68,4 +77,10 @@ def get_player_color(player_name):
     if canonical:
         return PLAYER_TO_COLOR[canonical]
     return '#FFD700'
+
+
+def get_player_portrait(player_name):
+    """Portrait image URL for a player, or None when none is available."""
+    canonical = canonical_player_name(player_name)
+    return PLAYER_TO_PORTRAIT.get(canonical) if canonical else None
 

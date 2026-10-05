@@ -703,6 +703,21 @@ def test_detailed_stats_use_per_session_values_not_cumulative_total():
         assert count == expected_killed_by[player], player
 
 
+def _kill_session(date, wins, killed_by):
+    today = {p: {"kill": 0, "death": 0, "self": 0, "killBy": killed_by.get(p, {})} for p in wins}
+    return {"date": date, "data": {"todayWin": wins, "today": today, "total": today}}
+
+
+def test_kill_relationship_average_counts_sessions_without_kills():
+    sessions = [
+        _kill_session("2026-01-01", {"LOUIS": 6, "ERIC": 4}, {"ERIC": {"LOUIS": 10}}),
+        _kill_session("2026-01-02", {"LOUIS": 7, "ERIC": 3}, {}),
+    ]
+    avg, totals = SessionStatsManager(sessions).get_kill_relationships()
+    assert totals["LOUIS"]["ERIC"] == 10
+    assert avg["LOUIS"]["ERIC"] == 10 / 20
+
+
 if __name__ == "__main__":
     g = globals()
     for _name in sorted(g):

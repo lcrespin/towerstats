@@ -914,6 +914,7 @@ class SessionStatsManager:
                     kill_by = stats['detailed'].get('killBy', {})
                     for killer, count in kill_by.items():
                         total_kills[killer][player] += count
+                    for killer in set(players) | set(kill_by):
                         total_games[killer][player] += total_games_in_session
 
         relationships_avg = defaultdict(dict)

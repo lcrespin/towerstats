@@ -44,7 +44,6 @@ def test_legacy_session_only_has_hour_and_match_count():
         "scoreboard": [],
         "lead_changes": 0,
         "ahead_matrix": {},
-        "headline": None,
         "target": None,
     }
 
@@ -115,7 +114,7 @@ def test_target_is_most_common_winning_score():
     assert details["target"] == 10
 
 
-def test_scoreboard_win_matrix_and_headline():
+def test_scoreboard_and_win_matrix():
     details = build_session_details(_session({
         "todayWin": {"ERIC": 2, "LOUIS": 1, "DAVID": 1},
         "totalWin": {"ERIC": 2, "LOUIS": 1, "DAVID": 1},
@@ -132,9 +131,7 @@ def test_scoreboard_win_matrix_and_headline():
     assert details["ahead_matrix"]["ERIC"] == {"LOUIS": 3, "DAVID": 3}
     assert details["ahead_matrix"]["LOUIS"] == {"ERIC": 1, "DAVID": 3}
     assert details["ahead_matrix"]["DAVID"] == {"ERIC": 1, "LOUIS": 1}
-    assert details["headline"]["index"] == 3
-    assert details["headline"]["winner"] == "ERIC"
-    assert details["headline"]["margin"] == 7
+    assert "headline" not in details
 
 
 def test_new_awards_from_session_story():

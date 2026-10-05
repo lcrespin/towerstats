@@ -140,17 +140,38 @@
         </button>
         {%- endmacro %}
 
+        {% macro player_avatar(name) -%}
+        {% set portrait = get_player_portrait(name) %}
+        {% if portrait %}
+        <div class="player-avatar player-avatar--portrait" style="--player-color: {{ get_player_color(name) }};"><img src="{{ portrait }}" alt="{{ name }}"></div>
+        {% else %}
+        <div class="player-avatar" style="--player-color: {{ get_player_color(name) }};">{{ name[0] }}</div>
+        {% endif %}
+        {%- endmacro %}
+
         {% macro pixel_podium(rows, value_index, fmt, suffix='', detail='', podium_id=none) -%}
-        <div class="pixel-podium"{% if podium_id %} id="{{ podium_id }}"{% endif %}>
+        {% set ns = namespace(steps=[]) %}
+        {% for item in rows %}
+            {% if ns.steps and ns.steps[-1][0][0] == item[0] %}
+                {% set ns.steps = ns.steps[:-1] + [ns.steps[-1] + [item]] %}
+            {% elif ns.steps|length < 3 %}
+                {% set ns.steps = ns.steps + [[item]] %}
+            {% endif %}
+        {% endfor %}
+        <div class="pixel-podium pixel-podium--leaders"{% if podium_id %} id="{{ podium_id }}"{% endif %}>
             {% for p_rank in [2, 1, 3] %}
-            {% set item = rows[p_rank - 1] if rows|length >= p_rank else none %}
-            <div class="pixel-podium-slot pixel-podium-slot--{{ p_rank }}{% if not item %} pixel-podium-slot--empty{% endif %}">
-                {% if item %}
-                <div class="pixel-podium-medal">{{ stats_manager.get_medal(item[0]) }}</div>
-                <div class="player-avatar" style="--player-color: {{ get_player_color(item[1]) }};">{{ item[1][0] }}</div>
-                <div class="pixel-podium-name" style="color: {{ get_player_color(item[1]) }};">{{ item[1] }}</div>
-                <div class="pixel-podium-value led-value">{{ fmt % item[value_index] }}{{ suffix }}</div>
-                <div class="pixel-podium-detail">{% if detail == 'ratio' %}{{ item[2] }}/{{ item[3] }}{% else %}{{ detail }}{% endif %}</div>
+            {% set step = ns.steps[p_rank - 1] if ns.steps|length >= p_rank else none %}
+            <div class="pixel-podium-slot pixel-podium-slot--{{ p_rank }}{% if not step %} pixel-podium-slot--empty{% elif step|length > 1 %} pixel-podium-slot--shared{% endif %}">
+                {% if step %}
+                <div class="pixel-podium-players" style="--count: {{ step|length }};">
+                    {% for item in step %}{{ player_avatar(item[1]) }}{% endfor %}
+                    <div class="pixel-podium-medal">{{ stats_manager.get_medal(p_rank) }}</div>
+                    {% for item in step %}
+                    <div class="pixel-podium-name" style="color: {{ get_player_color(item[1]) }};">{{ item[1] }}</div>
+                    {% endfor %}
+                </div>
+                <div class="pixel-podium-value led-value">{{ fmt % step[0][value_index] }}{{ suffix }}</div>
+                <div class="pixel-podium-detail">{% if detail == 'ratio' %}{% for item in step %}{{ item[2] }}/{{ item[3] }}{% if not loop.last %} · {% endif %}{% endfor %}{% else %}{{ detail }}{% endif %}</div>
                 {% endif %}
             </div>
             {% endfor %}
@@ -614,10 +635,6 @@
                     <span>🎯 Guerre des flèches</span>
                     <button type="button" class="info-button info-button-inline" data-info="kill-relationships-info" aria-label="Aide guerre des flèches">?</button>
                 </h3>
-                <div class="flex items-center gap-2" style="color: var(--text);">
-                    <input type="checkbox" id="kill-relationships-totals-toggle" class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: var(--gold);">
-                    <label for="kill-relationships-totals-toggle" class="form-label mb-0 cursor-pointer">Totaux</label>
-                </div>
             </div>
             <p class="section-tagline">Qui cible qui ? {{ taglines.fleches }}</p>
             <div class="text-center mb-3 sm:mb-4">
@@ -636,6 +653,12 @@
             </div>
             <button id="toggle-kill-matrix" class="toggle-button w-full sm:w-auto">▼ Voir la matrice détaillée</button>
             <div id="kill-matrix-container" class="hidden overflow-x-auto mt-4">
+                <div class="rivalry-controls">
+                    <div class="flex items-center gap-2" style="color: var(--text);">
+                        <input type="checkbox" id="kill-relationships-totals-toggle" class="w-4 h-4 sm:w-5 sm:h-5 cursor-pointer" style="accent-color: var(--gold);">
+                        <label for="kill-relationships-totals-toggle" class="form-label mb-0 cursor-pointer">Totaux</label>
+                    </div>
+                </div>
                 <table class="ranking-table w-full txt-xs" id="kill-relationships-table">
                     <thead>
                         <tr>
@@ -970,6 +993,8 @@
         // Données globales pour JavaScript
         const rankingsByGroup = {{ rankings_by_group|tojson }};
         const playerColors = {{ player_colors|tojson }};
+        const playerPortraits = {{ player_portraits|tojson }};
+        const isCareerView = {{ is_career_view|default(false)|tojson }};
         const allSessions = {{ all_sessions_data|tojson }};
         const latestSessions = {{ latest_sessions_data|tojson }};
         const liveSession = {{ live_session|tojson }};

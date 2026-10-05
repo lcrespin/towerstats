@@ -1024,6 +1024,7 @@ section h2 {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     gap: 8px;
+    margin-bottom: 16px;
 }
 
 .session-award {
@@ -1049,21 +1050,6 @@ section h2 {
 .ranking-table.session-duel-table td.session-duel-self {
     background: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255, 255, 255, 0.05) 4px, rgba(255, 255, 255, 0.05) 8px);
     color: var(--text-muted);
-}
-
-.session-headline {
-    background: rgba(242, 201, 76, 0.08);
-    border: 1px solid rgba(242, 201, 76, 0.35);
-    padding: 10px 12px;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--gold);
-}
-
-.session-headline-scores {
-    margin-top: 4px;
-    font-weight: 500;
-    color: var(--text);
 }
 
 .session-scoreboard-chart {
@@ -1099,22 +1085,9 @@ section h2 {
     text-shadow: none;
 }
 
-.session-match-chip--close {
-    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.85), inset 0 0 0 3px #fff;
-}
-
-.session-match-chip--blowout {
-    outline: 2px solid var(--gold);
-    outline-offset: 1px;
-}
-
 .session-match-chip.is-active {
     transform: translateY(-2px);
     box-shadow: 0 0 0 2px var(--gold), 0 4px 10px rgba(0, 0, 0, 0.6);
-}
-
-.session-match-chip--close.is-active {
-    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.85), inset 0 0 0 3px #fff, 0 0 0 2px var(--gold), 0 4px 10px rgba(0, 0, 0, 0.6);
 }
 
 .match-coins {
@@ -1149,8 +1122,10 @@ section h2 {
 
 .match-crown {
     display: inline-block;
+    flex-shrink: 0;
     width: 14px;
     font-size: 10px;
+    line-height: 1;
     text-align: center;
 }
 
@@ -1251,6 +1226,29 @@ section h2 {
     flex-shrink: 0;
 }
 
+.match-controls {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.match-control {
+    min-width: 36px;
+    height: 28px;
+    padding: 0 10px;
+    font-size: 16px;
+    line-height: 1;
+    color: var(--gold);
+    background: rgba(0, 0, 0, 0.35);
+    border: 2px solid var(--border);
+    cursor: pointer;
+}
+
+.match-control:hover:not(:disabled) { border-color: var(--gold); }
+.match-control:disabled { opacity: 0.35; cursor: default; }
+.match-control--play { min-width: 48px; font-size: 13px; }
+
 .match-panel {
     margin-top: 10px;
     padding: 14px 16px;
@@ -1283,6 +1281,34 @@ section h2 {
     width: 80px;
     text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
 }
+
+.h2h-row {
+    display: grid;
+    grid-template-columns: 64px 22px 1fr 22px 64px;
+    gap: 6px;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+    margin: 5px 0;
+}
+
+.h2h-name--left { text-align: right; }
+
+.h2h-count {
+    text-align: center;
+    color: var(--text-muted);
+    font-variant-numeric: tabular-nums;
+}
+
+.h2h-count.is-ahead { color: var(--gold); }
+
+.h2h-bar {
+    display: flex;
+    gap: 2px;
+    height: 8px;
+}
+
+.h2h-bar span { display: block; height: 100%; }
 
 .session-cause-row {
     display: grid;
@@ -2618,8 +2644,19 @@ section.arcade-panel::before { opacity: 0.3; }
 .pixel-podium-slot--2 { order: 1; padding-top: 28px; }
 .pixel-podium-slot--3 { order: 3; padding-top: 44px; }
 .pixel-podium-slot--empty { visibility: hidden; }
+.pixel-podium-slot--shared { max-width: 200px; }
 
-.pixel-podium-medal { font-size: 20px; margin-bottom: 4px; }
+.pixel-podium-players {
+    display: grid;
+    grid-template-columns: repeat(var(--count, 1), auto);
+    justify-content: center;
+    justify-items: center;
+    column-gap: 6px;
+}
+
+.pixel-podium-players .player-avatar { margin-bottom: 2px; }
+
+.pixel-podium-medal { grid-column: 1 / -1; font-size: 20px; line-height: 1; margin-bottom: 4px; }
 
 .player-avatar {
     width: 48px;
@@ -2638,6 +2675,29 @@ section.arcade-panel::before { opacity: 0.3; }
 
 @media (min-width: 640px) {
     .player-avatar { width: 56px; height: 56px; font-size: 22px; }
+}
+
+.player-avatar--portrait {
+    width: 40px;
+    height: 52px;
+    border: none;
+    background: none;
+    box-shadow: none;
+    overflow: hidden;
+    align-items: flex-start;
+    -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 38%, #000 80%, transparent 100%);
+    mask-image: radial-gradient(ellipse 50% 50% at 50% 38%, #000 80%, transparent 100%);
+}
+
+.player-avatar--portrait img {
+    width: 100%;
+    height: auto;
+    display: block;
+    image-rendering: pixelated;
+}
+
+@media (min-width: 640px) {
+    .player-avatar--portrait { width: 48px; height: 62px; }
 }
 
 .pixel-podium-name {
@@ -2662,17 +2722,51 @@ section.arcade-panel::before { opacity: 0.3; }
 .pixel-podium-slot--1::after,
 .pixel-podium-slot--2::after,
 .pixel-podium-slot--3::after {
-    content: '';
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
     margin-top: 8px;
-    background: linear-gradient(180deg, var(--border), #5c2e0a);
-    border: 2px solid var(--gold);
+    font-family: 'Press Start 2P', cursive;
+    font-size: 16px;
+    color: rgba(0, 0, 0, 0.35);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
-.pixel-podium-slot--1::after { height: 72px; }
-.pixel-podium-slot--2::after { height: 52px; }
-.pixel-podium-slot--3::after { height: 36px; }
+.pixel-podium-slot--1::after {
+    content: '1';
+    height: 72px;
+    background: #c9a43a;
+    box-shadow: inset 0 4px 0 #f2c94c, inset 0 -4px 0 #8a6d1f;
+}
+
+.pixel-podium-slot--2::after {
+    content: '2';
+    height: 52px;
+    background: #8d93a6;
+    box-shadow: inset 0 4px 0 #c8cedc, inset 0 -4px 0 #5d6273;
+}
+
+.pixel-podium-slot--3::after {
+    content: '3';
+    height: 36px;
+    background: #a0603a;
+    box-shadow: inset 0 4px 0 #cd7f46, inset 0 -4px 0 #6b3c22;
+}
+
+.pixel-podium--session {
+    margin: 12px 0 16px;
+    min-height: 0;
+}
+
+.rivalry-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-bottom: 8px;
+}
 
 .rivalry-map-container {
     position: relative;

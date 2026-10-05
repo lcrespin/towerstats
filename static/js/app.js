@@ -14,34 +14,79 @@ function getMedal(rank) {
     return '';
 }
 
-function buildPodiumSlotHtml(rank, player, value, detail) {
-    if (!player) {
-        return '<div class="pixel-podium-slot pixel-podium-slot--' + rank + ' pixel-podium-slot--empty"></div>';
-    }
+function getPlayerPortrait(playerName) {
+    if (typeof playerPortraits === 'undefined') return null;
+    return playerPortraits[playerName.toUpperCase()] || null;
+}
+
+function buildPlayerAvatarHtml(player) {
     var color = getPlayerColor(player);
-    return '<div class="pixel-podium-slot pixel-podium-slot--' + rank + '">' +
-        '<div class="pixel-podium-medal">' + getMedal(rank) + '</div>' +
-        '<div class="player-avatar" style="--player-color: ' + color + ';">' + player.charAt(0) + '</div>' +
-        '<div class="pixel-podium-name" style="color: ' + color + ';">' + player + '</div>' +
-        '<div class="pixel-podium-value led-value">' + value + '</div>' +
-        '<div class="pixel-podium-detail">' + detail + '</div>' +
+    var portrait = getPlayerPortrait(player);
+    if (portrait) {
+        return '<div class="player-avatar player-avatar--portrait" style="--player-color: ' + color + ';">' +
+            '<img src="' + portrait + '" alt="' + player + '"></div>';
+    }
+    return '<div class="player-avatar" style="--player-color: ' + color + ';">' + player.charAt(0) + '</div>';
+}
+
+function buildPodiumSlotHtml(position, step) {
+    var cls = 'pixel-podium-slot pixel-podium-slot--' + position;
+    if (!step) {
+        return '<div class="' + cls + ' pixel-podium-slot--empty"></div>';
+    }
+    if (step.length > 1) cls += ' pixel-podium-slot--shared';
+    var details = step.map(function(e) { return e.detail; }).filter(function(d, i, all) {
+        return d && all.indexOf(d) === i;
+    });
+    var avatars = step.map(function(e) { return buildPlayerAvatarHtml(e.player); }).join('');
+    var names = step.map(function(e) {
+        return '<div class="pixel-podium-name" style="color: ' + getPlayerColor(e.player) + ';">' + e.player + '</div>';
+    }).join('');
+    return '<div class="' + cls + '">' +
+        '<div class="pixel-podium-players" style="--count: ' + step.length + ';">' + avatars +
+        '<div class="pixel-podium-medal">' + getMedal(position) + '</div>' + names + '</div>' +
+        '<div class="pixel-podium-value led-value">' + step[0].value + '</div>' +
+        '<div class="pixel-podium-detail">' + details.join(' · ') + '</div>' +
         '</div>';
+}
+
+// entries: [{ player, value, detail, rank }] sorted best first; equal ranks share a step
+function groupPodiumSteps(entries) {
+    var steps = [];
+    entries.forEach(function(e) {
+        var last = steps[steps.length - 1];
+        if (last && last[0].rank === e.rank) {
+            last.push(e);
+        } else if (steps.length < 3) {
+            steps.push([e]);
+        }
+    });
+    return steps;
+}
+
+function buildPodiumSlotsHtml(entries) {
+    var steps = groupPodiumSteps(entries);
+    return [2, 1, 3].map(function(position) {
+        return buildPodiumSlotHtml(position, steps[position - 1]);
+    }).join('');
 }
 
 function renderGroupPodium(ranking) {
     var podium = document.getElementById('group-podium');
     if (!podium) return;
-    var order = [2, 1, 3];
-    var html = '';
-    order.forEach(function(pRank) {
-        var item = ranking[pRank - 1];
-        if (item) {
-            html += buildPodiumSlotHtml(item[0], item[1], item[2], 'victoires');
-        } else {
-            html += buildPodiumSlotHtml(pRank, null, '', '');
-        }
-    });
-    podium.innerHTML = html;
+    podium.innerHTML = buildPodiumSlotsHtml(ranking.map(function(item) {
+        return { player: item[1], value: item[2], detail: 'victoires', rank: item[0] };
+    }));
+}
+
+function buildSessionPodium(session) {
+    var entries = session.players
+        .filter(function(p) { return p.today > 0; })
+        .map(function(p) {
+            return { player: p.name, value: p.today, detail: 'victoire' + (p.today > 1 ? 's' : ''), rank: p.rank };
+        });
+    if (!entries.length) return '';
+    return '<div class="pixel-podium pixel-podium--session">' + buildPodiumSlotsHtml(entries) + '</div>';
 }
 
 function updateRanking(groupId) {
@@ -338,7 +383,8 @@ function buildSessionTable(session) {
     var combat = (session.details && session.details.combat) || {};
     var hasCombat = Object.keys(combat).length > 0;
     var sessionWins = session.players.reduce(function(sum, p) { return sum + p.today; }, 0);
-    var head = '<th>Joueur</th><th>Victoires</th><th>%</th><th>Total</th>';
+    var careerTotals = typeof isCareerView !== 'undefined' && isCareerView && !session.live;
+    var head = '<th>Joueur</th><th>Victoires</th><th>%</th><th>' + (careerTotals ? 'Carrière' : 'Saison') + '</th>';
     if (hasCombat) head += '<th>Kills</th><th>Morts</th><th>Auto</th><th>K/D</th>';
     var rows = '';
     session.players.forEach(function(p) {
@@ -376,19 +422,6 @@ function buildSessionAwards(awards) {
     return '<div class="session-awards">' + items + '</div>';
 }
 
-function buildHeadline(headline, players) {
-    if (!headline) return '';
-    var names = (players || []).map(function(p) { return p.name; });
-    var scoreline = names.map(function(name) {
-        var score = headline.scores && headline.scores[name];
-        var label = playerLabel(name) + ' ' + (score != null ? score : '-');
-        return name === headline.winner ? '<strong>' + label + '</strong>' : label;
-    }).join(' · ');
-    return '<div class="session-headline">Carton du soir · match ' + headline.index +
-        ' · ' + playerLabel(headline.winner) + ' +' + headline.margin +
-        '<div class="session-headline-scores">' + scoreline + '</div></div>';
-}
-
 function buildScoreboard(players, scoreboard, leadChanges) {
     if (!scoreboard || scoreboard.length < 2 || !players || players.length === 0) return '';
     var hint = leadChanges ? leadChanges + ' changement' + (leadChanges > 1 ? 's' : '') + ' de leader' : '';
@@ -406,7 +439,7 @@ function drawScoreboard(card, session) {
         var dataset = buildPlayerLineDataset(name, scoreboard.map(function(row) {
             return (row.wins && row.wins[name]) || 0;
         }));
-        dataset.stepped = true;
+        dataset.cubicInterpolationMode = 'monotone';
         return dataset;
     });
     canvas._chart = new Chart(canvas.getContext('2d'), {
@@ -470,42 +503,48 @@ function buildMatchStrip(players, matches) {
         }).join(' · ');
         var title = '#' + (i + 1) + (match.winner ? ' · ' + match.winner : '') +
             (match.margin != null ? ' +' + match.margin : '') + ' · ' + scores;
-        var kind = match.kind ? ' session-match-chip--' + match.kind : '';
         var textColor = readableTextColor(color);
         var light = textColor === '#fff' ? '' : ' is-light';
-        return '<button type="button" class="session-match-chip' + kind + light + '" data-match-index="' + i + '" style="background:' + color + '; color:' + textColor + ';" title="' + title + '">' + (i + 1) + '</button>';
+        return '<button type="button" class="session-match-chip' + light + '" data-match-index="' + i + '" style="background:' + color + '; color:' + textColor + ';" title="' + title + '">' + (i + 1) + '</button>';
     }).join('');
-    return '<div class="session-detail-block"><h4 class="session-detail-title">🎬 Déroulé <span class="session-detail-hint">(cliquez un match · double contour = serré · or = carton)</span></h4>' +
-        '<div class="session-match-strip">' + cells + '</div><div class="match-panel" hidden></div></div>';
+    return '<div class="session-detail-block"><h4 class="session-detail-title">🎬 Déroulé</h4>' +
+        '<div class="session-match-strip">' + cells + '</div>' +
+        '<div class="match-controls">' +
+        '<button type="button" class="match-control" data-action="prev" aria-label="Match précédent">‹</button>' +
+        '<button type="button" class="match-control match-control--play" data-action="play" aria-label="Rejouer la soirée">▶</button>' +
+        '<button type="button" class="match-control" data-action="next" aria-label="Match suivant">›</button>' +
+        '</div><div class="match-panel" hidden></div></div>';
 }
 
 function buildAheadMatrix(players, matrix) {
     if (!matrix || !players || players.length < 2) return '';
-    var names = players.map(function(p) { return p.name; });
+    var names = players.map(function(p) { return p.name; }).sort();
     if (!names.some(function(name) { return matrix[name]; })) return '';
-    var max = 0;
-    names.forEach(function(row) {
-        names.forEach(function(col) {
-            if (row !== col) {
-                max = Math.max(max, (matrix[row] && matrix[row][col]) || 0);
-            }
+    function ahead(a, b) { return (matrix[a] && matrix[a][b]) || 0; }
+    var pairs = [];
+    names.forEach(function(a, i) {
+        names.slice(i + 1).forEach(function(b) {
+            pairs.push(ahead(a, b) >= ahead(b, a) ? [a, b] : [b, a]);
         });
     });
-    var head = '<th>Devant →</th>' + names.map(function(n) { return '<th>' + playerLabel(n) + '</th>'; }).join('');
-    var rows = names.map(function(row) {
-        var cells = names.map(function(col) {
-            if (row === col) {
-                return '<td class="session-duel-self">-</td>';
-            }
-            var count = (matrix[row] && matrix[row][col]) || 0;
-            var intensity = max > 0 ? count / max : 0;
-            var hue = (1 - intensity) * 120;
-            return '<td style="background-color: hsla(' + hue + ', 70%, 52%, 0.40);">' + (count || '-') + '</td>';
-        }).join('');
-        return '<tr><td>' + playerLabel(row) + '</td>' + cells + '</tr>';
+    pairs.sort(function(p, q) {
+        return (ahead(q[0], q[1]) - ahead(q[1], q[0])) - (ahead(p[0], p[1]) - ahead(p[1], p[0]));
+    });
+    var rows = pairs.map(function(pair) {
+        var a = pair[0], b = pair[1];
+        var x = ahead(a, b), y = ahead(b, a), total = x + y || 1;
+        return '<div class="h2h-row">' +
+            '<span class="h2h-name h2h-name--left">' + playerLabel(a) + '</span>' +
+            '<span class="h2h-count' + (x > y ? ' is-ahead' : '') + '">' + x + '</span>' +
+            '<div class="h2h-bar">' +
+            '<span style="width: ' + (100 * x / total) + '%; background: ' + getPlayerColor(a) + ';"></span>' +
+            '<span style="width: ' + (100 * y / total) + '%; background: ' + getPlayerColor(b) + ';"></span>' +
+            '</div>' +
+            '<span class="h2h-count' + (y > x ? ' is-ahead' : '') + '">' + y + '</span>' +
+            '<span class="h2h-name">' + playerLabel(b) + '</span></div>';
     }).join('');
-    return '<div class="session-detail-block"><h4 class="session-detail-title">🏆 Qui finit devant qui <span class="session-detail-hint">(matchs où la ligne a plus de kills que la colonne)</span></h4>' +
-        '<div class="overflow-x-auto"><table class="ranking-table session-duel-table w-full text-[5px] sm:text-[6px] md:text-[9px]"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+    return '<div class="session-detail-block"><h4 class="session-detail-title">🏆 Qui finit devant qui <span class="session-detail-hint">(matchs terminés devant l\'autre)</span></h4>' +
+        rows + '</div>';
 }
 
 function buildDuelMatrix(players, combat) {
@@ -609,7 +648,7 @@ function buildMatchTimeline(players, matches, target) {
             '<span class="match-card-result">' + matchSubtitle(match) + '</span>' + buildMatchBadge(match) + '</div>' +
             buildMatchRows(match, goal, 'md') + '</div>';
     }).join('');
-    return '<div class="session-detail-block"><h4 class="session-detail-title">📜 Match par match <span class="session-detail-hint">(' + goal + ' pièces pour gagner · orange = kills en bonus)</span></h4>' +
+    return '<div class="session-detail-block"><h4 class="session-detail-title">📜 Match par match</h4>' +
         '<div class="match-card-grid">' + cards + '</div></div>';
 }
 
@@ -617,6 +656,8 @@ function buildMatchPanel(match, index, target) {
     return '<div class="match-panel-title">Match ' + (index + 1) + ' · ' + matchSubtitle(match) + buildMatchBadge(match) + '</div>' +
         buildMatchRows(match, target, 'lg');
 }
+
+var MATCH_REPLAY_MS = 1200;
 
 function bindMatchStrip(card, session) {
     var details = session.details || {};
@@ -626,29 +667,72 @@ function bindMatchStrip(card, session) {
     if (!strip || !panel || matches.length === 0) return;
     var goal = matchTarget(matches, details.target);
     var grid = card.querySelector('.match-card-grid');
+    var controls = card.querySelector('.match-controls');
+    var playBtn = controls && controls.querySelector('[data-action="play"]');
+    var prevBtn = controls && controls.querySelector('[data-action="prev"]');
+    var current = -1;
+    var playTimer = null;
 
     function selectMatch(index) {
         var chip = strip.querySelector('.session-match-chip[data-match-index="' + index + '"]');
-        var wasActive = chip && chip.classList.contains('is-active');
+        if (!chip) return false;
         card.querySelectorAll('.session-match-chip.is-active, .match-card.is-active').forEach(function(el) {
             el.classList.remove('is-active');
         });
-        if (!chip || wasActive) {
-            panel.hidden = true;
-            return false;
-        }
         chip.classList.add('is-active');
         var matchCard = grid && grid.querySelector('.match-card[data-match-index="' + index + '"]');
         if (matchCard) matchCard.classList.add('is-active');
         panel.innerHTML = buildMatchPanel(matches[index], index, goal);
         panel.hidden = false;
+        current = index;
+        if (prevBtn) prevBtn.disabled = index === 0;
         return true;
+    }
+
+    function stopPlayback() {
+        clearInterval(playTimer);
+        playTimer = null;
+        if (playBtn) {
+            playBtn.textContent = '▶';
+            playBtn.setAttribute('aria-label', 'Rejouer la soirée');
+        }
+    }
+
+    function startPlayback() {
+        selectMatch(0);
+        playBtn.textContent = '⏸';
+        playBtn.setAttribute('aria-label', 'Pause');
+        playTimer = setInterval(function() {
+            if (!card.isConnected || current >= matches.length - 1) {
+                stopPlayback();
+                return;
+            }
+            selectMatch(current + 1);
+        }, MATCH_REPLAY_MS);
+    }
+
+    if (controls) {
+        controls.addEventListener('click', function(e) {
+            var btn = e.target.closest('.match-control');
+            if (!btn) return;
+            var action = btn.dataset.action;
+            if (action === 'play') {
+                if (playTimer) stopPlayback(); else startPlayback();
+                return;
+            }
+            stopPlayback();
+            if (action === 'prev' && current > 0) selectMatch(current - 1);
+            if (action === 'next') selectMatch((current + 1) % matches.length);
+        });
     }
 
     strip.addEventListener('click', function(e) {
         var chip = e.target.closest('.session-match-chip');
-        if (chip) selectMatch(parseInt(chip.dataset.matchIndex, 10));
+        if (!chip) return;
+        stopPlayback();
+        selectMatch(parseInt(chip.dataset.matchIndex, 10));
     });
+    selectMatch(matches.length - 1);
     if (!grid) return;
     function onCard(e) {
         var matchCard = e.target.closest('.match-card');
@@ -657,6 +741,7 @@ function bindMatchStrip(card, session) {
             if (e.key !== 'Enter' && e.key !== ' ') return;
             e.preventDefault();
         }
+        stopPlayback();
         if (selectMatch(parseInt(matchCard.dataset.matchIndex, 10))) {
             strip.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
@@ -668,9 +753,7 @@ function bindMatchStrip(card, session) {
 function buildSessionDetails(session, open) {
     var details = session.details || {};
     var combat = details.combat || {};
-    var body = buildSessionAwards(details.awards) +
-        buildHeadline(details.headline, session.players) +
-        buildScoreboard(session.players, details.scoreboard, details.lead_changes) +
+    var body = buildScoreboard(session.players, details.scoreboard, details.lead_changes) +
         buildMatchStrip(session.players, details.matches) +
         buildAheadMatrix(session.players, details.ahead_matrix) +
         buildDuelMatrix(session.players, combat) +
@@ -686,7 +769,8 @@ function buildSessionCard(session, highlight, openDetails) {
     card.className = 'session-card p-2 sm:p-4 md:p-[15px]';
     card.dataset.sessionKey = session.session_select_id;
     if (highlight) card.classList.add('session-card--highlight');
-    card.innerHTML = buildSessionHeader(session) + buildSessionTable(session) + buildSessionDetails(session, openDetails);
+    card.innerHTML = buildSessionHeader(session) + buildSessionPodium(session) +
+        buildSessionAwards((session.details || {}).awards) + buildSessionTable(session) + buildSessionDetails(session, openDetails);
     var tbl = card.querySelector('table');
     if (tbl) makeTableSortable(tbl);
     bindMatchStrip(card, session);

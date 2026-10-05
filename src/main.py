@@ -10,6 +10,8 @@ from .data_manager import SessionDataManager
 from .stats_manager import SessionStatsManager, leaderboard_career_deltas
 from .config import (
     get_player_color,
+    get_player_portrait,
+    PLAYER_TO_PORTRAIT,
     DEFAULT_GAME_MODE,
     GAME_MODES,
     normalize_game_mode,
@@ -55,6 +57,8 @@ app = Flask(__name__,
 
 # Ajouter get_player_color comme fonction globale pour les templates
 app.jinja_env.globals['get_player_color'] = get_player_color
+app.jinja_env.globals['get_player_portrait'] = get_player_portrait
+app.jinja_env.globals['player_portraits'] = PLAYER_TO_PORTRAIT
 
 # Ajouter un filtre enumerate pour Jinja2
 @app.template_filter('enumerate')
