@@ -858,6 +858,14 @@
 
     </div>
 
+    <button type="button" id="live-button" class="live-button{% if not live_session %} is-hidden{% endif %}" aria-hidden="{{ 'false' if live_session else 'true' }}" aria-expanded="false" aria-controls="live-popin">
+        <span class="live-button-dot" aria-hidden="true"></span>
+        <span class="live-button-copy">
+            <span class="live-button-label">EN DIRECT</span>
+            <span class="live-button-group">{% if live_session %}{{ live_session.id }}{% endif %}</span>
+        </span>
+    </button>
+
     <div id="app-overlays">
         <div id="overlay-backdrop" class="overlay-backdrop" aria-hidden="true"></div>
 
@@ -920,6 +928,13 @@
             </form>
         </div>
 
+        <div id="live-popin" class="live-popin arcade-overlay" aria-hidden="true" role="dialog" aria-labelledby="live-popin-title">
+            <button type="button" class="live-popin-close" aria-label="Fermer">×</button>
+            <h3 id="live-popin-title" class="overlay-title">En direct</h3>
+            <p id="live-popin-updated" class="live-popin-updated"></p>
+            <div id="live-popin-body"></div>
+        </div>
+
         <div id="global-data-info" class="info-bubble arcade-overlay">
             <div class="info-bubble-title">🔧 Correction des Données</div>
             <div class="info-bubble-content">
@@ -957,6 +972,7 @@
         const playerColors = {{ player_colors|tojson }};
         const allSessions = {{ all_sessions_data|tojson }};
         const latestSessions = {{ latest_sessions_data|tojson }};
+        const liveSession = {{ live_session|tojson }};
         const hasDetailedStats = {{ has_detailed_stats|tojson }};
         const eveningCurveData = {{ evening_curve|tojson }};
         const eloEvolutionData = {{ elo_evolution|tojson }};

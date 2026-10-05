@@ -4,11 +4,26 @@ import urllib.request
 import csv
 import io
 import json
+import time
 from datetime import datetime, timedelta
 from collections import defaultdict
 from typing import List, Dict, Any
 
 from .config import CSV_URL, DEFAULT_GAME_MODE, canonical_player_name, normalize_game_mode
+
+CSV_CACHE_SECONDS = 60
+_CSV_CACHE: Dict[str, tuple] = {}
+
+
+def _download_csv(url: str) -> str:
+    """Remote CSV text, reused for CSV_CACHE_SECONDS so live polling does not hit Google on every request."""
+    cached = _CSV_CACHE.get(url)
+    if cached and time.monotonic() - cached[0] < CSV_CACHE_SECONDS:
+        return cached[1]
+    with urllib.request.urlopen(url) as response:
+        text = response.read().decode('utf-8')
+    _CSV_CACHE[url] = (time.monotonic(), text)
+    return text
 
 
 class SessionDataManager:
@@ -27,9 +42,7 @@ class SessionDataManager:
                 with open(self.local_file, 'r', encoding='utf-8') as f:
                     csv_data = f.read()
             else:
-                # Télécharge le CSV distant
-                with urllib.request.urlopen(self.csv_url) as response:
-                    csv_data = response.read().decode('utf-8')
+                csv_data = _download_csv(self.csv_url)
             
             # Parse le CSV
             csv_reader = csv.DictReader(io.StringIO(csv_data))

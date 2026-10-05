@@ -35,7 +35,18 @@ def test_legacy_session_only_has_hour_and_match_count():
         "todayWin": {"ERIC": 4, "LOUIS": 2},
         "totalWin": {"ERIC": 4, "LOUIS": 2},
     }))
-    assert details == {"hour": 23, "match_count": 6, "combat": {}, "matches": [], "awards": []}
+    assert details == {
+        "hour": 23,
+        "match_count": 6,
+        "combat": {},
+        "matches": [],
+        "awards": [],
+        "scoreboard": [],
+        "lead_changes": 0,
+        "ahead_matrix": {},
+        "headline": None,
+        "target": None,
+    }
 
 
 def test_detailed_session_exposes_combat_matches_and_awards():
@@ -70,6 +81,86 @@ def test_awards_skip_zero_values_and_keep_ties():
     }))
     awards = _awards(details)
     assert awards == {"Meilleur tueur": (4, [["ERIC"], ["LOUIS"]])}
+
+
+def test_matches_expose_margin_and_drama():
+    details = build_session_details(_session({
+        "todayWin": {"ERIC": 2, "LOUIS": 1},
+        "totalWin": {"ERIC": 2, "LOUIS": 1},
+        "matchsResults": [
+            {"ERIC": 5, "LOUIS": 4},
+            {"ERIC": 8, "LOUIS": 4},
+            {"ERIC": 3, "LOUIS": 5},
+        ],
+    }))
+    kinds = [(m["winner"], m["margin"], m["kind"]) for m in details["matches"]]
+    assert kinds == [
+        ("ERIC", 1, "close"),
+        ("ERIC", 4, "blowout"),
+        ("LOUIS", 2, "normal"),
+    ]
+
+
+def test_target_is_most_common_winning_score():
+    details = build_session_details(_session({
+        "todayWin": {"ERIC": 3, "LOUIS": 1},
+        "totalWin": {"ERIC": 3, "LOUIS": 1},
+        "matchsResults": [
+            {"ERIC": 10, "LOUIS": 4},
+            {"ERIC": 11, "LOUIS": 9},
+            {"ERIC": 10, "LOUIS": 7},
+            {"ERIC": 3, "LOUIS": 10},
+        ],
+    }))
+    assert details["target"] == 10
+
+
+def test_scoreboard_win_matrix_and_headline():
+    details = build_session_details(_session({
+        "todayWin": {"ERIC": 2, "LOUIS": 1, "DAVID": 1},
+        "totalWin": {"ERIC": 2, "LOUIS": 1, "DAVID": 1},
+        "matchsResults": [
+            {"ERIC": 5, "LOUIS": 4, "DAVID": 2},
+            {"ERIC": 3, "LOUIS": 8, "DAVID": 2},
+            {"ERIC": 10, "LOUIS": 3, "DAVID": 1},
+            {"ERIC": 4, "LOUIS": 3, "DAVID": 6},
+        ],
+    }))
+    assert [row["leader"] for row in details["scoreboard"]] == ["ERIC", None, "ERIC", "ERIC"]
+    assert details["scoreboard"][-1]["wins"] == {"ERIC": 2, "LOUIS": 1, "DAVID": 1}
+    assert details["lead_changes"] == 0
+    assert details["ahead_matrix"]["ERIC"] == {"LOUIS": 3, "DAVID": 3}
+    assert details["ahead_matrix"]["LOUIS"] == {"ERIC": 1, "DAVID": 3}
+    assert details["ahead_matrix"]["DAVID"] == {"ERIC": 1, "LOUIS": 1}
+    assert details["headline"]["index"] == 3
+    assert details["headline"]["winner"] == "ERIC"
+    assert details["headline"]["margin"] == 7
+
+
+def test_new_awards_from_session_story():
+    details = build_session_details(_session({
+        "todayWin": {"ERIC": 2, "LOUIS": 3, "DAVID": 1},
+        "totalWin": {"ERIC": 2, "LOUIS": 3, "DAVID": 1},
+        "today": {
+            "ERIC": _today(20, 12, 0),
+            "LOUIS": _today(22, 10, 1),
+            "DAVID": _today(8, 18, 0),
+        },
+        "total": {},
+        "matchsResults": [
+            {"ERIC": 5, "LOUIS": 4, "DAVID": 2},
+            {"ERIC": 8, "LOUIS": 4, "DAVID": 3},
+            {"ERIC": 6, "LOUIS": 3, "DAVID": 4},
+            {"ERIC": 2, "LOUIS": 6, "DAVID": 3},
+            {"ERIC": 3, "LOUIS": 4, "DAVID": 3},
+            {"ERIC": 2, "LOUIS": 3, "DAVID": 6},
+        ],
+    }))
+    awards = _awards(details)
+    assert awards["Comeback"] == (2, [["LOUIS"]])
+    assert awards["Clutch"] == (1, [["ERIC"], ["LOUIS"]])
+    assert "Finisher" not in awards
+    assert "Cible" not in awards
 
 
 def test_template_data_attaches_details_to_every_session_and_latest():

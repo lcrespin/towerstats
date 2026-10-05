@@ -322,7 +322,11 @@ function formatRatio(value) {
 function buildSessionHeader(session) {
     var details = session.details || {};
     var parts = [session.formatted_date || session.date];
-    if (details.hour != null) parts.push('fin vers ' + details.hour + 'h');
+    if (session.live) {
+        parts.push('en cours');
+    } else if (details.hour != null) {
+        parts.push('fin vers ' + details.hour + 'h');
+    }
     parts.push(session.game_mode_label || session.game_mode);
     if (details.match_count) parts.push(details.match_count + ' match' + (details.match_count > 1 ? 's' : ''));
     parts.push(session.players.length + ' joueur' + (session.players.length > 1 ? 's' : ''));
@@ -334,7 +338,7 @@ function buildSessionTable(session) {
     var combat = (session.details && session.details.combat) || {};
     var hasCombat = Object.keys(combat).length > 0;
     var sessionWins = session.players.reduce(function(sum, p) { return sum + p.today; }, 0);
-    var head = '<th>Joueur</th><th>Session</th><th>%</th><th>Total</th>';
+    var head = '<th>Joueur</th><th>Victoires</th><th>%</th><th>Total</th>';
     if (hasCombat) head += '<th>Kills</th><th>Morts</th><th>Auto</th><th>K/D</th>';
     var rows = '';
     session.players.forEach(function(p) {
@@ -370,6 +374,138 @@ function buildSessionAwards(awards) {
             '<div class="session-award-value">' + award.value + ' ' + award.unit + '</div></div></div>';
     }).join('');
     return '<div class="session-awards">' + items + '</div>';
+}
+
+function buildHeadline(headline, players) {
+    if (!headline) return '';
+    var names = (players || []).map(function(p) { return p.name; });
+    var scoreline = names.map(function(name) {
+        var score = headline.scores && headline.scores[name];
+        var label = playerLabel(name) + ' ' + (score != null ? score : '-');
+        return name === headline.winner ? '<strong>' + label + '</strong>' : label;
+    }).join(' · ');
+    return '<div class="session-headline">Carton du soir · match ' + headline.index +
+        ' · ' + playerLabel(headline.winner) + ' +' + headline.margin +
+        '<div class="session-headline-scores">' + scoreline + '</div></div>';
+}
+
+function buildScoreboard(players, scoreboard, leadChanges) {
+    if (!scoreboard || scoreboard.length < 2 || !players || players.length === 0) return '';
+    var hint = leadChanges ? leadChanges + ' changement' + (leadChanges > 1 ? 's' : '') + ' de leader' : '';
+    return '<div class="session-detail-block"><h4 class="session-detail-title">📈 Au fil de la soirée' +
+        (hint ? ' <span class="session-detail-hint">(' + hint + ')</span>' : '') + '</h4>' +
+        '<div class="session-scoreboard-chart"><canvas></canvas></div></div>';
+}
+
+function drawScoreboard(card, session) {
+    var canvas = card.querySelector('.session-scoreboard-chart canvas');
+    if (!canvas || canvas._chart || canvas.offsetParent === null || typeof Chart === 'undefined') return;
+    var scoreboard = (session.details && session.details.scoreboard) || [];
+    var names = session.players.map(function(p) { return p.name; }).sort();
+    var datasets = names.map(function(name) {
+        var dataset = buildPlayerLineDataset(name, scoreboard.map(function(row) {
+            return (row.wins && row.wins[name]) || 0;
+        }));
+        dataset.stepped = true;
+        return dataset;
+    });
+    canvas._chart = new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: scoreboard.map(function(_row, i) { return String(i + 1); }),
+            datasets: datasets
+        },
+        options: buildPlayerLineChartOptions({
+            xTitle: 'Match',
+            yTitle: 'Victoires',
+            hoverChartRef: function() { return canvas._chart; },
+            yScale: {
+                min: 0,
+                ticks: { color: CHART_TICK_COLOR, font: CHART_FONT_SMALL, precision: 0 }
+            }
+        })
+    });
+    canvas._chart._hoverDatasetIndex = null;
+    bindMultiSeriesChartHoverReset(canvas, function() { return canvas._chart; });
+}
+
+function bindScoreboard(card, session) {
+    var details = card.querySelector('.session-details');
+    if (!details || !card.querySelector('.session-scoreboard-chart')) return;
+    details.addEventListener('toggle', function() {
+        if (details.open) drawScoreboard(card, session);
+    });
+    requestAnimationFrame(function() {
+        if (details.open) drawScoreboard(card, session);
+    });
+}
+
+function destroySessionCharts(container) {
+    container.querySelectorAll('.session-scoreboard-chart canvas').forEach(function(canvas) {
+        if (canvas._chart) {
+            canvas._chart.destroy();
+            canvas._chart = null;
+        }
+    });
+}
+
+function readableTextColor(hex) {
+    var h = String(hex || '').replace('#', '');
+    if (h.length === 3) h = h.split('').map(function(c) { return c + c; }).join('');
+    if (h.length !== 6) return '#fff';
+    var r = parseInt(h.substr(0, 2), 16);
+    var g = parseInt(h.substr(2, 2), 16);
+    var b = parseInt(h.substr(4, 2), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) > 160 ? '#1a1a2e' : '#fff';
+}
+
+function buildMatchStrip(players, matches) {
+    if (!matches || matches.length === 0) return '';
+    var names = (players || []).map(function(p) { return p.name; });
+    var cells = matches.map(function(match, i) {
+        var color = match.winner ? getPlayerColor(match.winner) : '#666';
+        var scores = names.map(function(name) {
+            var score = match.scores && match.scores[name];
+            return name + ' ' + (score != null ? score : '-');
+        }).join(' · ');
+        var title = '#' + (i + 1) + (match.winner ? ' · ' + match.winner : '') +
+            (match.margin != null ? ' +' + match.margin : '') + ' · ' + scores;
+        var kind = match.kind ? ' session-match-chip--' + match.kind : '';
+        var textColor = readableTextColor(color);
+        var light = textColor === '#fff' ? '' : ' is-light';
+        return '<button type="button" class="session-match-chip' + kind + light + '" data-match-index="' + i + '" style="background:' + color + '; color:' + textColor + ';" title="' + title + '">' + (i + 1) + '</button>';
+    }).join('');
+    return '<div class="session-detail-block"><h4 class="session-detail-title">🎬 Déroulé <span class="session-detail-hint">(cliquez un match · double contour = serré · or = carton)</span></h4>' +
+        '<div class="session-match-strip">' + cells + '</div><div class="match-panel" hidden></div></div>';
+}
+
+function buildAheadMatrix(players, matrix) {
+    if (!matrix || !players || players.length < 2) return '';
+    var names = players.map(function(p) { return p.name; });
+    if (!names.some(function(name) { return matrix[name]; })) return '';
+    var max = 0;
+    names.forEach(function(row) {
+        names.forEach(function(col) {
+            if (row !== col) {
+                max = Math.max(max, (matrix[row] && matrix[row][col]) || 0);
+            }
+        });
+    });
+    var head = '<th>Devant →</th>' + names.map(function(n) { return '<th>' + playerLabel(n) + '</th>'; }).join('');
+    var rows = names.map(function(row) {
+        var cells = names.map(function(col) {
+            if (row === col) {
+                return '<td class="session-duel-self">-</td>';
+            }
+            var count = (matrix[row] && matrix[row][col]) || 0;
+            var intensity = max > 0 ? count / max : 0;
+            var hue = (1 - intensity) * 120;
+            return '<td style="background-color: hsla(' + hue + ', 70%, 52%, 0.40);">' + (count || '-') + '</td>';
+        }).join('');
+        return '<tr><td>' + playerLabel(row) + '</td>' + cells + '</tr>';
+    }).join('');
+    return '<div class="session-detail-block"><h4 class="session-detail-title">🏆 Qui finit devant qui <span class="session-detail-hint">(matchs où la ligne a plus de kills que la colonne)</span></h4>' +
+        '<div class="overflow-x-auto"><table class="ranking-table session-duel-table w-full text-[5px] sm:text-[6px] md:text-[9px]"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div></div>';
 }
 
 function buildDuelMatrix(players, combat) {
@@ -420,42 +556,141 @@ function buildDeathCauses(players, combat) {
     return '<div class="session-detail-block"><h4 class="session-detail-title">☠️ Causes de mort</h4>' + rows + '</div>';
 }
 
-function buildMatchTimeline(players, matches) {
-    if (!matches || matches.length === 0) return '';
-    var names = players.map(function(p) { return p.name; });
-    var head = '<th>#</th>' + names.map(function(n) { return '<th>' + playerLabel(n) + '</th>'; }).join('');
-    var rows = matches.map(function(match, i) {
-        var cells = names.map(function(n) {
-            var score = match.scores[n];
-            var cls = n === match.winner ? ' class="session-match-winner"' : '';
-            return '<td' + cls + '>' + (score != null ? score : '-') + '</td>';
-        }).join('');
-        return '<tr><td>' + (i + 1) + '</td>' + cells + '</tr>';
-    }).join('');
-    return '<div class="session-detail-block"><h4 class="session-detail-title">📜 Match par match <span class="session-detail-hint">(kills, vainqueur surligné)</span></h4>' +
-        '<div class="overflow-x-auto session-match-scroll"><table class="ranking-table session-match-table w-full text-[5px] sm:text-[6px] md:text-[9px]"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+function matchTarget(matches, target) {
+    if (target) return target;
+    return matches.reduce(function(max, match) {
+        return match.winner ? Math.max(max, match.scores[match.winner] || 0) : max;
+    }, 0);
 }
 
-function buildSessionDetails(session) {
+function buildCoins(score, target, size) {
+    var filled = Math.min(score, target);
+    var html = '';
+    for (var i = 0; i < target; i++) {
+        html += '<span class="match-coin' + (i < filled ? ' is-filled' : '') + '"></span>';
+    }
+    for (var j = target; j < score; j++) {
+        html += '<span class="match-coin is-bonus"></span>';
+    }
+    return '<span class="match-coins match-coins--' + size + '">' + html + '</span>';
+}
+
+var MATCH_KIND_BADGES = { close: 'Serré', blowout: 'Carton', tie: 'Égalité' };
+
+function buildMatchRows(match, target, size) {
+    var names = Object.keys(match.scores).sort(function(a, b) { return a.localeCompare(b); });
+    return names.map(function(name) {
+        var isWinner = name === match.winner;
+        var score = match.scores[name];
+        return '<div class="match-panel-row' + (isWinner ? ' is-winner' : '') + '">' +
+            '<span class="match-crown" aria-hidden="true">' + (isWinner ? '👑' : '') + '</span>' +
+            '<span class="match-panel-name" style="color: ' + getPlayerColor(name) + ';">' + name + '</span>' +
+            buildCoins(score, target, size) +
+            '<span class="match-panel-score">' + score + '</span></div>';
+    }).join('');
+}
+
+function matchSubtitle(match) {
+    return match.winner ? playerLabel(match.winner) + ' +' + match.margin : 'Égalité';
+}
+
+function buildMatchBadge(match) {
+    var label = match.kind && match.kind !== 'tie' ? MATCH_KIND_BADGES[match.kind] : '';
+    return label ? '<span class="match-badge match-badge--' + match.kind + '">' + label + '</span>' : '';
+}
+
+function buildMatchTimeline(players, matches, target) {
+    if (!matches || matches.length === 0) return '';
+    var goal = matchTarget(matches, target);
+    var cards = matches.map(function(match, i) {
+        var color = match.winner ? getPlayerColor(match.winner) : 'var(--border)';
+        return '<div class="match-card" role="button" tabindex="0" data-match-index="' + i + '" style="border-top-color: ' + color + ';">' +
+            '<div class="match-card-head"><span class="match-card-number">Match ' + (i + 1) + '</span>' +
+            '<span class="match-card-result">' + matchSubtitle(match) + '</span>' + buildMatchBadge(match) + '</div>' +
+            buildMatchRows(match, goal, 'md') + '</div>';
+    }).join('');
+    return '<div class="session-detail-block"><h4 class="session-detail-title">📜 Match par match <span class="session-detail-hint">(' + goal + ' pièces pour gagner · orange = kills en bonus)</span></h4>' +
+        '<div class="match-card-grid">' + cards + '</div></div>';
+}
+
+function buildMatchPanel(match, index, target) {
+    return '<div class="match-panel-title">Match ' + (index + 1) + ' · ' + matchSubtitle(match) + buildMatchBadge(match) + '</div>' +
+        buildMatchRows(match, target, 'lg');
+}
+
+function bindMatchStrip(card, session) {
+    var details = session.details || {};
+    var matches = details.matches || [];
+    var strip = card.querySelector('.session-match-strip');
+    var panel = card.querySelector('.match-panel');
+    if (!strip || !panel || matches.length === 0) return;
+    var goal = matchTarget(matches, details.target);
+    var grid = card.querySelector('.match-card-grid');
+
+    function selectMatch(index) {
+        var chip = strip.querySelector('.session-match-chip[data-match-index="' + index + '"]');
+        var wasActive = chip && chip.classList.contains('is-active');
+        card.querySelectorAll('.session-match-chip.is-active, .match-card.is-active').forEach(function(el) {
+            el.classList.remove('is-active');
+        });
+        if (!chip || wasActive) {
+            panel.hidden = true;
+            return false;
+        }
+        chip.classList.add('is-active');
+        var matchCard = grid && grid.querySelector('.match-card[data-match-index="' + index + '"]');
+        if (matchCard) matchCard.classList.add('is-active');
+        panel.innerHTML = buildMatchPanel(matches[index], index, goal);
+        panel.hidden = false;
+        return true;
+    }
+
+    strip.addEventListener('click', function(e) {
+        var chip = e.target.closest('.session-match-chip');
+        if (chip) selectMatch(parseInt(chip.dataset.matchIndex, 10));
+    });
+    if (!grid) return;
+    function onCard(e) {
+        var matchCard = e.target.closest('.match-card');
+        if (!matchCard) return;
+        if (e.type === 'keydown') {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            e.preventDefault();
+        }
+        if (selectMatch(parseInt(matchCard.dataset.matchIndex, 10))) {
+            strip.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+    grid.addEventListener('click', onCard);
+    grid.addEventListener('keydown', onCard);
+}
+
+function buildSessionDetails(session, open) {
     var details = session.details || {};
     var combat = details.combat || {};
     var body = buildSessionAwards(details.awards) +
+        buildHeadline(details.headline, session.players) +
+        buildScoreboard(session.players, details.scoreboard, details.lead_changes) +
+        buildMatchStrip(session.players, details.matches) +
+        buildAheadMatrix(session.players, details.ahead_matrix) +
         buildDuelMatrix(session.players, combat) +
         buildDeathCauses(session.players, combat) +
-        buildMatchTimeline(session.players, details.matches);
+        buildMatchTimeline(session.players, details.matches, details.target);
     if (!body) return '';
-    return '<details class="session-details"><summary class="session-details-summary">Détails de la soirée</summary>' +
+    return '<details class="session-details"' + (open ? ' open' : '') + '><summary class="session-details-summary">Détails de la soirée</summary>' +
         '<div class="session-details-body">' + body + '</div></details>';
 }
 
-function buildSessionCard(session, highlight) {
+function buildSessionCard(session, highlight, openDetails) {
     var card = document.createElement('div');
     card.className = 'session-card p-2 sm:p-4 md:p-[15px]';
     card.dataset.sessionKey = session.session_select_id;
     if (highlight) card.classList.add('session-card--highlight');
-    card.innerHTML = buildSessionHeader(session) + buildSessionTable(session) + buildSessionDetails(session);
+    card.innerHTML = buildSessionHeader(session) + buildSessionTable(session) + buildSessionDetails(session, openDetails);
     var tbl = card.querySelector('table');
     if (tbl) makeTableSortable(tbl);
+    bindMatchStrip(card, session);
+    bindScoreboard(card, session);
     return card;
 }
 
@@ -1722,8 +1957,10 @@ function updateOverlayBackdrop() {
     }
     var popoverOpen = document.getElementById('date-picker-popover') &&
         document.getElementById('date-picker-popover').classList.contains('active');
+    var liveOpen = document.getElementById('live-popin') &&
+        document.getElementById('live-popin').classList.contains('active');
     var infoOpen = document.querySelector('.info-bubble.active');
-    var open = popoverOpen || infoOpen;
+    var open = popoverOpen || liveOpen || infoOpen;
     backdrop.classList.toggle('active', !!open);
     backdrop.setAttribute('aria-hidden', open ? 'false' : 'true');
 }
@@ -1748,6 +1985,15 @@ function closeAllOverlays() {
         bubble.classList.remove('active');
         bubble.style.transform = '';
     });
+    var livePopin = document.getElementById('live-popin');
+    if (livePopin) {
+        livePopin.classList.remove('active');
+        livePopin.setAttribute('aria-hidden', 'true');
+    }
+    var liveBtn = document.getElementById('live-button');
+    if (liveBtn) {
+        liveBtn.setAttribute('aria-expanded', 'false');
+    }
     updateOverlayBackdrop();
 }
 
@@ -2135,6 +2381,171 @@ function initBackgroundParallax() {
     }, { passive: true });
 }
 
+var LIVE_POLL_MS = 60000;
+var LIVE_IDLE_POLL_MS = 300000;
+var liveState = {
+    session: (typeof liveSession !== 'undefined') ? liveSession : null,
+    fetchedAt: Date.now(),
+    renderedKey: null,
+    timer: null
+};
+
+function setLiveButtonVisible(session) {
+    var btn = document.getElementById('live-button');
+    if (!btn) {
+        return;
+    }
+    var visible = !!session;
+    btn.classList.toggle('is-hidden', !visible);
+    btn.setAttribute('aria-hidden', visible ? 'false' : 'true');
+    var group = btn.querySelector('.live-button-group');
+    if (group) {
+        group.textContent = session ? (session.id || '') : '';
+    }
+}
+
+function formatLiveUpdated(session, from) {
+    var details = session.details || {};
+    var parts = [];
+    if (details.match_count) {
+        parts.push(details.match_count + ' match' + (details.match_count > 1 ? 's' : '') + ' joué' + (details.match_count > 1 ? 's' : ''));
+    }
+    if (details.hour != null) parts.push('dernier envoi vers ' + details.hour + 'h');
+    var seconds = Math.max(0, Math.round((Date.now() - from) / 1000));
+    parts.push('vérifié il y a ' + seconds + 's');
+    return parts.join(' · ');
+}
+
+function updateLiveUpdatedLabel() {
+    var el = document.getElementById('live-popin-updated');
+    if (!el) {
+        return;
+    }
+    el.textContent = liveState.session ? formatLiveUpdated(liveState.session, liveState.fetchedAt) : '';
+}
+
+function renderLivePopin(session) {
+    var body = document.getElementById('live-popin-body');
+    if (!body) {
+        return;
+    }
+    var key = session ? JSON.stringify(session) : 'ended';
+    if (key === liveState.renderedKey) {
+        return;
+    }
+    liveState.renderedKey = key;
+    destroySessionCharts(body);
+    body.innerHTML = '';
+    if (!session) {
+        body.innerHTML = '<p class="live-popin-ended">Session terminée</p>';
+        return;
+    }
+    body.appendChild(buildSessionCard(Object.assign({}, session, { live: true }), false, true));
+}
+
+function applyLivePayload(payload) {
+    var session = payload && payload.live ? payload.session : null;
+    liveState.session = session;
+    liveState.fetchedAt = Date.now();
+    setLiveButtonVisible(session);
+    var popin = document.getElementById('live-popin');
+    if (popin && popin.classList.contains('active')) {
+        renderLivePopin(session);
+        updateLiveUpdatedLabel();
+    }
+}
+
+function scheduleLivePoll() {
+    clearTimeout(liveState.timer);
+    liveState.timer = setTimeout(fetchLiveSession, liveState.session ? LIVE_POLL_MS : LIVE_IDLE_POLL_MS);
+}
+
+function fetchLiveSession() {
+    if (document.hidden) {
+        scheduleLivePoll();
+        return;
+    }
+    fetch('/api/live').then(function(res) {
+        return res.ok ? res.json() : null;
+    }).then(function(data) {
+        if (data) {
+            applyLivePayload(data);
+        }
+    }).catch(function() {}).then(scheduleLivePoll);
+}
+
+function openLivePopin() {
+    var popin = document.getElementById('live-popin');
+    if (!popin) {
+        return;
+    }
+    var datePopover = document.getElementById('date-picker-popover');
+    if (datePopover) {
+        datePopover.classList.remove('active');
+        datePopover.setAttribute('aria-hidden', 'true');
+        setFilterToggleOpen(false);
+    }
+    document.querySelectorAll('.info-bubble.active').forEach(function(bubble) {
+        bubble.classList.remove('active');
+        bubble.style.transform = '';
+    });
+    renderLivePopin(liveState.session);
+    updateLiveUpdatedLabel();
+    popin.classList.add('active');
+    popin.setAttribute('aria-hidden', 'false');
+    var liveBtn = document.getElementById('live-button');
+    if (liveBtn) {
+        liveBtn.setAttribute('aria-expanded', 'true');
+    }
+    updateOverlayBackdrop();
+}
+
+function closeLivePopin() {
+    var popin = document.getElementById('live-popin');
+    if (!popin) {
+        return;
+    }
+    popin.classList.remove('active');
+    popin.setAttribute('aria-hidden', 'true');
+    var liveBtn = document.getElementById('live-button');
+    if (liveBtn) {
+        liveBtn.setAttribute('aria-expanded', 'false');
+    }
+    updateOverlayBackdrop();
+}
+
+function initLiveSession() {
+    var btn = document.getElementById('live-button');
+    var popin = document.getElementById('live-popin');
+    if (!btn || !popin) {
+        return;
+    }
+    setLiveButtonVisible(liveState.session);
+    btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (popin.classList.contains('active')) {
+            closeLivePopin();
+        } else {
+            openLivePopin();
+        }
+    });
+    var closeBtn = popin.querySelector('.live-popin-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeLivePopin);
+    }
+    scheduleLivePoll();
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            fetchLiveSession();
+        }
+    });
+    setInterval(function() {
+        if (popin.classList.contains('active')) {
+            updateLiveUpdatedLabel();
+        }
+    }, 1000);
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initBackgroundParallax();
     initOverlayPortal();
@@ -2159,6 +2570,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initEloMatchEvolutionChart();
     initEveningCurveChart();
     initInfoBubbles();
+    initLiveSession();
     if (hasDetailedStats) {
         initKillRelationshipsTotalsToggle();
         initRivalryMap();

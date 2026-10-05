@@ -1,7 +1,7 @@
 """Application Flask principale pour TowerStats."""
 
 import functions_framework  # type: ignore
-from flask import Flask, send_from_directory, render_template, request  # type: ignore
+from flask import Flask, send_from_directory, render_template, request, jsonify  # type: ignore
 import io
 import os
 import random
@@ -31,6 +31,7 @@ from .seasons import (
 )
 from .messages_loader import load_win_messages
 from .taglines import pick_taglines
+from .live_session import get_live_session_payload
 
 
 def _filter_sessions_by_session_id(sessions, session_id):
@@ -78,6 +79,13 @@ def capitalize_first_filter(s):
     return s[0].upper() + s[1:]
 
 
+def _load_sessions():
+    """Fetch, correct and return the full session list."""
+    data_manager = SessionDataManager()
+    data_manager.load_all()
+    return data_manager.get_sessions()
+
+
 @app.route('/images/<filename>')
 def serve_image(filename):
     """Route pour servir les images statiques."""
@@ -85,17 +93,24 @@ def serve_image(filename):
     return send_from_directory(images_dir, filename)
 
 
+@app.route('/api/live')
+def live_session_api():
+    """JSON snapshot of the current live session, if any."""
+    try:
+        sessions = _load_sessions()
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    entry = get_live_session_payload(sessions)
+    return jsonify({'live': entry is not None, 'session': entry})
+
+
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def flask_display_stats(path):
     """Route principale qui affiche les statistiques depuis Google Sheets."""
-    # Récupère les données de la sheet
     try:
-        data_manager = SessionDataManager()
-        data_manager.load_all()
-        sessions = data_manager.get_sessions()
+        sessions = _load_sessions()
     except Exception as e:
-        # Erreur lors de la récupération
         return render_template('error.html', error_message=str(e)), 500
     
     date_start = request.args.get('dateStart') or None
@@ -188,6 +203,7 @@ def flask_display_stats(path):
             'all_sessions_data'
         ]
 
+    template_data['live_session'] = get_live_session_payload(all_sessions)
     template_data['career_deltas'] = None
     if selected_season != CAREER_SEASON_ID:
         career_sessions = SessionDataManager.filter_sessions_by_game_mode(

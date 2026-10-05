@@ -120,6 +120,46 @@ class SessionStatsManager:
                 running[id(session)] = dict(totals)
         return running
 
+    def _ranked_session_players(self, session, window_totals):
+        """(rank, player, stats) for one session, with season totals in stats['total']."""
+        players = SessionDataManager.parse_session_data(session)
+        if not players:
+            return None
+        season_totals = window_totals.get(id(session), {})
+        ranked_players = {
+            player: {**stats, 'total': season_totals.get(player, stats.get('today', 0))}
+            for player, stats in players.items()
+        }
+        sorted_players = sorted(ranked_players.items(), key=lambda x: (-x[1]['today'], x[0]))
+        ranks = self._session_ranks_from_sorted(sorted_players)
+        return [(ranks[p], p, s) for p, s in sorted_players]
+
+    def _session_entry(self, session, players_list):
+        mode = session.get('mode', DEFAULT_GAME_MODE)
+        return {
+            'id': session['id'],
+            'group': session['id'],
+            'date': session['date'],
+            'formatted_date': self.format_date(self._session_date_str(session)),
+            'game_mode': mode,
+            'game_mode_label': game_mode_label(mode),
+            'session_select_id': SessionDataManager.format_session_select_id(session),
+            'players': [
+                {'rank': r, 'name': p, 'today': s['today'], 'total': s['total']}
+                for r, p, s in players_list
+            ],
+            'details': build_session_details(session),
+        }
+
+    def build_session_entry(self, session, window_totals=None):
+        """JSON card for one session, as shown in the archives; None when it has no players."""
+        if window_totals is None:
+            window_totals = self._window_running_totals()
+        players_list = self._ranked_session_players(session, window_totals)
+        if not players_list:
+            return None
+        return self._session_entry(session, players_list)
+
     @staticmethod
     def _session_ranks_from_sorted(sorted_players):
         """Assign dense ranks: same 'today' score => same rank (avoids arbitrary ELO gap on ties)."""
@@ -1024,57 +1064,23 @@ class SessionStatsManager:
 
         window_totals = self._window_running_totals()
 
-        def session_players_with_dense_rank(session):
-            players = SessionDataManager.parse_session_data(session)
-            if not players:
-                return None
-            season_totals = window_totals.get(id(session), {})
-            ranked_players = {}
-            for player, stats in players.items():
-                ranked_players[player] = {
-                    **stats,
-                    'total': season_totals.get(player, stats.get('today', 0)),
-                }
-            sorted_players = sorted(
-                ranked_players.items(),
-                key=lambda x: (-x[1]['today'], x[0])
-            )
-            ranks = self._session_ranks_from_sorted(sorted_players)
-            return [(ranks[p], p, s) for p, s in sorted_players]
-
         latest_sessions_parsed = []
         for session in latest_sessions:
-            players_list = session_players_with_dense_rank(session)
+            players_list = self._ranked_session_players(session, window_totals)
             if players_list:
                 latest_sessions_parsed.append({'session': session, 'players': players_list})
 
-        def session_entry(session, date, players_list):
-            return {
-                'id': session['id'],
-                'group': session['id'],
-                'date': session['date'],
-                'formatted_date': self.format_date(date),
-                'game_mode': session.get('mode', DEFAULT_GAME_MODE),
-                'game_mode_label': game_mode_label(session.get('mode', DEFAULT_GAME_MODE)),
-                'session_select_id': SessionDataManager.format_session_select_id(session),
-                'players': [
-                    {'rank': r, 'name': p, 'today': s['today'], 'total': s['total']}
-                    for r, p, s in players_list
-                ],
-                'details': build_session_details(session),
-            }
-
         latest_sessions_data = [
-            session_entry(entry['session'], latest_date, entry['players'])
+            self._session_entry(entry['session'], entry['players'])
             for entry in latest_sessions_parsed
         ]
 
         all_sessions_data = []
-        for date, date_sessions in sessions_by_date.items():
+        for date_sessions in sessions_by_date.values():
             for session in date_sessions:
-                players_list = session_players_with_dense_rank(session)
-                if players_list:
-                    all_sessions_data.append(session_entry(session, date, players_list))
+                entry = self.build_session_entry(session, window_totals)
+                if entry:
+                    all_sessions_data.append(entry)
         
         # Statistiques détaillées (si disponibles)
         has_detailed = self.has_detailed_stats()

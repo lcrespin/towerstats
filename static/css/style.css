@@ -1042,8 +1042,7 @@ section h2 {
 .session-award-holders { font-weight: 600; }
 .session-award-value { color: var(--text-muted); }
 
-.session-duel-table td,
-.session-match-table td {
+.session-duel-table td {
     text-align: center;
 }
 
@@ -1052,15 +1051,237 @@ section h2 {
     color: var(--text-muted);
 }
 
-.session-match-scroll {
-    max-height: 320px;
-    overflow-y: auto;
+.session-headline {
+    background: rgba(242, 201, 76, 0.08);
+    border: 1px solid rgba(242, 201, 76, 0.35);
+    padding: 10px 12px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gold);
 }
 
-.session-match-table td.session-match-winner {
-    color: #1a1a2e;
-    background: var(--gold) !important;
+.session-headline-scores {
+    margin-top: 4px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.session-scoreboard-chart {
+    position: relative;
+    height: 220px;
+    background: rgba(0, 0, 0, 0.22);
+    border: 1px solid var(--grid);
+    padding: 4px;
+}
+
+.session-match-strip {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.session-match-chip {
+    min-width: 22px;
+    height: 22px;
+    padding: 0 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
     font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
+    border: none;
+    cursor: pointer;
+}
+
+.session-match-chip.is-light {
+    text-shadow: none;
+}
+
+.session-match-chip--close {
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.85), inset 0 0 0 3px #fff;
+}
+
+.session-match-chip--blowout {
+    outline: 2px solid var(--gold);
+    outline-offset: 1px;
+}
+
+.session-match-chip.is-active {
+    transform: translateY(-2px);
+    box-shadow: 0 0 0 2px var(--gold), 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+.session-match-chip--close.is-active {
+    box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.85), inset 0 0 0 3px #fff, 0 0 0 2px var(--gold), 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+.match-coins {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.match-coins--md { gap: 2px; }
+.match-coins--lg { gap: 6px; }
+
+.match-coin {
+    display: inline-block;
+    border-radius: 50%;
+    background: rgba(160, 140, 90, 0.28);
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.match-coins--md .match-coin { width: 8px; height: 11px; }
+.match-coins--lg .match-coin { width: 14px; height: 18px; }
+
+.match-coin.is-filled {
+    background: #f7d23e;
+    box-shadow: inset 0 -2px 0 #b8901a, 0 0 3px rgba(247, 210, 62, 0.45);
+}
+
+.match-coin.is-bonus {
+    background: #ff9f43;
+    box-shadow: inset 0 -2px 0 #b8641a, 0 0 4px rgba(255, 159, 67, 0.6);
+}
+
+.match-crown {
+    display: inline-block;
+    width: 14px;
+    font-size: 10px;
+    text-align: center;
+}
+
+.match-panel-score {
+    margin-left: auto;
+    padding-left: 6px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-variant-numeric: tabular-nums;
+}
+
+.match-panel-row.is-winner .match-panel-score {
+    color: var(--gold);
+    font-weight: 700;
+}
+
+.match-badge {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 1px 6px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    vertical-align: middle;
+}
+
+.match-badge--close {
+    color: #7dff9a;
+    border: 1px solid rgba(125, 255, 154, 0.6);
+}
+
+.match-badge--blowout {
+    color: var(--gold);
+    border: 1px solid var(--gold);
+}
+
+.match-card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 8px;
+}
+
+.match-card {
+    padding: 8px 10px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--grid);
+    border-top: 3px solid var(--border);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.match-card:hover,
+.match-card:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 0 0 1px rgba(242, 201, 76, 0.5);
+    outline: none;
+}
+
+.match-card.is-active {
+    box-shadow: 0 0 0 2px var(--gold), 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+.match-card-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    font-size: 11px;
+}
+
+.match-card-number {
+    font-weight: 700;
+    color: var(--gold);
+}
+
+.match-card-result {
+    font-weight: 600;
+}
+
+.match-card-head .match-badge {
+    margin-left: auto;
+}
+
+.match-card .match-panel-row {
+    gap: 6px;
+    margin: 3px 0;
+}
+
+.match-card .match-panel-row .match-crown {
+    width: 14px;
+    font-size: 10px;
+}
+
+.match-card .match-panel-name {
+    font-size: 7px;
+    width: 58px;
+    flex-shrink: 0;
+}
+
+.match-panel {
+    margin-top: 10px;
+    padding: 14px 16px;
+    background: rgba(0, 0, 0, 0.35);
+    border: 2px solid var(--border);
+}
+
+.match-panel-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 10px;
+}
+
+.match-panel-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 6px 0;
+}
+
+.match-panel-row .match-crown {
+    width: 22px;
+    font-size: 16px;
+}
+
+.match-panel-name {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 9px;
+    width: 80px;
+    text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.8);
 }
 
 .session-cause-row {
@@ -2641,6 +2862,7 @@ section.arcade-panel::before { opacity: 0.3; }
 }
 
 #app-overlays .date-picker-popover.active,
+#app-overlays .live-popin.active,
 #app-overlays .info-bubble.active {
     pointer-events: auto;
 }
@@ -2751,4 +2973,127 @@ section.arcade-panel::before { opacity: 0.3; }
 .date-picker-popover .date-picker-close:hover {
     opacity: 1;
     color: var(--gold);
+}
+
+.live-button {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 10003;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(20, 12, 35, 0.96);
+    border: 3px solid #c0392b;
+    color: #fff7f7;
+    font-family: 'Press Start 2P', cursive;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55), 0 0 18px rgba(192, 57, 43, 0.35);
+}
+
+.live-button.is-hidden {
+    display: none;
+}
+
+.live-button-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #ff3b3b;
+    box-shadow: 0 0 8px #ff3b3b;
+    animation: live-pulse 1.2s ease-in-out infinite;
+    flex-shrink: 0;
+}
+
+.live-button-copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+}
+
+.live-button-label {
+    font-size: 8px;
+    letter-spacing: 0.06em;
+    line-height: 1.3;
+}
+
+.live-button-group {
+    font-family: Inter, system-ui, sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #ffb4b4;
+    line-height: 1.2;
+}
+
+@keyframes live-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.45; transform: scale(0.85); }
+}
+
+.live-popin {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(1100px, 94vw);
+    max-height: 88vh;
+    overflow-y: auto;
+    background: rgba(20, 12, 35, 0.98);
+    border: 4px solid var(--border);
+    padding: 32px 20px 20px;
+    z-index: 10002;
+    box-shadow: inset 0 0 0 1px rgba(242, 201, 76, 0.25), 0 12px 40px rgba(0, 0, 0, 0.7);
+    color: var(--text);
+}
+
+.live-popin.active {
+    display: block;
+}
+
+.live-popin-close {
+    position: absolute;
+    top: 8px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.85;
+    z-index: 2;
+}
+
+.live-popin-close:hover {
+    opacity: 1;
+    color: var(--gold);
+}
+
+.live-popin-updated,
+.live-popin-ended {
+    text-align: center;
+    margin: 0 0 14px;
+    font-size: 12px;
+    color: #c9b89a;
+}
+
+.live-popin-ended {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 8px;
+    color: #ffb4b4;
+    padding: 24px 8px;
+}
+
+.live-popin .session-card {
+    margin-bottom: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .live-button-dot,
+    .season-live-badge {
+        animation: none;
+    }
 }

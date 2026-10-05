@@ -3,6 +3,12 @@
 # Script pour lancer le serveur en local
 
 PORT=8080
+LIVE_DEMO=0
+for arg in "$@"; do
+    if [ "$arg" = "--live" ]; then
+        LIVE_DEMO=1
+    fi
+done
 
 echo "🚀 Démarrage du serveur local..."
 echo ""
@@ -40,6 +46,10 @@ fi
 echo ""
 echo "✅ Démarrage du serveur sur http://localhost:$PORT"
 echo "   Mode développement avec rechargement automatique activé"
+if [ "$LIVE_DEMO" = "1" ]; then
+    export TOWERSTATS_LIVE_DEMO=1
+    echo "   Mode démo live activé (dernière session historique traitée comme live)"
+fi
 echo "   Appuyez sur Ctrl+C pour arrêter"
 echo ""
 
