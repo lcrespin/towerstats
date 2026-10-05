@@ -199,24 +199,6 @@ function initRankingTable() {
     }
 }
 
-// Initialisation du toggle ELO legacy
-function initEloLegacyToggle() {
-    const toggleEloLegacy = document.getElementById('toggle-elo-legacy');
-    if (toggleEloLegacy) {
-        toggleEloLegacy.addEventListener('click', function() {
-            const eloLegacyContainer = document.getElementById('elo-legacy-container');
-            if (eloLegacyContainer) {
-                eloLegacyContainer.classList.toggle('hidden');
-            }
-            if (eloLegacyContainer.classList.contains('hidden')) {
-                toggleEloLegacy.textContent = '▼ ELO legacy';
-            } else {
-                toggleEloLegacy.textContent = '▲ Masquer ELO legacy';
-            }
-        });
-    }
-}
-
 // Initialisation du sélecteur de groupe
 function initGroupSelector() {
     const groupSelect = document.getElementById('group-select');
@@ -384,7 +366,7 @@ function buildSessionTable(session) {
     var hasCombat = Object.keys(combat).length > 0;
     var sessionWins = session.players.reduce(function(sum, p) { return sum + p.today; }, 0);
     var careerTotals = typeof isCareerView !== 'undefined' && isCareerView && !session.live;
-    var head = '<th>Joueur</th><th>Victoires</th><th>%</th><th>' + (careerTotals ? 'Carrière' : 'Saison') + '</th>';
+    var head = '<th>Joueur</th><th>Victoires</th><th>%</th><th>' + (careerTotals ? 'All-time' : 'Saison') + '</th>';
     if (hasCombat) head += '<th>Kills</th><th>Morts</th><th>Auto</th><th>K/D</th>';
     var rows = '';
     session.players.forEach(function(p) {
@@ -561,7 +543,7 @@ function buildDuelMatrix(players, combat) {
         var cells = names.map(function(victim) {
             var count = combat[victim].killBy[killer] || 0;
             if (killer === victim) {
-                return '<td class="session-duel-self" title="Auto-kills">' + (count || '-') + '</td>';
+                return '<td class="session-duel-self" title="Auto-kills — se tuer soi-même">' + (count || '-') + '</td>';
             }
             var intensity = max > 0 ? count / max : 0;
             var hue = (1 - intensity) * 120;
@@ -2847,7 +2829,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initBackgroundParallax();
     initOverlayPortal();
     initRankingTable();
-    initEloLegacyToggle();
     initDatePickerToggle();
     initMobileMenu();
     initGroupSelector();

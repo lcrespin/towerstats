@@ -192,11 +192,11 @@
             <div id="leaders-info" class="info-bubble">
                 <div class="info-bubble-title">🏆 Leaders</div>
                 <div class="info-bubble-content">
-                    Les leaders {% if is_career_view %}de la carrière{% else %}de la saison{% endif %} sur les classements qui comptent. Touchez une carte pour afficher son podium et le classement complet juste en dessous.<br><br>
-                    <strong>Par groupe</strong> : classement des victoires cumulées dans un groupe de joueurs précis.
+                    Les rois de la colline{% if is_career_view %} — All-time{% else %} cette saison{% endif %}. Touchez une carte pour voir son podium et le classement complet juste en dessous.<br><br>
+                    <strong>Par groupe</strong> : on additionne les victoires dans un groupe de joueurs précis. Idéal pour régler les comptes entre les mêmes têtes.
                 </div>
             </div>
-            <p class="section-tagline">{% if is_career_view %}Les patrons de la carrière{% else %}En tête de la saison{% endif %} — {{ taglines.podium }}</p>
+            <p class="section-tagline">{% if is_career_view %}Les patrons All-time{% else %}En tête de la saison{% endif %} — {{ taglines.podium }}</p>
 
             <ul class="season-summary">
                 <li><strong>{{ unique_players_count }}</strong> joueurs</li>
@@ -232,13 +232,13 @@
                     <button type="button" class="info-button info-button-inline" data-info="pourcentage-victoires-info" aria-label="Aide % victoires">?</button>
                 </h3>
                 <div id="pourcentage-victoires-info" class="info-bubble">
-                    <div class="info-bubble-title">🏆 Pourcentage de Victoires</div>
+                    <div class="info-bubble-title">🏆 Pourcentage de victoires</div>
                     <div class="info-bubble-content">
-                        <strong>Victoires :</strong> On additionne toutes les victoires du joueur dans toutes ses sessions.<br><br>
-                        <strong>Parties :</strong> On compte toutes les parties jouées dans tous les groupes où le joueur a participé. Si une session a 4 joueurs qui ont gagné 10, 8, 6 et 4 parties chacun, cela fait 28 parties au total pour cette session.<br><br>
-                        <strong>Joueurs avec 0 victoires :</strong> Tous les joueurs présents dans une session sont comptabilisés, même ceux qui n'ont gagné aucune partie.<br><br>
-                        <strong>Pourcentage :</strong> (Victoires ÷ Parties) × 100<br><br>
-                        <em>Exemple :</em> Si un joueur a 50 victoires sur 100 parties, son pourcentage est de 50%.
+                        Combien de parties on gagne, sur toutes celles où on était autour de la table.<br><br>
+                        <strong>Victoires :</strong> les wins de chaque soirée, additionnées.<br>
+                        <strong>Parties :</strong> le nombre de matchs de ces soirées. Tout le monde joue chaque manche, donc 10 + 8 + 6 + 4 victoires = 28 parties.<br>
+                        <strong>%</strong> : victoires ÷ parties × 100.<br><br>
+                        Même à zéro victoire, on reste dans le tableau. Fuir les stats n'est pas une option.
                     </div>
                 </div>
                 {% if win_percentage_ranking %}
@@ -275,19 +275,9 @@
                 <div id="elo-ranking-info" class="info-bubble">
                     <div class="info-bubble-title">🏆 Classement ELO session</div>
                     <div class="info-bubble-content">
-                        <strong>Qu'est-ce que l'ELO ?</strong><br>
-                        Un système de classement qui évalue le niveau de chaque joueur. Plus le score ELO est élevé, meilleur est le joueur.<br>
-                        <a href="https://fr.wikipedia.org/wiki/Classement_Elo" target="_blank" rel="noopener noreferrer">En savoir plus sur Wikipedia</a><br><br>
-                        <strong>Calcul</strong><br>
-                        • Tous les joueurs commencent à 1500 points<br>
-                        • Les joueurs sont classés selon leur nombre de victoires dans la session<br>
-                        • Les confrontations sont évaluées entre toutes les paires de joueurs<br>
-                        • Les variations d'une session sont appliquées en batch à la fin de la session<br>
-                        • Battre un joueur plus fort fait gagner plus de points<br><br>
-                        <strong>Différence avec ELO legacy</strong><br>
-                        ELO legacy mettait à jour les ratings séquentiellement à l'intérieur d'une session : l'ordre des paires pouvait influencer le résultat final. Le calcul batch est plus stable et déterministe.<br><br>
-                        <strong>Facteur K = 32</strong><br>
-                        Détermine la vitesse de changement après chaque session.
+                        Un score de niveau, pas un simple compteur de victoires. Tout le monde démarre à 1500. À la fin de chaque soirée, chaque duo est comparé : celui qui a plus de wins « bat » l'autre. Tomber un plus fort rapporte plus ; perdre contre un plus faible coûte plus.<br>
+                        <a href="https://fr.wikipedia.org/wiki/Classement_Elo" target="_blank" rel="noopener noreferrer">Le détail sur Wikipedia</a><br><br>
+                        Les points de la soirée sont appliqués d'un coup, pour que l'ordre des duels ne change rien.
                     </div>
                 </div>
                 {% if elo_ranking %}
@@ -316,32 +306,6 @@
                         </tbody>
                     </table>
                 </div>
-                <button id="toggle-elo-legacy" class="toggle-button w-full sm:w-auto">
-                    ▼ ELO legacy
-                </button>
-                <div id="elo-legacy-container" class="hidden overflow-x-auto mt-4">
-                    <table class="ranking-table w-full txt-xs">
-                        <thead>
-                            <tr>
-                                <th class="player-column">Joueur</th>
-                                <th>ELO (legacy)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in elo_legacy_ranking %}
-                            {% set rank, player, elo = item[0], item[1], item[2] %}
-                            <tr>
-                                <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
-                                <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.0f" % elo }}</td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="2" class="text-center" style="color: var(--text); padding: 20px;">Aucun classement ELO legacy disponible</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
             </div>
 
             {% if best_elo_match_players %}
@@ -353,9 +317,9 @@
                 <div id="elo-match-ranking-info" class="info-bubble">
                     <div class="info-bubble-title">⚔️ Classement ELO match</div>
                     <div class="info-bubble-content">
-                        ELO recalculé <em>match par match</em> dans l'ordre global (dates de session, puis ordre des matchs dans chaque session). Pour chaque match, les joueurs sont classés par nombre de kills ; les paires et le batch suivent la même règle que l'ELO session.<br><br>
-                        Une session sans score par match n'alimente pas ce calcul : le joueur reste à 1500 jusqu'à ses premiers matchs comptés.<br><br>
-                        <strong>Facteur K = 32</strong>, appliqué après chaque match.
+                        Même recette que l'ELO session, mais on recale après <em>chaque match</em> : c'est le nombre de kills du match qui décide qui a « battu » qui.<br><br>
+                        Une soirée sans score par match ne compte pas — on reste à 1500 jusqu'au premier vrai duel.<br><br>
+                        Plus nerveux que l'ELO session : une bonne (ou très mauvaise) soirée peut faire des montagnes russes.
                     </div>
                 </div>
                 {{ pixel_podium(elo_match_ranking, 2, "%.0f", detail='ELO match') }}
@@ -388,11 +352,12 @@
                     <button type="button" class="info-button info-button-inline" data-info="combat-stats-info" aria-label="Aide combat">?</button>
                 </h3>
                 <div id="combat-stats-info" class="info-bubble">
-                    <div class="info-bubble-title">⚔️ Combat</div>
+                    <div class="info-bubble-title">⚔️ Ratio K/D</div>
                     <div class="info-bubble-content">
-                        <strong>K/D Ratio :</strong> Ratio Kills/Deaths. Plus le ratio est élevé, meilleur est le joueur en combat.<br><br>
-                        <strong>Moy. Kills / Moy. Deaths / Moy. Auto :</strong> Moyennes par partie jouée (total divisé par le nombre de parties). Cliquez sur une colonne pour trier.<br><br>
-                        <strong>Parties :</strong> Pour chaque joueur, on ne compte que les parties jouées dans les sessions où les stats de combat existent.
+                        <strong>K/D :</strong> kills ÷ morts. Au-dessus de 1, on fait plus de dégâts qu'on en prend. En dessous, on est le punching-ball de service.<br><br>
+                        <strong>Self :</strong> les auto-kills (le vide, le mur, sa propre flèche…). Comptés à part, parce que ça mérite une mention spéciale.<br><br>
+                        <strong>Moyennes :</strong> totaux ÷ parties. On ne compte que les soirées où les stats de combat existent — les vieilles sessions sans détail restent hors-jeu.<br><br>
+                        Cliquez une colonne pour trier : serial killer d'un côté, kamikaze de l'autre.
                     </div>
                 </div>
                 {{ pixel_podium(kill_death_ranking, 5, "%.2f", detail='K/D') }}
@@ -439,7 +404,15 @@
             <div class="leader-panel hidden" id="leader-panel-kills" data-panel="kills" role="tabpanel">
                 <h3 class="subsection-title subsection-title-row">
                     <span>Kills par partie</span>
+                    <button type="button" class="info-button info-button-inline" data-info="kills-per-game-info" aria-label="Aide kills">?</button>
                 </h3>
+                <div id="kills-per-game-info" class="info-bubble">
+                    <div class="info-bubble-title">🏹 Kills par partie</div>
+                    <div class="info-bubble-content">
+                        Les flèches qui ont trouvé quelqu'un, divisées par le nombre de parties — uniquement les soirées avec stats de combat.<br><br>
+                        C'est le volume, pas l'efficacité : on peut spammer les kills et quand même avoir un K/D moyen si on meurt autant.
+                    </div>
+                </div>
                 {{ pixel_podium(kills_per_game_ranking, 2, "%.2f", detail='kills /partie') }}
                 <div class="overflow-x-auto">
                     <table class="ranking-table w-full txt-xs">
@@ -474,11 +447,11 @@
                     <button type="button" class="info-button info-button-inline" data-info="classement-info" aria-label="Aide classement groupe">?</button>
                 </h3>
                 <div id="classement-info" class="info-bubble">
-                    <div class="info-bubble-title">👥 Classement par Groupe</div>
+                    <div class="info-bubble-title">👥 Classement par groupe</div>
                     <div class="info-bubble-content">
-                        Pour chaque joueur du groupe sélectionné, on additionne ses <strong>scores de chaque session</strong> (victoires du jour) de ce groupe.<br><br>
-                        Les joueurs sont classés du plus haut total au plus bas. Lorsque des filtres (ex. dates) sont appliqués, le classement est recalculé sur les sessions visibles.<br><br>
-                        <em>Exemple :</em> Si un joueur a eu 50, 75 et 60 victoires dans trois sessions du groupe, son score groupe est 50+75+60 = 185.
+                        Pour un groupe précis (les mêmes têtes autour de la table), on additionne les victoires de chaque soirée. Le plus gros total gagne.<br><br>
+                        Les filtres (dates, saison…) recoupent le classement sur les sessions visibles.<br><br>
+                        <em>Exemple :</em> 12, 8 et 15 wins sur trois soirs = 35. Simple, brutal, incontestable.
                     </div>
                 </div>
                 {% if default_ranking %}
@@ -535,11 +508,13 @@
             <div id="records-info" class="info-bubble">
                 <div class="info-bubble-title">⭐ Records à battre</div>
                 <div class="info-bubble-content">
-                    Les meilleurs exploits réalisés en une seule soirée{% if not is_career_view %} cette saison{% endif %}. En cas d'égalité, tous les détenteurs sont listés, du plus ancien au plus récent. Touchez un record pour retrouver la session dans les archives.<br><br>
-                    <strong>Plus longue série :</strong> victoires consécutives dans une même soirée (sessions avec le score de chaque match).<br><br>
-                    <strong>Plus gros gain ELO :</strong> la plus forte hausse d'ELO session en une soirée.<br><br>
-                    <strong>Soirée la plus propre :</strong> le moins de morts par partie sur une soirée d'au moins 5 parties.<br><br>
-                    <strong>Zéro auto-kill :</strong> la plus longue soirée (au moins 5 parties) sans jamais se tuer soi-même.
+                    Les exploits d'une seule soirée{% if not is_career_view %} cette saison{% endif %}. En cas d'égalité, tout le monde est listé, du plus ancien au plus récent. Touchez un nom pour ouvrir la session dans les archives.<br><br>
+                    <strong>Meilleur score :</strong> le plus de victoires en une soirée.<br>
+                    <strong>Plus longue série :</strong> wins d'affilée dans la même soirée (il faut le score de chaque match).<br>
+                    <strong>Plus de kills :</strong> le plus gros massacre en une soirée.<br>
+                    <strong>Plus gros gain ELO :</strong> la plus belle plus-value d'ELO session.<br>
+                    <strong>Soirée la plus propre :</strong> le moins de morts par partie, sur au moins 5 matchs.<br>
+                    <strong>Zéro auto-kill :</strong> la plus longue soirée (5 matchs min.) sans jamais se suicider.
                 </div>
             </div>
             <p class="section-tagline">Le high score — {{ taglines.records }}</p>
@@ -583,9 +558,10 @@
             <div id="combat-profiles-info" class="info-bubble">
                 <div class="info-bubble-title">🃏 Fiches de combat</div>
                 <div class="info-bubble-content">
-                    <strong>Badge :</strong> le trait où le joueur se démarque le plus du groupe (suicides, K/D, forme en fin de session, matchs serrés). Un badge par joueur ; « Réglementaire » si rien ne ressort.<br><br>
-                    <strong>Bête noire :</strong> l'adversaire qui le tue le plus, en kills par match joué ensemble. <strong>Souffre-douleur :</strong> l'inverse.<br><br>
-                    <strong>Matchs serrés :</strong> matchs gagnés ou perdus d'un seul kill. <strong>Meilleure série :</strong> victoires d'affilée dans une même session. Ces deux lignes ne couvrent que les sessions avec le score de chaque match.
+                    Une carte d'identité au combat — il faut un minimum de matchs pour avoir droit à une fiche.<br><br>
+                    <strong>Badge :</strong> le trait où le joueur détonne le plus par rapport aux autres (suicides, K/D, forme en fin de soirée, matchs serrés). Un badge par personne ; « Réglementaire » si rien ne ressort — trop dans la moyenne pour être intéressant.<br><br>
+                    <strong>Bête noire :</strong> l'adversaire qui le tue le plus, en kills par match joué ensemble. <strong>Souffre-douleur :</strong> l'inverse, sa victime préférée. Il faut assez de matchs en commun, sinon c'est trop facile de juger sur un soir.<br><br>
+                    <strong>Matchs à 1 kill</strong> et <strong>meilleure série :</strong> seulement les soirées où on a le score de chaque match. Une série, c'est des wins d'affilée dans la même session.
                 </div>
             </div>
             <p class="section-tagline">Le profil de chacun — {{ taglines.kills }}</p>
@@ -656,8 +632,10 @@
             <div id="kill-relationships-info" class="info-bubble">
                 <div class="info-bubble-title">🎯 Combat</div>
                 <div class="info-bubble-content">
-                    <strong>Carte des rivalités :</strong> chaque flèche va du tueur vers sa victime. Plus la flèche est épaisse et rouge, plus il y a de kills. Survolez ou cliquez un joueur pour isoler ses flèches sortantes et entrantes avec leurs valeurs.<br><br>
-                    <strong>Matrice détaillée :</strong> disponible via le bouton « Voir la matrice » pour les statisticiens acharnés.
+                    La carte des rancunes : chaque flèche va du tueur vers sa victime. Plus elle est épaisse et rouge, plus ça sent le règlement de comptes.<br><br>
+                    <strong>Moyenne :</strong> kills par partie jouée ensemble. <strong>Totaux :</strong> le compteur brut, pour les collectionneurs de cadavres.<br><br>
+                    Survolez ou cliquez un joueur pour isoler ses flèches — celles qu'il envoie et celles qu'il reçoit.<br><br>
+                    La matrice, en dessous, c'est la même chose en tableau. Pour les statisticiens qui veulent voir les chiffres en face.
                 </div>
             </div>
             <div id="rivalry-map-container" class="rivalry-map-container">
@@ -719,10 +697,11 @@
             <div id="evolution-scores-info" class="info-bubble">
                 <div class="info-bubble-title">📈 Le Parcours</div>
                 <div class="info-bubble-content">
-                    <strong>Scores :</strong> une barre par joueur et par soirée, sur une échelle commune. En mode cumulé, les barres grandissent avec le total de points.<br><br>
-                    <strong>% de victoires / ELO :</strong> courbes par joueur. Par défaut, seuls les 5 meilleurs joueurs (dernière valeur) sont affichés — cochez « Tous les joueurs » pour tout voir.<br><br>
-                    <strong>ELO match :</strong> choisissez « Par session » (dernier ELO de la session) ou « Par match » (chaque match).<br><br>
-                    <strong>La soirée :</strong> % de victoires par tranche de matchs (1 à 5, 6 à 10…) au fil d'une session.
+                    Soirée après soirée : qui monte, qui stagne, et qui a juste eu une bonne nuit.<br><br>
+                    <strong>Scores :</strong> une barre par joueur et par soirée, pour un groupe. « Cumulé » additionne les victoires au fil du temps.<br><br>
+                    <strong>% victoires / ELO :</strong> des courbes. Par défaut, les 5 meilleurs (dernière valeur) — cochez « Tous les joueurs » pour voir tout le monde, y compris les légendes oubliées.<br><br>
+                    <strong>ELO match :</strong> « Par session » = le score en fin de soirée ; « Par match » = chaque manche, pour les amateurs de montagnes russes.<br><br>
+                    <strong>La soirée :</strong> le % de victoires selon le rang du match (1–5, 6–10…). Qui démarre fort, qui s'écroule après minuit ?
                 </div>
             </div>
 
@@ -972,26 +951,15 @@
         </div>
 
         <div id="global-data-info" class="info-bubble arcade-overlay">
-            <div class="info-bubble-title">🔧 Correction des Données</div>
+            <div class="info-bubble-title">🔧 À propos des données</div>
             <div class="info-bubble-content">
-                <strong>Algorithme de correction des incohérences</strong><br><br>
-                Les données brutes peuvent contenir des incohérences entre TodayWins et TotalWins. Un algorithme corrige automatiquement ces erreurs. Parfois, Eric a dû éditer manuellement certaines entrées pour rattraper des plantages du jeu... qui plante parfois malgré ses améliorations (comme le stockage des stats dans Google Sheets). 😅<br><br>
-                <strong>Principe de correction :</strong><br>
-                Pour chaque groupe de joueurs, les sessions sont traitées dans l'ordre chronologique (de la plus ancienne à la plus récente).<br><br>
-                Pour chaque session et chaque joueur :<br>
-                • On récupère le TotalWins actuel et le TotalWins de la session précédente<br>
-                • On calcule le TodayWins attendu : <code>TodayWins = TotalWins_actuel - TotalWins_précédent</code><br>
-                • Si le TodayWins enregistré ≠ TodayWins attendu ET TodayWins attendu ≥ 0, on corrige TodayWins<br>
-                • On met à jour le TotalWins précédent pour la prochaine session<br><br>
-                <strong>Normalisation des joueurs :</strong><br>
-                Tous les joueurs présents dans les statistiques détaillées (<code>today</code>/<code>total</code>) sont automatiquement inclus dans <code>todayWin</code> et <code>totalWin</code>, même s'ils ont 0 victoires.<br><br>
-                <strong>Format des données :</strong><br>
-                Les données utilisent le format <code>todayWin[player]</code> et <code>totalWin[player]</code> pour stocker les statistiques de chaque joueur.<br><br>
-                <strong>Filtrage :</strong><br>
-                • Sessions passant minuit : si une session se termine après minuit, seule la session du jour suivant (00h-05h) est conservée<br>
-                • Joueurs invalides : AIJIMMY, P1, P2, A, BB, etc. sont ignorés<br><br>
-                <strong>Modes de jeu (v4) :</strong><br>
-                Depuis avril 2026, Eric a ajouté un champ <code>mode</code> dans les stats v4. Les anciennes sessions sans <code>mode</code> sont traitées comme Head Hunters. Les cumuls sont calculés <em>séparément par mode</em>.
+                Les stats brutes du jeu sont parfois un peu… créatives. Surtout quand Eric plante (le jeu, la Sheet, ou les deux). 😅<br><br>
+                L'algo remet de l'ordre, soirée après soirée, pour chaque groupe :<br>
+                • On compare le total de victoires d'une session avec celui de la précédente.<br>
+                • Si le score du jour ne colle pas (et que le calcul donne un nombre positif), on le corrige.<br>
+                • Un joueur autour de la table est compté même à 0 victoire — disparaître des stats n'est pas une stratégie.<br><br>
+                On ignore les faux joueurs (P1, P2, l'IA…) et les doublons après minuit : si la soirée déborde sur 2 h du matin, on ne garde que le lendemain.<br><br>
+                Depuis avril 2026, les modes (Head Hunters, Respawn 3…) sont séparés. Les vieilles sessions sans mode sont traitées comme du Head Hunters.
             </div>
         </div>
     </div>

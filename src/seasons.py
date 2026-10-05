@@ -27,7 +27,7 @@ SEASONS = [
 CAREER_SEASON = {
     'id': CAREER_SEASON_ID,
     'short': '∞',
-    'label': 'Carrière',
+    'label': 'All-time',
     'start': None,
     'end': None,
 }

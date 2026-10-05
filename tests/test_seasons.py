@@ -132,9 +132,9 @@ def test_career_delta_labels():
         },
     }
     deltas = leaderboard_career_deltas(season_data, career_data)
-    assert deltas['win_pct']['ALICE'] == 'carrière : 2e'
+    assert deltas['win_pct']['ALICE'] == 'All-time : 2e'
     assert deltas['elo']['ALICE'] == 'même rang'
-    assert deltas['elo_match']['BOB'] == 'carrière : 3e'
+    assert deltas['elo_match']['BOB'] == 'All-time : 3e'
     assert deltas['group_score']['ALICE'] == 'même rang'
 
 
@@ -243,4 +243,4 @@ def test_season_1_route_stops_before_august_15(_messages):
     assert '2025-06-03' in html
     assert 'Depuis le 03/06/25' in html
     assert 'juin 2025 → août 2026' in html
-    assert 'carrière :' in html or 'même rang' in html
+    assert 'All-time :' in html or 'même rang' in html

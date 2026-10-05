@@ -80,38 +80,6 @@ def test_best_win_percentage_from_snapshot():
         assert round(row[4], 4) == expected_wp[i][4]
 
 
-def test_elo_legacy_ranking_top3_from_snapshot():
-    stats = build_stats_from_snapshot()
-    ctx = stats.prepare_template_data()
-
-    elo_legacy_ranking = ctx["elo_legacy_ranking"]
-    assert len(elo_legacy_ranking) >= 3
-
-    top3_names = [row[1] for row in elo_legacy_ranking[:3]]
-    assert set(top3_names) == {"LOUIS", "ERIC", "DAVID"}
-
-
-def test_elo_legacy_scores_for_all_players_from_snapshot():
-    stats = build_stats_from_snapshot()
-    ctx = stats.prepare_template_data()
-
-    elo_ranking = ctx["elo_legacy_ranking"]
-    expected_players = {"LOUIS", "ERIC", "DAVID", "BENOIT", "MEHDI", "JULIEN"}
-    assert len(elo_ranking) == 6
-    assert {row[1] for row in elo_ranking} == expected_players
-
-    # Ordre: ELO décroissant puis nom (ex aequo en ordre alphabétique)
-    actual_order = [row[1] for row in elo_ranking]
-    assert set(actual_order) == set(expected_players)
-
-    # ELO strictement décroissant (format: rank, name, elo)
-    for i, row in enumerate(elo_ranking):
-        name, elo = row[1], row[2]
-        assert 1000 <= elo <= 2000, f"{name}: ELO {elo} hors plage"
-        if i < len(elo_ranking) - 1:
-            assert elo >= elo_ranking[i + 1][2], "Classement ELO doit être décroissant"
-
-
 def test_elo_batch_scores_for_all_players_from_snapshot():
     stats = build_stats_from_snapshot()
     ctx = stats.prepare_template_data()
@@ -306,7 +274,7 @@ def _assert_elo_session_and_match_invariants(snapshot_path: str, game_mode: str 
     n = ctx["unique_players_count"]
     assert n >= 1
 
-    for key in ("elo_ranking", "elo_match_ranking", "elo_legacy_ranking"):
+    for key in ("elo_ranking", "elo_match_ranking"):
         rows = ctx[key]
         assert len(rows) == n, key
         for i, row in enumerate(rows):
@@ -389,13 +357,6 @@ def test_elo_match_evolution_starts_with_session_baseline_on_date_filter():
     assert prematch_flat[-1]['date'] < first_match_point['date']
 
 
-def test_elo_batch_differs_from_legacy_from_snapshot():
-    stats = build_stats_from_snapshot()
-    ctx = stats.prepare_template_data()
-
-    assert ctx["elo_ranking"] != ctx["elo_legacy_ranking"]
-
-
 def test_elo_batch_is_deterministic_on_both_snapshots():
     for snapshot_path in SNAPSHOT_PATHS_INTEGRATION:
         stats_1 = build_stats_from_path(snapshot_path)
@@ -470,7 +431,6 @@ EXPECTED_TEMPLATE_KEYS = frozenset({
     "total_sessions", "unique_players_count", "best_players", "best_score",
     "best_percentage_players", "best_percentage", "win_percentage_ranking",
     "elo_ranking", "elo_evolution", "elo_match_evolution", "win_rate_evolution", "best_elo_players", "best_elo",
-    "elo_legacy_ranking", "best_elo_legacy_players", "best_elo_legacy",
     "elo_match_ranking", "elo_match_by_player", "best_elo_match", "best_elo_match_players",
     "latest_date",
     "latest_sessions_parsed", "latest_sessions_data", "sessions_by_date", "all_sessions_data",
@@ -503,9 +463,6 @@ def test_best_elo_and_dates_from_snapshot():
 
     assert ctx["best_elo"] == ctx["elo_ranking"][0][2]
     assert 1000 <= ctx["best_elo"] <= 2000
-    assert ctx["best_elo_legacy_players"] == ["LOUIS"]
-    assert ctx["best_elo_legacy"] == ctx["elo_legacy_ranking"][0][2]
-    assert 1000 <= ctx["best_elo_legacy"] <= 2000
     assert ctx["best_elo_match"] == ctx["elo_match_ranking"][0][2]
     assert 1000 <= ctx["best_elo_match"] <= 2000
 
