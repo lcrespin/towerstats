@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TowerStats - Statistiques TowerFall Ascension</title>
-    <link rel="icon" type="image/x-icon" href="/images/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script>
@@ -19,9 +19,7 @@
             }
         }
     </script>
-    <style>
-{{ css_content|safe }}
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 
 <body class="txt-base break-words">
@@ -34,18 +32,18 @@
 
     <header class="gap-2.5 sm:gap-5 pad-section min-h-[35px] sm:min-h-[45px] md:min-h-[80px]">
         <div class="header-characters gap-0.5 sm:gap-2 md:gap-8">
-            <img src="/images/pink-portrait-selected.png" alt="Pink Character" class="header-character left header-portrait">
-            <img src="/images/green-portrait-selected.png" alt="Green Character" class="header-character left header-portrait">
-            <img src="/images/altOrange-portrait-selected.png" alt="Orange Character" class="header-character left header-portrait">
+            <img src="{{ url_for('static', filename='images/pink-portrait-selected.png') }}" alt="Pink Character" class="header-character left header-portrait">
+            <img src="{{ url_for('static', filename='images/green-portrait-selected.png') }}" alt="Green Character" class="header-character left header-portrait">
+            <img src="{{ url_for('static', filename='images/altOrange-portrait-selected.png') }}" alt="Orange Character" class="header-character left header-portrait">
         </div>
         <div class="header-brand">
-            <h1 class="txt-title-h1 m-0.5 sm:m-0.5 md:m-2.5 lg:m-[10px] h-auto min-h-[16px] sm:min-h-[21px] md:min-h-[40px] lg:min-h-[120px] p-0.5 sm:p-0.5 md:p-0.5 lg:p-0"><span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span> TOWERSTATS <span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span></h1>
-            <p class="header-subtitle">Les stats officielles (plus ou moins) de la soirée TowerFall — saison par saison</p>
+            <h1 class="txt-title-h1 m-0 p-0"><span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span> TOWERSTATS <span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span></h1>
+            <p class="header-subtitle">{{ header_subtitle }}</p>
         </div>
         <div class="header-characters gap-0.5 sm:gap-2 md:gap-8">
-            <img src="/images/purple-portrait-selected.png" alt="Purple Character" class="header-character right header-portrait">
-            <img src="/images/white-portrait-selected.png" alt="White Character" class="header-character right header-portrait">
-            <img src="/images/altCyan-portrait-selected.png" alt="Cyan Character" class="header-character right header-portrait">
+            <img src="{{ url_for('static', filename='images/purple-portrait-selected.png') }}" alt="Purple Character" class="header-character right header-portrait">
+            <img src="{{ url_for('static', filename='images/white-portrait-selected.png') }}" alt="White Character" class="header-character right header-portrait">
+            <img src="{{ url_for('static', filename='images/altCyan-portrait-selected.png') }}" alt="Cyan Character" class="header-character right header-portrait">
         </div>
     </header>
 
@@ -180,6 +178,45 @@
         </div>
         {%- endmacro %}
 
+        {% macro rank_class(rank) -%}{% if rank <= 3 %}rank-{{ rank }}{% endif %}{%- endmacro %}
+
+        {% macro ranking_player_cell(rank, player) -%}
+        <td class="player-column {{ rank_class(rank) }}" style="color: {{ get_player_color(player) }};">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
+        {%- endmacro %}
+
+        {% macro ranking_value_cell(rank, value) -%}
+        <td class="{{ rank_class(rank) }}">{{ value }}</td>
+        {%- endmacro %}
+
+        {% macro ranking_table(rows, headers, extra_class='', table_id='', tbody_id='', empty_message='') %}
+        <div class="overflow-x-auto">
+            <table class="ranking-table w-full txt-xs{% if extra_class %} {{ extra_class }}{% endif %}"{% if table_id %} id="{{ table_id }}"{% endif %}>
+                <thead>
+                    <tr>
+                        {% for h in headers %}
+                        {% if h is mapping %}
+                        <th class="{% if loop.first %}player-column {% endif %}sortable-th" data-sort-type="{{ h.sort }}" data-col="{{ h.col }}">{{ h.label }} <span class="sort-indicator"></span></th>
+                        {% else %}
+                        <th{% if loop.first %} class="player-column"{% endif %}>{{ h }}</th>
+                        {% endif %}
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody{% if tbody_id %} id="{{ tbody_id }}"{% endif %}>
+                    {% for item in rows %}
+                    <tr>{{ caller(item, item[0], item[1]) }}</tr>
+                    {% else %}
+                    {% if empty_message %}
+                    <tr>
+                        <td colspan="{{ headers|length }}" class="text-center" style="color: var(--text); padding: 20px;">{{ empty_message }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endmacro %}
+
         {% set show_kd = has_detailed_stats and best_kd_ratio %}
         {% set show_kills = has_detailed_stats and best_kills_players %}
         {% set leader_count = [best_percentage_players, best_elo_players, best_elo_match_players, show_kd, show_kills]|select|list|length %}
@@ -244,27 +281,11 @@
                 {% if win_percentage_ranking %}
                 {{ pixel_podium(win_percentage_ranking, 4, "%.1f", suffix='%', detail='ratio') }}
                 {% endif %}
-                <div class="overflow-x-auto">
-                    <table class="ranking-table w-full txt-xs">
-                        <thead>
-                            <tr>
-                                <th class="player-column">Joueur</th>
-                                <th>Victoires / Parties</th>
-                                <th>% Victoires</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in win_percentage_ranking %}
-                            {% set rank, player, victories, games_played, win_percentage = item[0], item[1], item[2], item[3], item[4] %}
-                            <tr>
-                                <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
-                                <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ victories }}/{{ games_played }}</td>
-                                <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.2f" % win_percentage }}%</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                {% call(item, rank, player) ranking_table(win_percentage_ranking, ['Joueur', 'Victoires / Parties', '% Victoires']) %}
+                {{ ranking_player_cell(rank, player) }}
+                {{ ranking_value_cell(rank, item[2] ~ '/' ~ item[3]) }}
+                {{ ranking_value_cell(rank, ("%.2f" % item[4]) ~ '%') }}
+                {% endcall %}
             </div>
 
             <div class="leader-panel hidden" id="leader-panel-elo" data-panel="elo" role="tabpanel">
@@ -283,29 +304,10 @@
                 {% if elo_ranking %}
                 {{ pixel_podium(elo_ranking, 2, "%.0f", detail='ELO session') }}
                 {% endif %}
-                <div class="overflow-x-auto">
-                    <table class="ranking-table w-full txt-xs">
-                        <thead>
-                            <tr>
-                                <th class="player-column">Joueur</th>
-                                <th>ELO session</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in elo_ranking %}
-                            {% set rank, player, elo = item[0], item[1], item[2] %}
-                            <tr>
-                                <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
-                                <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.0f" % elo }}</td>
-                            </tr>
-                            {% else %}
-                            <tr>
-                                <td colspan="2" class="text-center" style="color: var(--text); padding: 20px;">Aucun classement ELO disponible</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                {% call(item, rank, player) ranking_table(elo_ranking, ['Joueur', 'ELO session'], empty_message='Aucun classement ELO disponible') %}
+                {{ ranking_player_cell(rank, player) }}
+                {{ ranking_value_cell(rank, "%.0f" % item[2]) }}
+                {% endcall %}
             </div>
 
             {% if best_elo_match_players %}
@@ -323,25 +325,10 @@
                     </div>
                 </div>
                 {{ pixel_podium(elo_match_ranking, 2, "%.0f", detail='ELO match') }}
-                <div class="overflow-x-auto">
-                    <table class="ranking-table w-full txt-xs">
-                        <thead>
-                            <tr>
-                                <th class="player-column">Joueur</th>
-                                <th>ELO match</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in elo_match_ranking %}
-                            {% set rank, player, elo = item[0], item[1], item[2] %}
-                            <tr>
-                                <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
-                                <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ "%.0f" % elo }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                {% call(item, rank, player) ranking_table(elo_match_ranking, ['Joueur', 'ELO match']) %}
+                {{ ranking_player_cell(rank, player) }}
+                {{ ranking_value_cell(rank, "%.0f" % item[2]) }}
+                {% endcall %}
             </div>
             {% endif %}
 
@@ -361,39 +348,32 @@
                     </div>
                 </div>
                 {{ pixel_podium(kill_death_ranking, 5, "%.2f", detail='K/D') }}
-                <div class="overflow-x-auto">
-                    <table class="ranking-table w-full txt-xs kill-detail-table-mobile" id="kill-detail-table">
-                        <thead>
-                            <tr>
-                                <th class="player-column sortable-th" data-sort-type="text" data-col="0">Joueur <span class="sort-indicator"></span></th>
-                                <th class="sortable-th" data-sort-type="number" data-col="1">Kills <span class="sort-indicator"></span></th>
-                                <th class="sortable-th" data-sort-type="number" data-col="2">Deaths <span class="sort-indicator"></span></th>
-                                <th class="sortable-th" data-sort-type="number" data-col="3">Self <span class="sort-indicator"></span></th>
-                                <th class="sortable-th" data-sort-type="number" data-col="4">Ratio K/D <span class="sort-indicator"></span></th>
-                                <th class="sortable-th" data-sort-type="number" data-col="5">Parties <span class="sort-indicator"></span></th>
-                                <th class="sortable-th" data-sort-type="number" data-col="6">Moy. Kills <span class="sort-indicator"></span></th>
-                                <th class="sortable-th" data-sort-type="number" data-col="7">Moy. Deaths <span class="sort-indicator"></span></th>
-                                <th class="sortable-th" data-sort-type="number" data-col="8">Moy. Auto <span class="sort-indicator"></span></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in kill_death_ranking %}
-                            {% set rank_class = 'rank-' ~ item[0] if item[0] <= 3 else '' %}
-                            <tr>
-                                <td class="player-column {{ rank_class }}" style="color: {{ get_player_color(item[1]) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(item[0]) }} {{ item[1] }}</td>
-                                <td class="{{ rank_class }}">{{ item[2] }}</td>
-                                <td class="{{ rank_class }}">{{ item[3] }}</td>
-                                <td class="{{ rank_class }}">{{ item[4] }}</td>
-                                <td class="{{ rank_class }}">{{ "%.2f" % item[5] }}</td>
-                                <td class="{{ rank_class }}">{{ item[6] }}</td>
-                                <td class="{{ rank_class }}">{{ "%.2f" % item[7] }}</td>
-                                <td class="{{ rank_class }}">{{ "%.2f" % item[8] }}</td>
-                                <td class="{{ rank_class }}">{{ "%.2f" % item[9] }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                {% call(item, rank, player) ranking_table(
+                    kill_death_ranking,
+                    [
+                        {'label': 'Joueur', 'sort': 'text', 'col': '0'},
+                        {'label': 'Kills', 'sort': 'number', 'col': '1'},
+                        {'label': 'Deaths', 'sort': 'number', 'col': '2'},
+                        {'label': 'Self', 'sort': 'number', 'col': '3'},
+                        {'label': 'Ratio K/D', 'sort': 'number', 'col': '4'},
+                        {'label': 'Parties', 'sort': 'number', 'col': '5'},
+                        {'label': 'Moy. Kills', 'sort': 'number', 'col': '6'},
+                        {'label': 'Moy. Deaths', 'sort': 'number', 'col': '7'},
+                        {'label': 'Moy. Auto', 'sort': 'number', 'col': '8'},
+                    ],
+                    extra_class='kill-detail-table-mobile',
+                    table_id='kill-detail-table',
+                ) %}
+                {{ ranking_player_cell(rank, player) }}
+                {{ ranking_value_cell(rank, item[2]) }}
+                {{ ranking_value_cell(rank, item[3]) }}
+                {{ ranking_value_cell(rank, item[4]) }}
+                {{ ranking_value_cell(rank, "%.2f" % item[5]) }}
+                {{ ranking_value_cell(rank, item[6]) }}
+                {{ ranking_value_cell(rank, "%.2f" % item[7]) }}
+                {{ ranking_value_cell(rank, "%.2f" % item[8]) }}
+                {{ ranking_value_cell(rank, "%.2f" % item[9]) }}
+                {% endcall %}
                 <div class="stats-dates">
                     <div>Stats de combat depuis le {{ date_debut_detailed }}</div>
                 </div>
@@ -414,27 +394,11 @@
                     </div>
                 </div>
                 {{ pixel_podium(kills_per_game_ranking, 2, "%.2f", detail='kills /partie') }}
-                <div class="overflow-x-auto">
-                    <table class="ranking-table w-full txt-xs">
-                        <thead>
-                            <tr>
-                                <th class="player-column">Joueur</th>
-                                <th>Kills /partie</th>
-                                <th>Parties</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for item in kills_per_game_ranking %}
-                            {% set rank_class = 'rank-' ~ item[0] if item[0] <= 3 else '' %}
-                            <tr>
-                                <td class="player-column {{ rank_class }}" style="color: {{ get_player_color(item[1]) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(item[0]) }} {{ item[1] }}</td>
-                                <td class="{{ rank_class }}">{{ "%.2f" % item[2] }}</td>
-                                <td class="{{ rank_class }}">{{ item[3] }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                {% call(item, rank, player) ranking_table(kills_per_game_ranking, ['Joueur', 'Kills /partie', 'Parties']) %}
+                {{ ranking_player_cell(rank, player) }}
+                {{ ranking_value_cell(rank, "%.2f" % item[2]) }}
+                {{ ranking_value_cell(rank, item[3]) }}
+                {% endcall %}
                 <div class="stats-dates">
                     <div>Stats de combat depuis le {{ date_debut_detailed }}</div>
                 </div>
@@ -470,25 +434,10 @@
                         <span class="select-arrow">▼</span>
                     </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="ranking-table w-full txt-xs" id="group-ranking-table">
-                        <thead>
-                            <tr>
-                                <th class="player-column">Joueur</th>
-                                <th>Victoires</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ranking-tbody">
-                            {% for item in default_ranking %}
-                            {% set rank, player, total = item[0], item[1], item[2] %}
-                            <tr>
-                                <td class="player-column {% if rank <= 3 %}rank-{{ rank }}{% endif %}" style="color: {{ get_player_color(player) }}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">{{ stats_manager.get_medal(rank) }} {{ player }}</td>
-                                <td class="{% if rank <= 3 %}rank-{{ rank }}{% endif %}">{{ total }}</td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
+                {% call(item, rank, player) ranking_table(default_ranking, ['Joueur', 'Victoires'], table_id='group-ranking-table', tbody_id='ranking-tbody') %}
+                {{ ranking_player_cell(rank, player) }}
+                {{ ranking_value_cell(rank, item[2]) }}
+                {% endcall %}
             </div>
         </section>
 
@@ -969,9 +918,7 @@
         <p class="site-footer-sub">TowerStats · Soirée hebdo · Quarantenaires armés de flèches · {{ total_sessions }} sessions{% if not is_career_view %} · {{ season_period_label }}{% endif %}</p>
     </footer>
 
-    <!-- Injection des données JSON pour JavaScript -->
     <script>
-        // Données globales pour JavaScript
         const rankingsByGroup = {{ rankings_by_group|tojson }};
         const playerColors = {{ player_colors|tojson }};
         const playerPortraits = {{ player_portraits|tojson }};
@@ -990,24 +937,12 @@
         const maxKillsInMatrix = {{ max_kills_in_matrix|tojson }};
         let currentPage = 1;
         const sessionsPerPage = 10;
-        // Initialiser filteredSessions avec toutes les sessions au chargement
         let filteredSessions = allSessions.slice();
         let totalPages = Math.ceil(filteredSessions.length / sessionsPerPage);
     </script>
 
-    <!-- Chargement du JavaScript externe -->
-    <script>
-{{ js_content|safe }}
-    </script>
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>
 
 </html>
-
-
-</html>
-
-</html>
-
-
-
 

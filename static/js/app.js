@@ -1,12 +1,10 @@
-// Fonction pour obtenir la couleur d'un joueur
 function getPlayerColor(playerName) {
     if (typeof playerColors === 'undefined') {
-        return '#FFD700'; // Or par défaut
+        return '#FFD700';
     }
     return playerColors[playerName.toUpperCase()] || '#FFD700';
 }
 
-// Mise à jour du classement par groupe
 function getMedal(rank) {
     if (rank === 1) return '🥇';
     if (rank === 2) return '🥈';
@@ -106,10 +104,10 @@ function updateRanking(groupId) {
         const playerColor = getPlayerColor(playerName);
         const medal = getMedal(rank);
         const row = document.createElement('tr');
-        row.innerHTML = `
-            <td class="player-column ${rankClass}" style="color: ${playerColor}; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">${medal} ${playerName}</td>
-            <td class="${rankClass}">${playerData[2]}</td>
-        `;
+        row.innerHTML =
+            '<td class="player-column ' + rankClass + '" style="color: ' + playerColor + ';">' +
+            medal + ' ' + playerName + '</td>' +
+            '<td class="' + rankClass + '">' + playerData[2] + '</td>';
         tbody.appendChild(row);
     });
     renderGroupPodium(ranking);
@@ -173,7 +171,6 @@ function makeTableSortable(table) {
     });
 }
 
-// Init sortable for all tables with 3+ columns
 function initSortableTables() {
     document.querySelectorAll('table').forEach(function(table) {
         var ths = table.querySelectorAll('thead th');
@@ -181,7 +178,6 @@ function initSortableTables() {
     });
 }
 
-// Initialisation du tableau de kills
 function initRankingTable() {
     const toggleRankingTable = document.getElementById('toggle-ranking-table');
     if (toggleRankingTable) {
@@ -199,7 +195,6 @@ function initRankingTable() {
     }
 }
 
-// Initialisation du sélecteur de groupe
 function initGroupSelector() {
     const groupSelect = document.getElementById('group-select');
     if (groupSelect) {
@@ -209,9 +204,7 @@ function initGroupSelector() {
     }
 }
 
-// Variables globales pour le filtrage
-// filteredSessions est initialisé dans le script inline du HTML
-// Si elle n'existe pas encore, on l'initialise ici
+// allSessions / filteredSessions are declared in the inline script in index.html.
 if (typeof filteredSessions === 'undefined') {
     filteredSessions = [];
 }
@@ -219,19 +212,16 @@ let currentPlayerFilter = '';
 let currentGroupFilter = '';
 let highlightedSessionKey = null;
 
-// Handlers pour les filtres (stockés pour pouvoir les supprimer)
 let playerFilterHandler = null;
 let groupFilterHandler = null;
 let filtersListenersAttached = false;
 
-// Filtrer les sessions selon les critères sélectionnés
 function filterSessions() {
     if (typeof allSessions === 'undefined') {
         return;
     }
     
     filteredSessions = allSessions.filter(function(session) {
-        // Filtre par joueur
         if (currentPlayerFilter) {
             const hasPlayer = session.players.some(function(p) {
                 return p.name === currentPlayerFilter;
@@ -241,7 +231,6 @@ function filterSessions() {
             }
         }
         
-        // Filtre par groupe
         if (currentGroupFilter) {
             const sessionGroup = session.group || session.id;
             if (sessionGroup !== currentGroupFilter) {
@@ -252,14 +241,12 @@ function filterSessions() {
         return true;
     });
     
-    // Réinitialiser à la page 1 après filtrage
     currentPage = 1;
     updatePagination();
     updateSessionsCount();
     renderSessions();
 }
 
-// Mettre à jour la pagination
 function updatePagination() {
     totalPages = Math.ceil(filteredSessions.length / sessionsPerPage);
     if (totalPages === 0) {
@@ -270,7 +257,6 @@ function updatePagination() {
     }
 }
 
-// Mettre à jour le compteur de sessions
 function updateSessionsCount() {
     const countElement = document.getElementById('sessions-count-value');
     if (countElement) {
@@ -279,7 +265,6 @@ function updateSessionsCount() {
     }
 }
 
-// Rendu des sessions avec pagination
 function renderSessions() {
     if (typeof allSessions === 'undefined') {
         return;
@@ -290,7 +275,6 @@ function renderSessions() {
     
     container.innerHTML = '';
     
-    // S'assurer que filteredSessions est initialisé
     if (filteredSessions.length === 0 && allSessions.length > 0) {
         filteredSessions = allSessions.slice();
         updatePagination();
@@ -760,7 +744,6 @@ function buildSessionCard(session, highlight, openDetails) {
     return card;
 }
 
-// Mettre à jour les contrôles de pagination
 function updatePaginationControls() {
     const pageInfo = document.getElementById('page-info');
     const prevBtn = document.getElementById('prev-page');
@@ -777,55 +760,44 @@ function updatePaginationControls() {
     }
 }
 
-// Variable pour suivre si les filtres ont été initialisés
 let filtersInitialized = false;
 
-// Initialiser les listes déroulantes de filtrage
 function initFilters() {
     if (typeof allSessions === 'undefined' || allSessions.length === 0) {
-        // Initialiser quand même filteredSessions pour éviter les erreurs
         filteredSessions = [];
         return;
     }
-    
-    // Toujours initialiser filteredSessions, même si les filtres sont déjà initialisés
+
     if (filteredSessions.length === 0 && !currentPlayerFilter && !currentGroupFilter) {
         filteredSessions = allSessions.slice();
         updateSessionsCount();
     }
-    
-    // Si les filtres sont déjà initialisés, synchroniser seulement les valeurs des selects
-    // IMPORTANT: Ne pas réinitialiser les selects à vide, seulement synchroniser si la variable a une valeur
+
+    // Do not wipe the user's select: only copy JS state onto the select when that state is non-empty.
     if (filtersInitialized) {
         const playerSelect = document.getElementById('filter-player');
         if (playerSelect) {
-            // Synchroniser la valeur du select avec la variable seulement si la variable a une valeur
-            // Ne pas réinitialiser à vide pour préserver la sélection de l'utilisateur
             if (currentPlayerFilter && playerSelect.value !== currentPlayerFilter) {
                 playerSelect.value = currentPlayerFilter;
             }
         }
-        
+
         const groupSelect = document.getElementById('filter-group');
         if (groupSelect) {
-            // Synchroniser la valeur du select avec la variable seulement si la variable a une valeur
-            // Ne pas réinitialiser à vide pour préserver la sélection de l'utilisateur
             if (currentGroupFilter && groupSelect.value !== currentGroupFilter) {
                 groupSelect.value = currentGroupFilter;
             }
         }
-        
+
         updatePagination();
         updateSessionsCount();
         return;
     }
-    
-    // Extraire tous les joueurs uniques
+
     const allPlayers = new Set();
     const allGroups = new Set();
-    
+
     allSessions.forEach(function(session) {
-        // Le groupe peut être dans session.group ou session.id
         const group = session.group || session.id;
         if (group) {
             allGroups.add(group);
@@ -836,15 +808,12 @@ function initFilters() {
             });
         }
     });
-    
-    // Trier les joueurs et groupes
+
     const sortedPlayers = Array.from(allPlayers).sort();
     const sortedGroups = Array.from(allGroups).sort();
-    
-    // Remplir la liste déroulante des joueurs
+
     const playerSelect = document.getElementById('filter-player');
     if (playerSelect) {
-        // Remplir seulement si pas déjà rempli
         if (playerSelect.children.length === 1) {
             sortedPlayers.forEach(function(player) {
                 const option = document.createElement('option');
@@ -853,23 +822,17 @@ function initFilters() {
                 playerSelect.appendChild(option);
             });
         }
-        
-        // Synchroniser la valeur du select avec la variable (sans déclencher l'event)
-        // IMPORTANT: Lire la valeur actuelle du select et la mettre dans la variable si elle n'est pas vide
-        // Cela préserve la sélection de l'utilisateur même si la variable était vide
+
         if (playerSelect.value && !currentPlayerFilter) {
             currentPlayerFilter = playerSelect.value;
         }
-        // Sinon, synchroniser le select avec la variable si la variable a une valeur
         else if (currentPlayerFilter && playerSelect.value !== currentPlayerFilter) {
             playerSelect.value = currentPlayerFilter;
         }
-        
-        // Attacher le listener seulement s'il n'est pas déjà attaché
+
         if (!filtersListenersAttached) {
             playerFilterHandler = function() {
                 currentPlayerFilter = this.value;
-                // Si un joueur est sélectionné, réinitialiser le filtre groupe
                 if (currentPlayerFilter) {
                     currentGroupFilter = '';
                     const groupSelect = document.getElementById('filter-group');
@@ -882,11 +845,9 @@ function initFilters() {
             playerSelect.addEventListener('change', playerFilterHandler);
         }
     }
-    
-    // Remplir la liste déroulante des groupes
+
     const groupSelect = document.getElementById('filter-group');
     if (groupSelect) {
-        // Remplir seulement si pas déjà rempli
         if (groupSelect.children.length === 1) {
             sortedGroups.forEach(function(group) {
                 const option = document.createElement('option');
@@ -895,23 +856,17 @@ function initFilters() {
                 groupSelect.appendChild(option);
             });
         }
-        
-        // Synchroniser la valeur du select avec la variable (sans déclencher l'event)
-        // IMPORTANT: Lire la valeur actuelle du select et la mettre dans la variable si elle n'est pas vide
-        // Cela préserve la sélection de l'utilisateur même si la variable était vide
+
         if (groupSelect.value && !currentGroupFilter) {
             currentGroupFilter = groupSelect.value;
         }
-        // Sinon, synchroniser le select avec la variable si la variable a une valeur
         else if (currentGroupFilter && groupSelect.value !== currentGroupFilter) {
             groupSelect.value = currentGroupFilter;
         }
-        
-        // Attacher le listener seulement s'il n'est pas déjà attaché
+
         if (!filtersListenersAttached) {
             groupFilterHandler = function() {
                 currentGroupFilter = this.value;
-                // Si un groupe est sélectionné, réinitialiser le filtre joueur
                 if (currentGroupFilter) {
                     currentPlayerFilter = '';
                     const playerSelect = document.getElementById('filter-player');
@@ -925,8 +880,7 @@ function initFilters() {
             filtersListenersAttached = true;
         }
     }
-    
-    // Initialiser les sessions filtrées avec toutes les sessions si pas déjà fait
+
     if (filteredSessions.length === 0) {
         filteredSessions = allSessions.slice();
     }
@@ -935,7 +889,6 @@ function initFilters() {
     filtersInitialized = true;
 }
 
-// Initialisation de la pagination des sessions
 function initSessionsPagination() {
     if (typeof allSessions === 'undefined') {
         return;
@@ -954,18 +907,15 @@ function initSessionsPagination() {
             } else {
                 container.classList.remove('hidden');
                 this.textContent = '▲ Masquer toutes les sessions';
-                
-                // Initialiser les filtres et filteredSessions
+
                 initFilters();
-                
-                // S'assurer que filteredSessions est initialisé
+
                 if (filteredSessions.length === 0 && typeof allSessions !== 'undefined' && allSessions.length > 0) {
                     filteredSessions = allSessions.slice();
                     updatePagination();
                     updateSessionsCount();
                 }
-                
-                // Rendre les sessions
+
                 renderSessions();
             }
         });
@@ -1115,7 +1065,6 @@ function initAnchorOnLoad() {
     setTimeout(scrollToAnchor, 150);
 }
 
-// Smooth scroll pour le menu (resolve short hashes via ANCHOR_HASH_MAP, then scroll)
 function initSmoothScroll() {
     document.querySelectorAll('nav a').forEach(function(anchor) {
         anchor.addEventListener('click', function (e) {
@@ -1307,16 +1256,13 @@ function refreshLineEvolutionCharts() {
     renderEloMatchEvolutionChart();
 }
 
-// Graphique d'évolution des scores
 let evolutionChart = null;
 
-// Initialiser le graphique d'évolution
 function initEvolutionChart() {
     if (typeof allSessions === 'undefined' || allSessions.length === 0) {
         return;
     }
 
-    // Récupérer tous les groupes uniques
     const allGroups = new Set();
     allSessions.forEach(function(session) {
         const group = session.group || session.id;
@@ -1325,16 +1271,14 @@ function initEvolutionChart() {
         }
     });
 
-    // Trier les groupes par le meilleur score du groupe (décroissant)
     const sortedGroups = Array.from(allGroups).sort(function(a, b) {
         const rankingA = rankingsByGroup[a] || [];
         const rankingB = rankingsByGroup[b] || [];
         const bestScoreA = rankingA.length > 0 ? rankingA[0][1] : 0;
         const bestScoreB = rankingB.length > 0 ? rankingB[0][1] : 0;
-        return bestScoreB - bestScoreA; // Décroissant
+        return bestScoreB - bestScoreA;
     });
 
-    // Remplir le sélecteur de groupe
     const groupSelect = document.getElementById('evolution-group-select');
     const cumulCheckbox = document.getElementById('evolution-cumul-checkbox');
     
@@ -1346,13 +1290,11 @@ function initEvolutionChart() {
             groupSelect.appendChild(option);
         });
 
-        // Écouter les changements du sélecteur
         groupSelect.addEventListener('change', function() {
             const isCumul = cumulCheckbox ? cumulCheckbox.checked : true;
             updateEvolutionChart(this.value, isCumul);
         });
         
-        // Écouter les changements de la case à cocher
         if (cumulCheckbox) {
             cumulCheckbox.addEventListener('change', function() {
                 const groupId = groupSelect.value;
@@ -1362,7 +1304,6 @@ function initEvolutionChart() {
             });
         }
 
-        // Initialiser avec le premier groupe si disponible
         if (sortedGroups.length > 0) {
             groupSelect.value = sortedGroups[0];
             const isCumul = cumulCheckbox ? cumulCheckbox.checked : true;
@@ -1371,19 +1312,16 @@ function initEvolutionChart() {
     }
 }
 
-// Mettre à jour le graphique d'évolution
 function updateEvolutionChart(groupId, isCumul) {
     if (typeof allSessions === 'undefined' || !groupId) {
         return;
     }
     
-    // Par défaut, utiliser le mode cumul si non spécifié
     if (typeof isCumul === 'undefined') {
         const cumulCheckbox = document.getElementById('evolution-cumul-checkbox');
         isCumul = cumulCheckbox ? cumulCheckbox.checked : true;
     }
 
-    // Filtrer les sessions du groupe sélectionné
     const groupSessions = allSessions.filter(function(session) {
         const sessionGroup = session.group || session.id;
         return sessionGroup === groupId;
@@ -1393,16 +1331,14 @@ function updateEvolutionChart(groupId, isCumul) {
         return;
     }
 
-    // Organiser les données par date
     const dataByDate = {};
-    const dateMapping = {}; // Mapping date originale -> date formatée
+    const dateMapping = {};
     const allPlayers = new Set();
 
     groupSessions.forEach(function(session) {
-        const originalDate = session.date; // Format YYYY-MM-DD pour le tri
+        const originalDate = session.date;
         const formattedDate = session.formatted_date || session.date;
         
-        // Utiliser la date originale comme clé pour le tri
         if (!dataByDate[originalDate]) {
             dataByDate[originalDate] = {};
             dateMapping[originalDate] = formattedDate;
@@ -1411,7 +1347,6 @@ function updateEvolutionChart(groupId, isCumul) {
         if (session.players) {
             session.players.forEach(function(player) {
                 allPlayers.add(player.name);
-                // Utiliser total pour cumul, today pour session
                 const value = isCumul ? (player.total || 0) : (player.today || 0);
                 if (!dataByDate[originalDate][player.name]) {
                     dataByDate[originalDate][player.name] = 0;
@@ -1421,8 +1356,7 @@ function updateEvolutionChart(groupId, isCumul) {
         }
     });
 
-    // Trier les dates par date originale (format YYYY-MM-DD)
-    // pour avoir la plus ancienne à gauche, la plus récente à droite
+    // Sort by source YYYY-MM-DD so the chart reads oldest to newest (formatted dates would not).
     const sortedOriginalDates = Object.keys(dataByDate).sort();
     const sortedDates = sortedOriginalDates.map(function(originalDate) {
         return dateMapping[originalDate];
@@ -1453,16 +1387,10 @@ function updateEvolutionChart(groupId, isCumul) {
         return;
     }
 
-    if (evolutionChart) {
-        evolutionChart.destroy();
-    }
-
-    evolutionChart = new Chart(canvas.getContext('2d'), {
+    evolutionChart = mountPlayerLineChart(evolutionChart, 'evolution-chart', {
         type: 'bar',
-        data: {
-            labels: sortedDates,
-            datasets: datasets
-        },
+        labels: sortedDates,
+        datasets: datasets,
         options: buildPlayerLineChartOptions({
             xTitle: 'Dates',
             yTitle: isCumul ? 'Points totaux' : 'Points par session',
@@ -1483,11 +1411,8 @@ function updateEvolutionChart(groupId, isCumul) {
             }
         })
     });
-    evolutionChart._hoverDatasetIndex = null;
-    bindMultiSeriesChartHoverReset(canvas, function() { return evolutionChart; });
 }
 
-// Graphique d'évolution moyenne de victoires par session
 let winRateEvolutionChart = null;
 
 function initWinRateEvolutionChart() {
@@ -1511,10 +1436,9 @@ function initWinRateEvolutionChart() {
 
     const canvas = document.getElementById('win-rate-evolution-chart-canvas');
     if (!canvas) { return; }
-    if (winRateEvolutionChart) { winRateEvolutionChart.destroy(); }
-    winRateEvolutionChart = new Chart(canvas.getContext('2d'), {
-        type: 'line',
-        data: { labels: labels, datasets: datasets },
+    winRateEvolutionChart = mountPlayerLineChart(winRateEvolutionChart, 'win-rate-evolution-chart-canvas', {
+        labels: labels,
+        datasets: datasets,
         options: buildPlayerLineChartOptions({
             xTitle: 'Session',
             yTitle: 'Taux de victoires',
@@ -1539,8 +1463,6 @@ function initWinRateEvolutionChart() {
             }
         })
     });
-    winRateEvolutionChart._hoverDatasetIndex = null;
-    bindMultiSeriesChartHoverReset(canvas, function() { return winRateEvolutionChart; });
 }
 
 let eveningCurveChart = null;
@@ -1568,10 +1490,9 @@ function initEveningCurveChart() {
     });
     const yMax = dataMax > 0 ? Math.min(1, dataMax * 1.10) : 0.1;
 
-    if (eveningCurveChart) { eveningCurveChart.destroy(); }
-    eveningCurveChart = new Chart(canvas.getContext('2d'), {
-        type: 'line',
-        data: { labels: eveningCurveData.labels, datasets: datasets },
+    eveningCurveChart = mountPlayerLineChart(eveningCurveChart, 'evening-curve-chart-canvas', {
+        labels: eveningCurveData.labels,
+        datasets: datasets,
         options: buildPlayerLineChartOptions({
             xTitle: 'Rang du match dans la session',
             yTitle: 'Taux de victoires',
@@ -1600,11 +1521,7 @@ function initEveningCurveChart() {
             }
         })
     });
-    eveningCurveChart._hoverDatasetIndex = null;
-    bindMultiSeriesChartHoverReset(canvas, function() { return eveningCurveChart; });
 }
-
-// --- Utilitaires communs (survol + lignes sans points) ---
 
 function sortTooltipItemsByValueDesc(a, b) {
     const ya = a.parsed.y != null ? a.parsed.y : a.raw;
@@ -1748,6 +1665,24 @@ function bindMultiSeriesChartHoverReset(canvas, getChart) {
     });
 }
 
+function mountPlayerLineChart(existingChart, canvasId, spec) {
+    var canvas = document.getElementById(canvasId);
+    if (!canvas) {
+        return existingChart;
+    }
+    if (existingChart) {
+        existingChart.destroy();
+    }
+    var chart = new Chart(canvas.getContext('2d'), {
+        type: spec.type || 'line',
+        data: { labels: spec.labels, datasets: spec.datasets },
+        options: spec.options
+    });
+    chart._hoverDatasetIndex = null;
+    bindMultiSeriesChartHoverReset(canvas, function() { return chart; });
+    return chart;
+}
+
 function buildPlayerLineDataset(player, data) {
     const color = getPlayerColor(player);
     return {
@@ -1857,18 +1792,6 @@ function buildPlayerLineChartOptions(opts) {
     };
 }
 
-function buildEloEvolutionDatasets(points) {
-    return buildPlayerLineDatasets(points, 'elo_by_player');
-}
-
-function applyEloChartHighlight(chart, activeDatasetIndex) {
-    applyMultiSeriesChartHighlight(chart, activeDatasetIndex);
-}
-
-function getEloChartHoveredDatasetIndex(chart, event) {
-    return getMultiSeriesHoveredDatasetIndex(chart, event);
-}
-
 function buildEloLineChartOptions(xTitle, xTickLimit, hoverChartRef) {
     return buildPlayerLineChartOptions({
         xTitle: xTitle,
@@ -1878,7 +1801,6 @@ function buildEloLineChartOptions(xTitle, xTickLimit, hoverChartRef) {
     });
 }
 
-// Graphique d'évolution ELO par session
 let eloEvolutionChart = null;
 
 function initEloEvolutionChart() {
@@ -1890,23 +1812,17 @@ function initEloEvolutionChart() {
         topN: LINE_CHART_TOP_N,
         showAll: showAllLineChartPlayers
     });
-    const canvas = document.getElementById('elo-evolution-chart-canvas');
-    if (!canvas) { return; }
-    if (eloEvolutionChart) { eloEvolutionChart.destroy(); }
-    eloEvolutionChart = new Chart(canvas.getContext('2d'), {
-        type: 'line',
-        data: { labels: labels, datasets: datasets },
+    eloEvolutionChart = mountPlayerLineChart(eloEvolutionChart, 'elo-evolution-chart-canvas', {
+        labels: labels,
+        datasets: datasets,
         options: buildPlayerLineChartOptions({
             xTitle: 'Session',
             yTitle: 'ELO',
             hoverChartRef: function() { return eloEvolutionChart; }
         })
     });
-    eloEvolutionChart._hoverDatasetIndex = null;
-    bindMultiSeriesChartHoverReset(canvas, function() { return eloEvolutionChart; });
 }
 
-// Graphique d'évolution ELO match (un point par match)
 let eloMatchEvolutionChart = null;
 
 function getEloMatchGranularity() {
@@ -1968,23 +1884,14 @@ function renderEloMatchEvolutionChart() {
         topN: LINE_CHART_TOP_N,
         showAll: showAllLineChartPlayers
     });
-    const canvas = document.getElementById('elo-match-evolution-chart-canvas');
-    if (!canvas) {
-        return;
-    }
     const isMatchView = getEloMatchGranularity() === 'match';
-    if (eloMatchEvolutionChart) {
-        eloMatchEvolutionChart.destroy();
-    }
-    eloMatchEvolutionChart = new Chart(canvas.getContext('2d'), {
-        type: 'line',
-        data: { labels: labels, datasets: datasets },
+    eloMatchEvolutionChart = mountPlayerLineChart(eloMatchEvolutionChart, 'elo-match-evolution-chart-canvas', {
+        labels: labels,
+        datasets: datasets,
         options: buildEloLineChartOptions('Match', isMatchView ? 24 : undefined, function() {
             return eloMatchEvolutionChart;
         })
     });
-    eloMatchEvolutionChart._hoverDatasetIndex = null;
-    bindMultiSeriesChartHoverReset(canvas, function() { return eloMatchEvolutionChart; });
 }
 
 function initEloMatchEvolutionChart() {
@@ -1999,7 +1906,7 @@ function initEloMatchEvolutionChart() {
     });
 }
 
-// Portail overlays (filtres + infobulles au-dessus du thème arcade)
+// Move bubbles into #app-overlays so they paint above the arcade theme.
 function initOverlayPortal() {
     var portal = document.getElementById('app-overlays');
     if (!portal) {
@@ -2114,7 +2021,6 @@ function positionInfoBubbleCentered(infoBubble) {
     infoBubble.style.maxHeight = Math.min(window.innerHeight * 0.8, 600) + 'px';
 }
 
-// Initialisation des info-bulles
 function initInfoBubbles() {
     const infoButtons = document.querySelectorAll('.info-button[data-info]');
     

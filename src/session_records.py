@@ -1,13 +1,14 @@
-"""Records à battre : best single-session feats."""
+"""Best single-session feats (records to beat)."""
 
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple
 
-from .combat_profiles import (
-    _fr,
-    _match_outcome,
-    _session_today_stats,
-    _session_win_count,
+from .session_facts import (
+    best_win_streaks,
+    format_fr,
+    match_outcome,
     session_own_matches,
+    session_today_stats,
+    session_win_count,
 )
 from .config import get_player_color
 from .data_manager import SessionDataManager
@@ -48,24 +49,20 @@ def _session_scores(sessions):
 
 def _streaks(sessions):
     for session in sessions:
-        streak: Dict[str, int] = {}
-        best: Dict[str, int] = {}
-        for match in session_own_matches(session):
-            winner = _match_outcome(match)[0]
-            for player in match:
-                streak[player] = streak.get(player, 0) + 1 if player == winner else 0
-                best[player] = max(best.get(player, 0), streak[player])
-        for player, length in best.items():
+        contests = (
+            (match, match_outcome(match)[0]) for match in session_own_matches(session)
+        )
+        for player, length in best_win_streaks(contests).items():
             if length > 1:
                 yield length, player, session
 
 
 def _session_combat(sessions):
     for session in sessions:
-        today = _session_today_stats(session)
+        today = session_today_stats(session)
         if not today:
             continue
-        played = _session_win_count(session.get('data') or {}) or len(session_own_matches(session))
+        played = session_win_count(session.get('data') or {}) or len(session_own_matches(session))
         for player, stats in today.items():
             yield session, player, stats, played
 
@@ -106,7 +103,7 @@ def build_session_records(
         'best_streak': (_streaks(sessions), lambda v: str(int(v))),
         'most_kills_session': (_kills(sessions), lambda v: str(int(v))),
         'best_elo_gain': (_elo_gains(elo_deltas), lambda v: f"+{int(v)}"),
-        'cleanest_session': (_clean(sessions), lambda v: _fr(-v, 2)),
+        'cleanest_session': (_clean(sessions), lambda v: format_fr(-v, 2)),
         'no_self_kill_session': (_no_self_kill(sessions), lambda v: str(int(v))),
     }
     records = []

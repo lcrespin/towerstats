@@ -61,7 +61,7 @@ def test_best_win_percentage_from_snapshot():
     assert round(ctx["best_percentage"], 4) == 34.4756
     assert ctx["best_percentage_players"] == ["ERIC"]
 
-    # Classement complet % victoires: (rank, joueur, victoires, parties, pourcentage)
+    # Full win-% ranking: (rank, player, wins, games, percentage)
     wp = ctx["win_percentage_ranking"]
     assert len(wp) == 6
     expected_wp = [
@@ -91,9 +91,9 @@ def test_elo_batch_scores_for_all_players_from_snapshot():
 
     for i, row in enumerate(elo_ranking):
         name, elo = row[1], row[2]
-        assert 1000 <= elo <= 2000, f"{name}: ELO {elo} hors plage"
+        assert 1000 <= elo <= 2000, f"{name}: ELO {elo} out of range"
         if i < len(elo_ranking) - 1:
-            assert elo >= elo_ranking[i + 1][2], "Classement ELO batch doit être décroissant"
+            assert elo >= elo_ranking[i + 1][2], "Batch Elo ranking must be descending"
 
 
 def test_sessions_without_mode_default_to_head_hunters():
@@ -268,7 +268,7 @@ def test_elo_invariants_on_live_snapshot_per_mode():
 
 
 def _assert_elo_session_and_match_invariants(snapshot_path: str, game_mode: str | None = None) -> None:
-    """ELO session + ELO match : cohérence et ordre sur un export CSV d'intégration."""
+    """Session Elo and match Elo: ordering and consistency on an integration CSV export."""
     stats = build_stats_from_path(snapshot_path, game_mode=game_mode)
     ctx = stats.prepare_template_data()
     n = ctx["unique_players_count"]
@@ -374,7 +374,7 @@ def test_default_group_ranking_from_snapshot():
     ctx = stats.prepare_template_data()
 
     assert ctx["default_group"] == "DAVID-ERIC-LOUIS"
-    # Classement complet du groupe par défaut (rank, player, total)
+    # Full default-group ranking: (rank, player, total)
     assert ctx["default_ranking"] == [
         (1, "LOUIS", 218),
         (2, "DAVID", 205),
@@ -601,7 +601,7 @@ def test_only_declared_players_are_kept():
 
 
 def test_matchs_minimal_parse_and_session_without_field():
-    """matchsResults: session avec / sans champ ; algorithme ELO match ne lève pas."""
+    """matchsResults present or missing; match Elo must not raise."""
     m = SessionDataManager(local_file=MATCHS_MINIMAL)
     m.load_all()
     sessions = sorted(m.get_sessions(), key=lambda s: s.get("date", ""))

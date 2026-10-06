@@ -1,8 +1,8 @@
-"""Détails d'une session pour les archives : combat, déroulé des matchs et récompenses."""
+"""Archive extras for one session: combat, match rundown, and awards."""
 
 from typing import Any, Dict, List, Optional, Tuple
 
-from .combat_profiles import _match_outcome, session_own_matches
+from .session_facts import best_win_streaks, match_outcome, session_own_matches
 from .config import canonical_player_name
 from .data_manager import SessionDataManager
 
@@ -57,7 +57,7 @@ def _match_kind(margin: int, winner: Optional[str]) -> str:
 def _matches(session: Dict[str, Any]) -> List[Dict[str, Any]]:
     matches = []
     for match in session_own_matches(session):
-        winner, _runner, margin = _match_outcome(match)
+        winner, _runner, margin = match_outcome(match)
         matches.append({
             'scores': match,
             'winner': winner,
@@ -65,16 +65,6 @@ def _matches(session: Dict[str, Any]) -> List[Dict[str, Any]]:
             'kind': _match_kind(margin, winner),
         })
     return matches
-
-
-def _best_streaks(matches: List[Dict[str, Any]]) -> Dict[str, int]:
-    streak: Dict[str, int] = {}
-    best: Dict[str, int] = {}
-    for match in matches:
-        for player in match['scores']:
-            streak[player] = streak.get(player, 0) + 1 if player == match['winner'] else 0
-            best[player] = max(best.get(player, 0), streak[player])
-    return best
 
 
 def _scoreboard(matches: List[Dict[str, Any]]) -> Tuple[List[Dict[str, Any]], int]:
@@ -159,7 +149,11 @@ def _award_candidates(combat, matches) -> Dict[str, Dict[tuple, int]]:
             clutch[key] = clutch.get(key, 0) + 1
     return {
         'kill': {(p,): s['kill'] for p, s in combat.items()},
-        'streak': {(p,): n for p, n in _best_streaks(matches).items() if n > 1},
+        'streak': {
+            (p,): n
+            for p, n in best_win_streaks((m['scores'], m['winner']) for m in matches).items()
+            if n > 1
+        },
         'duel': duels,
         'self': {(p,): s['self'] for p, s in combat.items()},
         'clutch': clutch,

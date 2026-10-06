@@ -1,6 +1,5 @@
-"""Configuration et constantes pour TowerStats."""
+"""Declared players, colors, game modes, and sheet URLs."""
 
-# URL publique de la Google Sheet en CSV
 CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTTikaqWVWPY9RNMASh76zdipiwF5XwwAq-TNgUDSVs6uU10BRvaATt8GidTikAvL6E1Jh6drNG04wd/pub?gid=0&single=true&output=csv'
 
 # Game modes (v4+); missing mode in source data defaults to HeadHunters
@@ -31,7 +30,7 @@ def game_mode_label(mode: str) -> str:
 # Win/lose messages sheet (columns: NOMwin, NOMlose per player)
 MESSAGES_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTyNKz-IP1qJHMNpW8SFpvYOy_IXA9uDbN8FxZEOZRAR1kbP1ABb35ZKnhvB-0MJ_-d96ddIqER38fR/pub?gid=0&single=true&output=csv'
 
-# Mapping des couleurs pour l'affichage. Seuls ces joueurs sont comptés.
+# Allowlist of declared players (and their display colors). Unknown names are dropped.
 PLAYER_TO_COLOR = {
     'MEHDI': '#FFC0CB',
     'JULIEN': '#90EE90',
@@ -44,12 +43,12 @@ PLAYER_TO_COLOR = {
 }
 
 PLAYER_TO_PORTRAIT = {
-    'BENOIT': '/images/altCyan-portrait-selected.png',
-    'MEHDI': '/images/pink-portrait-selected.png',
-    'LOUIS': '/images/altOrange-portrait-selected.png',
-    'ERIC': '/images/purple-portrait-selected.png',
-    'DAVID': '/images/white-portrait-selected.png',
-    'JULIEN': '/images/green-portrait-selected.png',
+    'BENOIT': '/static/images/altCyan-portrait-selected.png',
+    'MEHDI': '/static/images/pink-portrait-selected.png',
+    'LOUIS': '/static/images/altOrange-portrait-selected.png',
+    'ERIC': '/static/images/purple-portrait-selected.png',
+    'DAVID': '/static/images/white-portrait-selected.png',
+    'JULIEN': '/static/images/green-portrait-selected.png',
 }
 
 # Sheet names that should display as a declared player.
@@ -72,7 +71,7 @@ def canonical_player_name(player_name) -> str | None:
 
 
 def get_player_color(player_name):
-    """Retourne la couleur d'un joueur pour l'affichage."""
+    """Display color for a declared player; gold for anyone else."""
     canonical = canonical_player_name(player_name)
     if canonical:
         return PLAYER_TO_COLOR[canonical]

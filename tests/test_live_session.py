@@ -115,7 +115,7 @@ def _get_client():
 
 
 @patch.dict(os.environ, {"TOWERSTATS_LIVE_DEMO": ""})
-@patch("src.main.load_win_messages", return_value={})
+@patch("src.page.load_win_messages", return_value={})
 @patch("src.main.SessionDataManager.load_all", _fake_load_all)
 def test_api_live_is_false_when_latest_session_is_stale(_messages):
     response = _get_client().get("/api/live")
@@ -125,7 +125,7 @@ def test_api_live_is_false_when_latest_session_is_stale(_messages):
 
 
 @patch.dict(os.environ, {"TOWERSTATS_LIVE_DEMO": "1"})
-@patch("src.main.load_win_messages", return_value={})
+@patch("src.page.load_win_messages", return_value={})
 @patch("src.main.SessionDataManager.load_all", _fake_load_all)
 def test_demo_mode_exposes_latest_session_as_live(_messages):
     client = _get_client()

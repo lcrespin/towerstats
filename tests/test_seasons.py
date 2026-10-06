@@ -195,7 +195,19 @@ def _get_client():
     return app.test_client()
 
 
-@patch('src.main.load_win_messages', return_value={})
+def test_static_assets_are_served():
+    client = _get_client()
+    css = client.get('/static/css/style.css')
+    js = client.get('/static/js/app.js')
+    assert css.status_code == 200
+    assert 'text/css' in (css.content_type or '')
+    assert js.status_code == 200
+    assert 'javascript' in (js.content_type or '')
+    portraits = client.get('/static/images/pink-portrait-selected.png')
+    assert portraits.status_code == 200
+
+
+@patch('src.page.load_win_messages', return_value={})
 @patch('src.main.SessionDataManager.load_all', _fake_load_all)
 def test_default_route_uses_current_season(_messages):
     client = _get_client()
@@ -213,7 +225,7 @@ def test_default_route_uses_current_season(_messages):
     assert 'depuis le 26 août 2026' in html
 
 
-@patch('src.main.load_win_messages', return_value={})
+@patch('src.page.load_win_messages', return_value={})
 @patch('src.main.SessionDataManager.load_all', _fake_load_all)
 def test_season_all_route_is_career(_messages):
     client = _get_client()
@@ -228,7 +240,7 @@ def test_season_all_route_is_career(_messages):
     assert '2026-08-26' in html
 
 
-@patch('src.main.load_win_messages', return_value={})
+@patch('src.page.load_win_messages', return_value={})
 @patch('src.main.SessionDataManager.load_all', _fake_load_all)
 def test_season_1_route_stops_before_august_15(_messages):
     client = _get_client()

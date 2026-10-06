@@ -1,11 +1,17 @@
-"""Fiches de combat par joueur et courbe « Au fil de la soirée »."""
+"""Per-player combat badges and the in-session win-rate curve."""
 
 from collections import defaultdict
 from statistics import mean, pstdev
 from typing import Any, Callable, Dict, List, Optional
 
-from .config import canonical_player_name, get_player_color
-from .data_manager import SessionDataManager
+from .config import get_player_color
+from .session_facts import (
+    format_fr,
+    match_outcome,
+    session_own_matches,
+    session_today_stats,
+    session_win_count,
+)
 
 MIN_PROFILE_MATCHES = 10
 MIN_RIVAL_MATCHES = 10
@@ -35,62 +41,14 @@ BADGES = {
 DEFAULT_BADGE = ('🎯', 'Réglementaire', 'dans la moyenne partout, rien à signaler')
 
 
-def _fr(value: float, digits: int = 1) -> str:
-    return f"{value:.{digits}f}".replace('.', ',')
-
-
-def _count(value: Any) -> int:
-    if isinstance(value, bool) or not isinstance(value, (int, float)):
-        return 0
-    return max(int(value), 0)
-
-
-def _session_win_count(data: Dict[str, Any]) -> int:
-    today_win = data.get('todayWin')
-    if not isinstance(today_win, dict):
-        return 0
-    return sum(_count(v) for v in today_win.values())
-
-
-def session_own_matches(session: Dict[str, Any]) -> List[Dict[str, int]]:
-    """Matches actually played in this session, with at least two players."""
-    return [m for m in SessionDataManager.parse_matchs_results(session) if len(m) >= 2]
-
-
-def _session_today_stats(session: Dict[str, Any]) -> Dict[str, Dict[str, Any]]:
-    today = (session.get('data') or {}).get('today')
-    if not isinstance(today, dict):
-        return {}
-    players: Dict[str, Dict[str, Any]] = {}
-    for name, stats in today.items():
-        player = canonical_player_name(name)
-        if player is None or not isinstance(stats, dict):
-            continue
-        entry = players.setdefault(player, {'kill': 0, 'death': 0, 'self': 0, 'killBy': defaultdict(int)})
-        for field in ('kill', 'death', 'self'):
-            entry[field] += _count(stats.get(field))
-        for killer, n in SessionDataManager._filter_kill_counts(stats.get('killBy'), keep_sources=False).items():
-            entry['killBy'][killer] += _count(n)
-    return players
-
-
-def _match_outcome(match: Dict[str, int]):
-    """(winner, runner_up, margin); winner is None on a tie for first."""
-    ranked = sorted(match.items(), key=lambda x: x[1], reverse=True)
-    if ranked[0][1] == ranked[1][1]:
-        return None, None, 0
-    runner_up = ranked[1][0] if len(ranked) < 3 or ranked[1][1] != ranked[2][1] else None
-    return ranked[0][0], runner_up, ranked[0][1] - ranked[1][1]
-
-
 def _badge_detail(trait: str, direction: int, stats: Dict[str, Any], group_mean: float) -> str:
     if trait == 'self_rate':
         return (
-            f"se suicide {_fr(stats['self_rate'], 2)} fois par match, "
-            f"contre {_fr(group_mean, 2)} en moyenne"
+            f"se suicide {format_fr(stats['self_rate'], 2)} fois par match, "
+            f"contre {format_fr(group_mean, 2)} en moyenne"
         )
     if trait == 'kd':
-        return f"K/D de {_fr(stats['kd'], 2)}, contre {_fr(group_mean, 2)} en moyenne"
+        return f"K/D de {format_fr(stats['kd'], 2)}, contre {format_fr(group_mean, 2)} en moyenne"
     if trait == 'late_delta':
         return (
             f"{round(stats['late_rate'] * 100)} % de victoires après le {EARLY_MATCHES}e match, "
@@ -140,7 +98,7 @@ def _pick_rival(player, rates):
     if not eligible:
         return None
     rate, other = max(eligible, key=lambda x: (x[0], x[1]))
-    return {'player': other, 'color': get_player_color(other), 'per_match': _fr(rate)}
+    return {'player': other, 'color': get_player_color(other), 'per_match': format_fr(rate)}
 
 
 def build_combat_profiles(
@@ -163,11 +121,11 @@ def build_combat_profiles(
     best_streak: Dict[str, Dict[str, Any]] = {}
 
     for session in sorted(sessions, key=lambda s: s.get('date', '')):
-        today = _session_today_stats(session)
+        today = session_today_stats(session)
         if not today:
             continue
         own = session_own_matches(session)
-        played = _session_win_count(session.get('data') or {}) or len(own)
+        played = session_win_count(session.get('data') or {}) or len(own)
         for player, stats in today.items():
             matches[player] += played
             kills[player] += stats['kill']
@@ -182,7 +140,7 @@ def build_combat_profiles(
         streak = defaultdict(int)
         session_day = (session.get('date') or '')[:10]
         for rank, match in enumerate(own, start=1):
-            winner, runner_up, margin = _match_outcome(match)
+            winner, runner_up, margin = match_outcome(match)
             phase = 0 if rank <= EARLY_MATCHES else 1
             for player in match:
                 scored[player] += 1
@@ -237,7 +195,7 @@ def build_combat_profiles(
             'kills': kills[player],
             'deaths': deaths[player],
             'self_kills': self_kills[player],
-            'kd': _fr(kills[player] / deaths[player], 2) if deaths[player] else '∞',
+            'kd': format_fr(kills[player] / deaths[player], 2) if deaths[player] else '∞',
             'badge': badges[player],
             'nemesis': _pick_rival(player, nemesis_rates),
             'victim': _pick_rival(player, victim_rates),
@@ -267,7 +225,7 @@ def build_evening_curve(
     for session in sessions:
         for rank, match in enumerate(session_own_matches(session), start=1):
             bucket = _bucket_index(rank)
-            winner, _, _ = _match_outcome(match)
+            winner, _, _ = match_outcome(match)
             for player in match:
                 played[player][bucket] += 1
                 if player == winner:

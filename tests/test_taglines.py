@@ -6,7 +6,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
 
-from src.taglines import load_tagline_mashups, pick_taglines, TAGLINE_SLOTS
+from src.taglines import (
+    HEADER_SUBTITLES,
+    load_tagline_mashups,
+    pick_header_subtitle,
+    pick_taglines,
+    TAGLINE_SLOTS,
+)
 
 
 def test_load_tagline_mashups_from_repo_file():
@@ -59,3 +65,19 @@ def test_pick_taglines_falls_back_when_favorites_exhausted():
 def test_pick_taglines_empty_pool():
     picked = pick_taglines(mashups=[])
     assert picked == {slot: "" for slot in TAGLINE_SLOTS}
+
+
+def test_header_subtitles_are_the_five_agreed_lines():
+    assert HEADER_SUBTITLES == (
+        "Toutes les soirées où ça aurait dû s'arrêter à minuit.",
+        "L'historique officiel des excuses après TowerFall.",
+        "Des soirées. Des flèches. Très peu de dignité.",
+        "On garde les scores. On oublie qui a commencé.",
+        "Preuves que ça durait trop, saison après saison.",
+    )
+
+
+def test_pick_header_subtitle_uses_rng():
+    picked = pick_header_subtitle(rng=random.Random(1))
+    assert picked in HEADER_SUBTITLES
+    assert pick_header_subtitle(rng=random.Random(1)) == picked

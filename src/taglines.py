@@ -19,6 +19,20 @@ TAGLINE_SLOTS = (
 FAVORITE_COUNT = 40
 FAVORITE_WEIGHT = 0.9
 
+HEADER_SUBTITLES = (
+    "Toutes les soirées où ça aurait dû s'arrêter à minuit.",
+    "L'historique officiel des excuses après TowerFall.",
+    "Des soirées. Des flèches. Très peu de dignité.",
+    "On garde les scores. On oublie qui a commencé.",
+    "Preuves que ça durait trop, saison après saison.",
+)
+
+
+def pick_header_subtitle(rng: Optional[random.Random] = None) -> str:
+    """Pick one header subtitle, rotating at random on each page load."""
+    chooser = rng or random
+    return chooser.choice(HEADER_SUBTITLES)
+
 
 def load_tagline_mashups(path: Optional[str] = None) -> List[str]:
     """Return non-empty mashup lines from the taglines file."""
