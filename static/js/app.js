@@ -371,7 +371,7 @@ function buildSessionTable(session) {
         }
         rows += '</tr>';
     });
-    return '<div class="overflow-x-auto"><table class="ranking-table w-full text-[5px] sm:text-[6px] md:text-[9px]"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
+    return '<div class="ranking-scroll"><table class="ranking-table"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div>';
 }
 
 function buildSessionAwards(awards) {
@@ -536,7 +536,7 @@ function buildDuelMatrix(players, combat) {
         return '<tr><td>' + playerLabel(killer) + '</td>' + cells + '</tr>';
     }).join('');
     return '<div class="session-detail-block"><h4 class="session-detail-title">🎯 Duels</h4>' +
-        '<div class="overflow-x-auto"><table class="ranking-table session-duel-table w-full text-[5px] sm:text-[6px] md:text-[9px]"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div></div>';
+        '<div class="ranking-scroll"><table class="ranking-table session-duel-table"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div></div>';
 }
 
 function buildDeathCauses(players, combat) {

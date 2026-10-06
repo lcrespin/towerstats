@@ -37,7 +37,7 @@
             <img src="{{ url_for('static', filename='images/altOrange-portrait-selected.png') }}" alt="Orange Character" class="header-character left header-portrait">
         </div>
         <div class="header-brand">
-            <h1 class="txt-title-h1 m-0 p-0"><span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span> TOWERSTATS <span class="title-emoji text-[0.3em] sm:text-[0.4em] md:text-[0.5em] lg:text-[0.8em] hidden sm:inline">🏹</span></h1>
+            <h1 class="txt-title-h1 m-0 p-0">TOWERSTATS</h1>
             <p class="header-subtitle">{{ header_subtitle }}</p>
         </div>
         <div class="header-characters gap-0.5 sm:gap-2 md:gap-8">
@@ -65,6 +65,7 @@
             </div>
             <div class="nav-arcade-bar">
                 <button type="button" id="toggle-date-picker" class="nav-hud-btn filter-toggle-button{% if selected_session_id or selected_group_id or selected_date_start or selected_date_end or selected_game_mode != default_game_mode %} has-filters{% endif %}" title="Filtrer les sessions" aria-label="Filtrer les sessions" aria-expanded="false" aria-controls="date-picker-popover">
+                    <span class="filter-toggle-icon" aria-hidden="true">🎚️</span>
                     <span class="filter-toggle-label">Filtres</span>
                 </button>
                 <button type="button" id="mobile-menu-toggle" class="nav-hud-btn nav-menu-toggle sm:hidden" aria-label="Menu" aria-expanded="false" aria-controls="mobile-menu">☰</button>
@@ -189,8 +190,8 @@
         {%- endmacro %}
 
         {% macro ranking_table(rows, headers, extra_class='', table_id='', tbody_id='', empty_message='') %}
-        <div class="overflow-x-auto">
-            <table class="ranking-table w-full txt-xs{% if extra_class %} {{ extra_class }}{% endif %}"{% if table_id %} id="{{ table_id }}"{% endif %}>
+        <div class="ranking-scroll">
+            <table class="ranking-table txt-xs{% if extra_class %} {{ extra_class }}{% endif %}"{% if table_id %} id="{{ table_id }}"{% endif %}>
                 <thead>
                     <tr>
                         {% for h in headers %}
@@ -422,7 +423,7 @@
                 {{ pixel_podium(default_ranking, 2, "%d", detail='victoires', podium_id='group-podium') }}
                 {% endif %}
                 <div class="mb-3 sm:mb-4 md:mb-5 relative z-10">
-                    <label for="group-select" class="block mb-1.5 sm:mb-2 md:mb-2.5 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: var(--text);">
+                    <label for="group-select" class="form-label block mb-1.5 sm:mb-2 md:mb-2.5">
                         Sélectionner un groupe de joueurs:
                     </label>
                     <div class="select-wrapper relative w-full max-w-md">
@@ -441,13 +442,7 @@
             </div>
         </section>
 
-        <div class="zone-divider" aria-hidden="true">
-            <div class="zone-divider-inner">
-                <span class="zone-divider-line"></span>
-                <span class="zone-divider-label">⭐ Records à battre</span>
-                <span class="zone-divider-line"></span>
-            </div>
-        </div>
+        <div class="zone-divider" aria-hidden="true"></div>
 
         <section id="records" class="margin-bottom-section pad-section arcade-panel">
             <div class="section-header">
@@ -492,13 +487,7 @@
         </section>
 
         {% if has_detailed_stats %}
-        <div class="zone-divider" aria-hidden="true">
-            <div class="zone-divider-inner">
-                <span class="zone-divider-line"></span>
-                <span class="zone-divider-label">🃏 Fiches de combat</span>
-                <span class="zone-divider-line"></span>
-            </div>
-        </div>
+        <div class="zone-divider" aria-hidden="true"></div>
         <section id="fiches" class="margin-bottom-section pad-section arcade-panel overflow-x-auto">
             <div class="section-header">
                 <h2 class="txt-heading break-words">🃏 Fiches de combat</h2>
@@ -558,13 +547,7 @@
             </div>
         </section>
 
-        <div class="zone-divider" aria-hidden="true">
-            <div class="zone-divider-inner">
-                <span class="zone-divider-line"></span>
-                <span class="zone-divider-label">🎯 Combat</span>
-                <span class="zone-divider-line"></span>
-            </div>
-        </div>
+        <div class="zone-divider" aria-hidden="true"></div>
         <section id="combat" class="margin-bottom-section pad-section arcade-panel overflow-x-auto">
             <div class="section-header">
                 <h2 class="txt-heading break-words">🎯 Combat</h2>
@@ -592,8 +575,8 @@
                 <div id="rivalry-map-tooltip" class="rivalry-map-tooltip hidden" role="tooltip"></div>
             </div>
             <button id="toggle-kill-matrix" class="toggle-button w-full sm:w-auto">▼ Voir la matrice détaillée</button>
-            <div id="kill-matrix-container" class="hidden overflow-x-auto mt-4">
-                <table class="ranking-table w-full txt-xs" id="kill-relationships-table">
+            <div id="kill-matrix-container" class="hidden ranking-scroll mt-4">
+                <table class="ranking-table txt-xs" id="kill-relationships-table">
                     <thead>
                         <tr>
                             <th class="player-column">Tueur → Victime</th>
@@ -629,13 +612,7 @@
         </section>
         {% endif %}
 
-        <div class="zone-divider" aria-hidden="true">
-            <div class="zone-divider-inner">
-                <span class="zone-divider-line"></span>
-                <span class="zone-divider-label">📈 Le Parcours</span>
-                <span class="zone-divider-line"></span>
-            </div>
-        </div>
+        <div class="zone-divider" aria-hidden="true"></div>
 
         <section id="parcours" class="margin-bottom-section pad-section arcade-panel overflow-x-auto">
             <div class="section-header">
@@ -754,13 +731,7 @@
             </div>
         </section>
 
-        <div class="zone-divider" aria-hidden="true">
-            <div class="zone-divider-inner">
-                <span class="zone-divider-line"></span>
-                <span class="zone-divider-label">📅 Archives</span>
-                <span class="zone-divider-line"></span>
-            </div>
-        </div>
+        <div class="zone-divider" aria-hidden="true"></div>
 
         <section id="derniere-soiree" class="margin-bottom-section pad-section arcade-panel">
             <h2 class="txt-heading break-words">📅 Archives</h2>
@@ -780,7 +751,7 @@
             <div id="all-sessions-container" class="hidden">
                 <div class="filters-container mb-4 sm:mb-5 flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-5">
                     <div class="filter-group flex-1">
-                        <label for="filter-player" class="block mb-1.5 sm:mb-2 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: var(--text);">
+                        <label for="filter-player" class="form-label block mb-1.5 sm:mb-2">
                             Filtrer par joueur:
                         </label>
                         <div class="select-wrapper relative w-full">
@@ -791,7 +762,7 @@
                         </div>
                     </div>
                     <div class="filter-group flex-1">
-                        <label for="filter-group" class="block mb-1.5 sm:mb-2 text-[5px] sm:text-[6px] md:text-[8px] lg:text-[10px]" style="color: var(--text);">
+                        <label for="filter-group" class="form-label block mb-1.5 sm:mb-2">
                             Filtrer par groupe:
                         </label>
                         <div class="select-wrapper relative w-full">
@@ -803,13 +774,13 @@
                     </div>
                 </div>
                 <div id="sessions-count" class="mb-3 sm:mb-4 text-center" style="color: var(--text); text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-                    <span class="text-[6px] sm:text-[7px] md:text-[9px]">Total: <span id="sessions-count-value">0</span> session(s)</span>
+                    <span class="form-label">Total: <span id="sessions-count-value">0</span> session(s)</span>
                 </div>
                 <div id="all-sessions-list"></div>
                 <div class="pagination-controls flex justify-center items-center gap-3 sm:gap-4 md:gap-5 my-3 sm:my-4 md:my-5">
-                    <button id="prev-page" class="pagination-button text-[5px] sm:text-[6px] md:text-[8px] p-1 sm:p-1.5 md:p-2 lg:p-2 lg:px-4">◄ Précédent</button>
-                    <span id="page-info" class="page-info text-[5px] sm:text-[6px] md:text-[9px]">1</span>
-                    <button id="next-page" class="pagination-button text-[5px] sm:text-[6px] md:text-[8px] p-1 sm:p-1.5 md:p-2 lg:p-2 lg:px-4">Suivant ►</button>
+                    <button id="prev-page" class="pagination-button">◄ Précédent</button>
+                    <span id="page-info" class="page-info">1</span>
+                    <button id="next-page" class="pagination-button">Suivant ►</button>
                 </div>
             </div>
         </section>
