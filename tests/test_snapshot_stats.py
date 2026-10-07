@@ -61,7 +61,7 @@ def test_best_win_percentage_from_snapshot():
     assert round(ctx["best_percentage"], 4) == 34.4756
     assert ctx["best_percentage_players"] == ["ERIC"]
 
-    # Classement complet % victoires: (rank, joueur, victoires, parties, pourcentage)
+    # Full win-% ranking: (rank, player, wins, games, percentage)
     wp = ctx["win_percentage_ranking"]
     assert len(wp) == 6
     expected_wp = [
@@ -80,38 +80,6 @@ def test_best_win_percentage_from_snapshot():
         assert round(row[4], 4) == expected_wp[i][4]
 
 
-def test_elo_legacy_ranking_top3_from_snapshot():
-    stats = build_stats_from_snapshot()
-    ctx = stats.prepare_template_data()
-
-    elo_legacy_ranking = ctx["elo_legacy_ranking"]
-    assert len(elo_legacy_ranking) >= 3
-
-    top3_names = [row[1] for row in elo_legacy_ranking[:3]]
-    assert set(top3_names) == {"LOUIS", "ERIC", "DAVID"}
-
-
-def test_elo_legacy_scores_for_all_players_from_snapshot():
-    stats = build_stats_from_snapshot()
-    ctx = stats.prepare_template_data()
-
-    elo_ranking = ctx["elo_legacy_ranking"]
-    expected_players = {"LOUIS", "ERIC", "DAVID", "BENOIT", "MEHDI", "JULIEN"}
-    assert len(elo_ranking) == 6
-    assert {row[1] for row in elo_ranking} == expected_players
-
-    # Ordre: ELO décroissant puis nom (ex aequo en ordre alphabétique)
-    actual_order = [row[1] for row in elo_ranking]
-    assert set(actual_order) == set(expected_players)
-
-    # ELO strictement décroissant (format: rank, name, elo)
-    for i, row in enumerate(elo_ranking):
-        name, elo = row[1], row[2]
-        assert 1000 <= elo <= 2000, f"{name}: ELO {elo} hors plage"
-        if i < len(elo_ranking) - 1:
-            assert elo >= elo_ranking[i + 1][2], "Classement ELO doit être décroissant"
-
-
 def test_elo_batch_scores_for_all_players_from_snapshot():
     stats = build_stats_from_snapshot()
     ctx = stats.prepare_template_data()
@@ -123,9 +91,9 @@ def test_elo_batch_scores_for_all_players_from_snapshot():
 
     for i, row in enumerate(elo_ranking):
         name, elo = row[1], row[2]
-        assert 1000 <= elo <= 2000, f"{name}: ELO {elo} hors plage"
+        assert 1000 <= elo <= 2000, f"{name}: ELO {elo} out of range"
         if i < len(elo_ranking) - 1:
-            assert elo >= elo_ranking[i + 1][2], "Classement ELO batch doit être décroissant"
+            assert elo >= elo_ranking[i + 1][2], "Batch Elo ranking must be descending"
 
 
 def test_sessions_without_mode_default_to_head_hunters():
@@ -300,13 +268,13 @@ def test_elo_invariants_on_live_snapshot_per_mode():
 
 
 def _assert_elo_session_and_match_invariants(snapshot_path: str, game_mode: str | None = None) -> None:
-    """ELO session + ELO match : cohérence et ordre sur un export CSV d'intégration."""
+    """Session Elo and match Elo: ordering and consistency on an integration CSV export."""
     stats = build_stats_from_path(snapshot_path, game_mode=game_mode)
     ctx = stats.prepare_template_data()
     n = ctx["unique_players_count"]
     assert n >= 1
 
-    for key in ("elo_ranking", "elo_match_ranking", "elo_legacy_ranking"):
+    for key in ("elo_ranking", "elo_match_ranking"):
         rows = ctx[key]
         assert len(rows) == n, key
         for i, row in enumerate(rows):
@@ -389,13 +357,6 @@ def test_elo_match_evolution_starts_with_session_baseline_on_date_filter():
     assert prematch_flat[-1]['date'] < first_match_point['date']
 
 
-def test_elo_batch_differs_from_legacy_from_snapshot():
-    stats = build_stats_from_snapshot()
-    ctx = stats.prepare_template_data()
-
-    assert ctx["elo_ranking"] != ctx["elo_legacy_ranking"]
-
-
 def test_elo_batch_is_deterministic_on_both_snapshots():
     for snapshot_path in SNAPSHOT_PATHS_INTEGRATION:
         stats_1 = build_stats_from_path(snapshot_path)
@@ -413,7 +374,7 @@ def test_default_group_ranking_from_snapshot():
     ctx = stats.prepare_template_data()
 
     assert ctx["default_group"] == "DAVID-ERIC-LOUIS"
-    # Classement complet du groupe par défaut (rank, player, total)
+    # Full default-group ranking: (rank, player, total)
     assert ctx["default_ranking"] == [
         (1, "LOUIS", 218),
         (2, "DAVID", 205),
@@ -470,16 +431,17 @@ EXPECTED_TEMPLATE_KEYS = frozenset({
     "total_sessions", "unique_players_count", "best_players", "best_score",
     "best_percentage_players", "best_percentage", "win_percentage_ranking",
     "elo_ranking", "elo_evolution", "elo_match_evolution", "win_rate_evolution", "best_elo_players", "best_elo",
-    "elo_legacy_ranking", "best_elo_legacy_players", "best_elo_legacy",
     "elo_match_ranking", "elo_match_by_player", "best_elo_match", "best_elo_match_players",
     "latest_date",
-    "latest_sessions_parsed", "sessions_by_date", "all_sessions_data",
+    "latest_sessions_parsed", "latest_sessions_data", "sessions_by_date", "all_sessions_data",
     "player_colors", "has_detailed_stats", "kill_death_ranking",
-    "kill_sources_aggregated", "kill_relationships", "kill_relationships_totals",
+    "combat_profiles", "evening_curve", "kill_relationships", "kill_relationships_totals",
     "all_players_for_matrix", "max_kills_in_matrix", "max_kills_in_matrix_totals",
     "top_killers", "top_deaths", "top_self_kills",
     "least_deaths_row", "least_self_kills_row",
     "best_kd_ratio", "best_kd_value",
+    "kills_per_game_ranking", "best_kills_players", "best_kills_value",
+    "total_games", "session_records",
 })
 
 
@@ -501,9 +463,6 @@ def test_best_elo_and_dates_from_snapshot():
 
     assert ctx["best_elo"] == ctx["elo_ranking"][0][2]
     assert 1000 <= ctx["best_elo"] <= 2000
-    assert ctx["best_elo_legacy_players"] == ["LOUIS"]
-    assert ctx["best_elo_legacy"] == ctx["elo_legacy_ranking"][0][2]
-    assert 1000 <= ctx["best_elo_legacy"] <= 2000
     assert ctx["best_elo_match"] == ctx["elo_match_ranking"][0][2]
     assert 1000 <= ctx["best_elo_match"] <= 2000
 
@@ -642,7 +601,7 @@ def test_only_declared_players_are_kept():
 
 
 def test_matchs_minimal_parse_and_session_without_field():
-    """matchsResults: session avec / sans champ ; algorithme ELO match ne lève pas."""
+    """matchsResults present or missing; match Elo must not raise."""
     m = SessionDataManager(local_file=MATCHS_MINIMAL)
     m.load_all()
     sessions = sorted(m.get_sessions(), key=lambda s: s.get("date", ""))
@@ -699,6 +658,21 @@ def test_detailed_stats_use_per_session_values_not_cumulative_total():
             killed_by[victim] = killed_by.get(victim, 0) + count
     for player, count in killed_by.items():
         assert count == expected_killed_by[player], player
+
+
+def _kill_session(date, wins, killed_by):
+    today = {p: {"kill": 0, "death": 0, "self": 0, "killBy": killed_by.get(p, {})} for p in wins}
+    return {"date": date, "data": {"todayWin": wins, "today": today, "total": today}}
+
+
+def test_kill_relationship_average_counts_sessions_without_kills():
+    sessions = [
+        _kill_session("2026-01-01", {"LOUIS": 6, "ERIC": 4}, {"ERIC": {"LOUIS": 10}}),
+        _kill_session("2026-01-02", {"LOUIS": 7, "ERIC": 3}, {}),
+    ]
+    avg, totals = SessionStatsManager(sessions).get_kill_relationships()
+    assert totals["LOUIS"]["ERIC"] == 10
+    assert avg["LOUIS"]["ERIC"] == 10 / 20
 
 
 if __name__ == "__main__":

@@ -1,4 +1,6 @@
+import json
 import os
+import re
 import sys
 from datetime import date
 from unittest.mock import patch
@@ -22,6 +24,11 @@ from src.seasons import (
 )
 from src.data_manager import SessionDataManager
 from src.stats_manager import SessionStatsManager, leaderboard_career_deltas
+
+
+def _latest_session_keys(html: str) -> list:
+    match = re.search(r'const latestSessions = (.*?);\n', html)
+    return [s['session_select_id'] for s in json.loads(match.group(1))]
 
 
 def _session(day: str, wins: dict, group: str = 'ERIC-LOUIS', mode: str = 'HeadHunters'):
@@ -125,9 +132,9 @@ def test_career_delta_labels():
         },
     }
     deltas = leaderboard_career_deltas(season_data, career_data)
-    assert deltas['win_pct']['ALICE'] == 'carrière : 2e'
+    assert deltas['win_pct']['ALICE'] == 'All-time : 2e'
     assert deltas['elo']['ALICE'] == 'même rang'
-    assert deltas['elo_match']['BOB'] == 'carrière : 3e'
+    assert deltas['elo_match']['BOB'] == 'All-time : 3e'
     assert deltas['group_score']['ALICE'] == 'même rang'
 
 
@@ -188,7 +195,19 @@ def _get_client():
     return app.test_client()
 
 
-@patch('src.main.load_win_messages', return_value={})
+def test_static_assets_are_served():
+    client = _get_client()
+    css = client.get('/static/css/style.css')
+    js = client.get('/static/js/app.js')
+    assert css.status_code == 200
+    assert 'text/css' in (css.content_type or '')
+    assert js.status_code == 200
+    assert 'javascript' in (js.content_type or '')
+    portraits = client.get('/static/images/pink-portrait-selected.png')
+    assert portraits.status_code == 200
+
+
+@patch('src.page.load_win_messages', return_value={})
 @patch('src.main.SessionDataManager.load_all', _fake_load_all)
 def test_default_route_uses_current_season(_messages):
     client = _get_client()
@@ -202,12 +221,11 @@ def test_default_route_uses_current_season(_messages):
     assert 'compteurs à zéro' in html
     assert 'Filtres appliqués' not in html
     assert 'name="season"' not in html
-    assert 'Session: ERIC-LOUIS - 2026-08-14' not in html
-    assert 'Session: ERIC-LOUIS - 2026-08-26' in html
+    assert _latest_session_keys(html) == ['2026-08-26|ERIC-LOUIS|HeadHunters']
     assert 'depuis le 26 août 2026' in html
 
 
-@patch('src.main.load_win_messages', return_value={})
+@patch('src.page.load_win_messages', return_value={})
 @patch('src.main.SessionDataManager.load_all', _fake_load_all)
 def test_season_all_route_is_career(_messages):
     client = _get_client()
@@ -222,7 +240,7 @@ def test_season_all_route_is_career(_messages):
     assert '2026-08-26' in html
 
 
-@patch('src.main.load_win_messages', return_value={})
+@patch('src.page.load_win_messages', return_value={})
 @patch('src.main.SessionDataManager.load_all', _fake_load_all)
 def test_season_1_route_stops_before_august_15(_messages):
     client = _get_client()
@@ -233,10 +251,8 @@ def test_season_1_route_stops_before_august_15(_messages):
     assert 'min="2025-06-01"' in html
     assert 'max="2026-08-14"' in html
     assert 'close' in html
-    assert 'Session: ERIC-LOUIS - 2026-08-14' in html
-    assert 'Session: ERIC-LOUIS - 2026-08-26' not in html
-    assert 'Session: ERIC-LOUIS - 2025-05-31' not in html
+    assert _latest_session_keys(html) == ['2026-08-14|ERIC-LOUIS|HeadHunters']
     assert '2025-06-03' in html
     assert 'Depuis le 03/06/25' in html
     assert 'juin 2025 → août 2026' in html
-    assert 'carrière :' in html or 'même rang' in html
+    assert 'All-time :' in html or 'même rang' in html

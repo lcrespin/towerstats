@@ -2,10 +2,10 @@
 
 import csv
 import io
-import urllib.request
 from typing import Dict, List
 
 from .config import MESSAGES_CSV_URL, PLAYER_NAME_ALIASES
+from .data_manager import _download_csv
 
 
 def load_win_messages(csv_url: str = None) -> Dict[str, List[str]]:
@@ -17,8 +17,7 @@ def load_win_messages(csv_url: str = None) -> Dict[str, List[str]]:
     url = csv_url or MESSAGES_CSV_URL
     result = {}
     try:
-        with urllib.request.urlopen(url) as response:
-            csv_data = response.read().decode('utf-8')
+        csv_data = _download_csv(url)
         reader = csv.DictReader(io.StringIO(csv_data))
         if not reader.fieldnames:
             return result

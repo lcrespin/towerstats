@@ -1,49 +1,27 @@
-# TowerStats - Google Sheets Statistics
+# TowerStats
 
-Service Cloud Run qui affiche les statistiques depuis une Google Sheet publique en CSV.
+Stats TowerFall Ascension depuis une Google Sheet publique (CSV), déployé sur Cloud Run.
 
 ## Fonctionnalités
 
-- Récupération automatique des données depuis une Google Sheet publique (format CSV)
-- Affichage en tableau HTML avec style moderne
-- Gestion des erreurs avec messages explicites
-- Support UTF-8 pour les caractères spéciaux
+- Sessions corrigées (minuit, today/total, modes Head Hunters / Respawn 3)
+- Saisons + vue carrière, filtres (dates, groupe, session, mode)
+- Classements : % victoires, Elo session, Elo match, K/D, groupes
+- Live session, archives détaillées, records, fiches de combat
+- Courbes d'évolution (scores, win rate, Elo)
 
 ## Test en local
 
-### Prérequis
-
-1. **Installer les dépendances Python** :
 ```bash
 pip install -r requirements.txt
+./run_local.sh          # Flask + reload ; ajoute --live pour démo live
 ```
 
-### Lancer le serveur local
+Ou : `functions-framework --target=display_stats --port=8080`
 
-**Méthode simple (script automatique) :**
-```bash
-./run_local.sh
-```
+→ http://localhost:8080
 
-**Méthode manuelle :**
-```bash
-functions-framework --target=display_stats --port=8080
-```
-
-Le serveur sera accessible sur : http://localhost:8080
-
-### Tester
-
-Ouvrir dans votre navigateur : http://localhost:8080
-
-Ou avec curl :
-```bash
-curl http://localhost:8080
-```
-
-## Déploiement sur Cloud Run
-
-Le projet inclut un objet `app` WSGI compatible avec Gunicorn dans `main.py`, ce qui permet d'utiliser les buildpacks automatiques de Cloud Run :
+## Déploiement Cloud Run
 
 ```bash
 gcloud run deploy towerstats-git \
@@ -52,30 +30,32 @@ gcloud run deploy towerstats-git \
   --allow-unauthenticated
 ```
 
-Cloud Run détectera automatiquement Python, installera les dépendances depuis `requirements.txt`, et lancera Gunicorn avec `main:app`.
+Buildpacks Python + Gunicorn via `main:app`. `display_stats` reste l'entrée functions-framework.
 
-**Note :** L'objet `app` dans `main.py` est un wrapper WSGI qui permet la compatibilité avec Gunicorn tout en utilisant `functions-framework` en arrière-plan.
-
-## Structure du projet
+## Structure
 
 ```
 towerstats/
-├── src/                    # Code source Python
-│   ├── config.py          # Configuration (URL CSV, couleurs, etc.)
-│   ├── data_manager.py    # Gestion des données (fetch, filter, correct)
-│   ├── stats_manager.py   # Calculs de statistiques
-│   └── main.py            # Application Flask
-├── main.py                 # Point d'entrée (réexport pour Gunicorn/Cloud Run)
-├── templates/             # Templates HTML Jinja2
-├── static/                 # Fichiers statiques (CSS, JS)
-└── images/                 # Images
+├── src/
+│   ├── config.py           # Joueurs, couleurs, modes, URLs
+│   ├── data_manager.py     # Fetch / filter / correct CSV
+│   ├── stats_manager.py    # Classements et payload template
+│   ├── elo.py              # Elo session et Elo match
+│   ├── page.py             # Contexte homepage
+│   ├── seasons.py          # Saisons et HUD
+│   ├── combat_profiles.py  # Badges / courbe soirée
+│   ├── session_*.py        # Faits, archives, records
+│   ├── live_session.py     # Session en cours
+│   ├── messages.py         # Messages win/lose
+│   ├── taglines.py         # Sous-titres
+│   └── main.py             # Flask
+├── main.py                 # Entrée Gunicorn / Cloud Run
+├── templates/
+├── static/                 # css, js, images
+├── tests/
+└── scripts/
 ```
 
 ## Configuration
 
-L'URL CSV est définie dans `src/config.py` :
-```python
-CSV_URL = 'https://docs.google.com/spreadsheets/d/e/.../pub?output=csv'
-```
-
-Pour utiliser une autre Google Sheet, publiez-la en CSV et mettez à jour cette URL.
+URLs CSV et joueurs dans `src/config.py` (`CSV_URL`, `MESSAGES_CSV_URL`, `PLAYER_TO_COLOR`).
