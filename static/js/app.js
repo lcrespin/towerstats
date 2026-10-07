@@ -2161,24 +2161,33 @@ function setRivalryEdgeGeometry(edge, amounts) {
     var dx = to.x - from.x;
     var dy = to.y - from.y;
     var len = Math.sqrt(dx * dx + dy * dy) || 1;
-    var shift = width / 2 + 1.5;
-    var px = -(dy / len) * shift;
-    var py = (dx / len) * shift;
-    var x1 = from.x + (dx / len) * from.r + px;
-    var y1 = from.y + (dy / len) * from.r + py;
-    var x2 = to.x - (dx / len) * (to.r + 4) + px;
-    var y2 = to.y - (dy / len) * (to.r + 4) + py;
-    var line = edge.querySelector('line');
+    var nx = -dy / len;
+    var ny = dx / len;
+    var bend = len * 0.07;
+    var qx = (from.x + to.x) / 2 + nx * bend;
+    var qy = (from.y + to.y) / 2 + ny * bend;
+    var sdx = qx - from.x;
+    var sdy = qy - from.y;
+    var slen = Math.sqrt(sdx * sdx + sdy * sdy) || 1;
+    var edx = qx - to.x;
+    var edy = qy - to.y;
+    var elen = Math.sqrt(edx * edx + edy * edy) || 1;
+    var x1 = from.x + (sdx / slen) * from.r;
+    var y1 = from.y + (sdy / slen) * from.r;
+    var x2 = to.x + (edx / elen) * (to.r + 4);
+    var y2 = to.y + (edy / elen) * (to.r + 4);
+    var path = edge.querySelector('path');
     var label = edge.querySelector('.rivalry-edge-label');
-    if (line) {
-        line.setAttribute('x1', x1);
-        line.setAttribute('y1', y1);
-        line.setAttribute('x2', x2);
-        line.setAttribute('y2', y2);
+    if (path) {
+        path.setAttribute('d', 'M' + x1 + ',' + y1 + ' Q' + qx + ',' + qy + ' ' + x2 + ',' + y2);
     }
     if (label) {
-        label.setAttribute('x', x1 + (x2 - x1) * 0.6 - (dy / len) * (width / 2 + 8));
-        label.setAttribute('y', y1 + (y2 - y1) * 0.6 + (dx / len) * (width / 2 + 8) + 4);
+        var t = 0.6;
+        var mt = 1 - t;
+        var lx = mt * mt * x1 + 2 * mt * t * qx + t * t * x2;
+        var ly = mt * mt * y1 + 2 * mt * t * qy + t * t * y2;
+        label.setAttribute('x', lx + nx * (width / 2 + 8));
+        label.setAttribute('y', ly + ny * (width / 2 + 8) + 4);
     }
 }
 
@@ -2318,7 +2327,8 @@ function renderRivalryMap(mode) {
             var alpha = 0.35 + intensity * 0.55;
             var width = 1 + intensity * 5;
 
-            var line = document.createElementNS(RIVALRY_NS, 'line');
+            var line = document.createElementNS(RIVALRY_NS, 'path');
+            line.setAttribute('fill', 'none');
             line.setAttribute('stroke', 'hsla(' + hue + ', 85%, 52%, ' + alpha + ')');
             line.setAttribute('stroke-width', width.toFixed(1));
             line.setAttribute('marker-end', 'url(#arrowhead)');
