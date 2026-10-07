@@ -604,23 +604,31 @@ function buildMatchBadge(match) {
     return label ? '<span class="match-badge match-badge--' + match.kind + '">' + label + '</span>' : '';
 }
 
+function buildMatchCard(match, index, target, options) {
+    var opts = options || {};
+    var color = match.winner ? getPlayerColor(match.winner) : 'var(--border)';
+    var active = opts.active ? ' is-active' : '';
+    var interactive = opts.interactive !== false
+        ? ' role="button" tabindex="0"'
+        : '';
+    return '<div class="match-card' + active + '"' + interactive + ' data-match-index="' + index + '" style="border-top-color: ' + color + ';">' +
+        '<div class="match-card-head"><span class="match-card-number">Match ' + (index + 1) + '</span>' +
+        '<span class="match-card-result">' + matchSubtitle(match) + '</span>' + buildMatchBadge(match) + '</div>' +
+        buildMatchRows(match, target, 'md') + '</div>';
+}
+
 function buildMatchTimeline(players, matches, target) {
     if (!matches || matches.length === 0) return '';
     var goal = matchTarget(matches, target);
     var cards = matches.map(function(match, i) {
-        var color = match.winner ? getPlayerColor(match.winner) : 'var(--border)';
-        return '<div class="match-card" role="button" tabindex="0" data-match-index="' + i + '" style="border-top-color: ' + color + ';">' +
-            '<div class="match-card-head"><span class="match-card-number">Match ' + (i + 1) + '</span>' +
-            '<span class="match-card-result">' + matchSubtitle(match) + '</span>' + buildMatchBadge(match) + '</div>' +
-            buildMatchRows(match, goal, 'md') + '</div>';
+        return buildMatchCard(match, i, goal);
     }).join('');
     return '<div class="session-detail-block"><h4 class="session-detail-title">📜 Match par match</h4>' +
         '<div class="match-card-grid">' + cards + '</div></div>';
 }
 
 function buildMatchPanel(match, index, target) {
-    return '<div class="match-panel-title">Match ' + (index + 1) + ' · ' + matchSubtitle(match) + buildMatchBadge(match) + '</div>' +
-        buildMatchRows(match, target, 'lg');
+    return buildMatchCard(match, index, target, { active: true, interactive: false });
 }
 
 var MATCH_REPLAY_MS = 1200;
