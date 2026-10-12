@@ -114,6 +114,21 @@ def test_target_is_most_common_winning_score():
     assert details["target"] == 10
 
 
+def test_each_match_has_its_own_even_target():
+    details = build_session_details(_session({
+        "todayWin": {"ERIC": 2, "LOUIS": 2},
+        "totalWin": {"ERIC": 2, "LOUIS": 2},
+        "matchsResults": [
+            {"ERIC": 4, "LOUIS": 2},
+            {"ERIC": 8, "LOUIS": 3},
+            {"ERIC": 3, "LOUIS": 4},
+            {"ERIC": 11, "LOUIS": 9},
+        ],
+    }))
+    assert [m["target"] for m in details["matches"]] == [4, 8, 4, 10]
+    assert details["target"] == 4
+
+
 def test_scoreboard_and_win_matrix():
     details = build_session_details(_session({
         "todayWin": {"ERIC": 2, "LOUIS": 1, "DAVID": 1},

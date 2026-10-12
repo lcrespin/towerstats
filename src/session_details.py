@@ -54,6 +54,16 @@ def _match_kind(margin: int, winner: Optional[str]) -> str:
     return 'normal'
 
 
+def _match_goal(scores: Dict[str, int]) -> int:
+    """Even max set at the start of the match; an odd top score is overtime."""
+    if not scores:
+        return 0
+    top = max(scores.values())
+    if top <= 0:
+        return 0
+    return top if top % 2 == 0 else top - 1
+
+
 def _matches(session: Dict[str, Any]) -> List[Dict[str, Any]]:
     matches = []
     for match in session_own_matches(session):
@@ -63,6 +73,7 @@ def _matches(session: Dict[str, Any]) -> List[Dict[str, Any]]:
             'winner': winner,
             'margin': margin,
             'kind': _match_kind(margin, winner),
+            'target': _match_goal(match),
         })
     return matches
 

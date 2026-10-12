@@ -27,8 +27,9 @@ from src.stats_manager import SessionStatsManager, leaderboard_career_deltas
 
 
 def _latest_session_keys(html: str) -> list:
-    match = re.search(r'const latestSessions = (.*?);\n', html)
-    return [s['session_select_id'] for s in json.loads(match.group(1))]
+    match = re.search(r'const allSessions = (.*?);\n', html)
+    sessions = json.loads(match.group(1))
+    return [sessions[0]['session_select_id']] if sessions else []
 
 
 def _session(day: str, wins: dict, group: str = 'ERIC-LOUIS', mode: str = 'HeadHunters'):
@@ -223,6 +224,11 @@ def test_default_route_uses_current_season(_messages):
     assert 'name="season"' not in html
     assert _latest_session_keys(html) == ['2026-08-26|ERIC-LOUIS|HeadHunters']
     assert 'depuis le 26 août 2026' in html
+    assert '🏆 Podiums de saison' in html
+    assert 'id="group-podium-title"' in html
+    assert 'Eric Louis saison 2' in html
+    assert 'Classement par groupe' not in html
+    assert '>Par groupe<' not in html
 
 
 @patch('src.page.load_win_messages', return_value={})
@@ -238,6 +244,7 @@ def test_season_all_route_is_career(_messages):
     assert '2025-06-03' in html
     assert '2026-08-14' in html
     assert '2026-08-26' in html
+    assert 'Eric Louis all-time' in html
 
 
 @patch('src.page.load_win_messages', return_value={})
@@ -256,3 +263,4 @@ def test_season_1_route_stops_before_august_15(_messages):
     assert 'Depuis le 03/06/25' in html
     assert 'juin 2025 → août 2026' in html
     assert 'All-time :' in html or 'même rang' in html
+    assert 'Eric Louis saison 1' in html

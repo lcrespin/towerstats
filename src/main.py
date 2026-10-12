@@ -13,7 +13,7 @@ from .config import (
     PLAYER_TO_PORTRAIT,
 )
 from .page import build_page_context
-from .live_session import get_live_session_payload
+from .live_session import get_live_status_payload
 
 BASE_PATH = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -56,8 +56,7 @@ def live_session_api():
         sessions = _load_sessions()
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-    entry = get_live_session_payload(sessions)
-    return jsonify({'live': entry is not None, 'session': entry})
+    return jsonify(get_live_status_payload(sessions))
 
 
 @app.route('/', defaults={'path': ''})

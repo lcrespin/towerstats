@@ -231,7 +231,7 @@
                 <div class="info-bubble-title">🏆 Leaders</div>
                 <div class="info-bubble-content">
                     Les rois de la colline{% if is_career_view %} — All-time{% else %} cette saison{% endif %}. Touchez une carte pour voir son podium et le classement complet juste en dessous.<br><br>
-                    <strong>Par groupe</strong> : on additionne les victoires dans un groupe de joueurs précis. Idéal pour régler les comptes entre les mêmes têtes.
+                    <strong>Podiums de saison</strong> : on additionne les victoires dans un groupe de joueurs précis. Idéal pour régler les comptes entre les mêmes têtes.
                 </div>
             </div>
             <p class="section-tagline">{% if is_career_view %}Les patrons All-time{% else %}En tête de la saison{% endif %} — {{ taglines.podium }}</p>
@@ -261,7 +261,7 @@
                 {% endif %}
             </div>
             <div class="leader-group-row">
-                <button type="button" class="leader-group-tab" role="tab" aria-selected="false" aria-controls="leader-panel-group" data-tab="group">👥 Classement par groupe</button>
+                <button type="button" class="leader-group-tab" role="tab" aria-selected="false" aria-controls="leader-panel-group" data-tab="group"><span aria-hidden="true">🏆</span> Podiums de saison</button>
             </div>
 
             <div class="leader-panel" id="leader-panel-winpct" data-panel="winpct" role="tabpanel">
@@ -407,12 +407,13 @@
             {% endif %}
 
             <div class="leader-panel hidden" id="leader-panel-group" data-panel="group" role="tabpanel">
+                {% set podium_season_label = (season_switcher | selectattr('active') | map(attribute='label') | first | lower) %}
                 <h3 class="subsection-title subsection-title-row">
-                    <span>Par groupe</span>
-                    <button type="button" class="info-button info-button-inline" data-info="classement-info" aria-label="Aide classement groupe">?</button>
+                    <span id="group-podium-title" data-season-label="{{ podium_season_label }}">{{ (((default_group or '') | replace('-', ' ') | title) ~ ' ' ~ podium_season_label) | trim }}</span>
+                    <button type="button" class="info-button info-button-inline" data-info="classement-info" aria-label="Aide podiums de saison">?</button>
                 </h3>
                 <div id="classement-info" class="info-bubble">
-                    <div class="info-bubble-title">👥 Classement par groupe</div>
+                    <div class="info-bubble-title">🏆 Podiums de saison</div>
                     <div class="info-bubble-content">
                         Pour un groupe précis (les mêmes têtes autour de la table), on additionne les victoires de chaque soirée. Le plus gros total gagne.<br><br>
                         Les filtres (dates, saison…) recoupent le classement sur les sessions visibles.<br><br>
@@ -736,19 +737,7 @@
         <section id="derniere-soiree" class="margin-bottom-section pad-section arcade-panel">
             <h2 class="txt-heading break-words">📅 Archives</h2>
             <p class="section-tagline">Les soirées passées — {{ taglines.archives }}</p>
-            <div id="derniere-soiree-content">
-            {% if latest_date and latest_sessions_parsed %}
-            <div class="session-badge">
-                Soirée #{{ total_sessions }} · {{ selected_game_mode_label }} · {{ latest_sessions_parsed[0].players|length }} joueur(s)
-            </div>
-            <div class="session-date">Date: {{ stats_manager.format_date(latest_date) }}</div>
-            <div id="latest-sessions-list"></div>
-            {% endif %}
-            </div>
-            <button id="toggle-all-sessions" class="toggle-button w-full sm:w-auto">
-                ▼ Voir toutes les sessions
-            </button>
-            <div id="all-sessions-container" class="hidden">
+            <div id="all-sessions-container">
                 <div class="filters-container mb-4 sm:mb-5 flex flex-col sm:flex-row gap-3 sm:gap-4 md:gap-5">
                     <div class="filter-group flex-1">
                         <label for="filter-player" class="form-label block mb-1.5 sm:mb-2">
@@ -786,14 +775,6 @@
         </section>
 
     </div>
-
-    <button type="button" id="live-button" class="live-button{% if not live_session %} is-hidden{% endif %}" aria-hidden="{{ 'false' if live_session else 'true' }}" aria-expanded="false" aria-controls="live-popin">
-        <span class="live-button-dot" aria-hidden="true"></span>
-        <span class="live-button-copy">
-            <span class="live-button-label">LIVE</span>
-            <span class="live-button-group">{% if live_session %}{{ live_session.id }}{% endif %}</span>
-        </span>
-    </button>
 
     <div id="app-overlays">
         <div id="overlay-backdrop" class="overlay-backdrop" aria-hidden="true"></div>
@@ -859,10 +840,10 @@
 
         <div id="live-popin" class="live-popin arcade-overlay" aria-hidden="true" role="dialog" aria-labelledby="live-popin-title">
             <button type="button" class="live-popin-close" aria-label="Fermer">×</button>
-            <h3 id="live-popin-title" class="live-popin-title">
+            <h3 id="live-popin-title" class="live-popin-title{% if live_session and not live_active %} is-replay{% endif %}">
                 <span class="live-button-dot" aria-hidden="true"></span>
                 <span class="live-button-copy">
-                    <span class="live-button-label">LIVE</span>
+                    <span class="live-button-label">{% if live_active %}LIVE{% else %}REPLAY{% endif %}</span>
                     <span class="live-button-group">{% if live_session %}{{ live_session.id }}{% endif %}</span>
                 </span>
             </h3>
@@ -895,8 +876,8 @@
         const playerPortraits = {{ player_portraits|tojson }};
         const isCareerView = {{ is_career_view|default(false)|tojson }};
         const allSessions = {{ all_sessions_data|tojson }};
-        const latestSessions = {{ latest_sessions_data|tojson }};
         const liveSession = {{ live_session|tojson }};
+        const liveActive = {{ live_active|default(false)|tojson }};
         const hasDetailedStats = {{ has_detailed_stats|tojson }};
         const eveningCurveData = {{ evening_curve|tojson }};
         const eloEvolutionData = {{ elo_evolution|tojson }};
@@ -911,6 +892,18 @@
         let filteredSessions = allSessions.slice();
         let totalPages = Math.ceil(filteredSessions.length / sessionsPerPage);
     </script>
+
+    <button type="button" id="scroll-top" class="scroll-top is-hidden" aria-label="Remonter en haut" aria-hidden="true">
+        <span class="scroll-top-icon" aria-hidden="true"></span>
+    </button>
+
+    <button type="button" id="live-button" class="live-button{% if not live_session %} is-hidden{% elif not live_active %} is-replay{% endif %}" aria-hidden="{{ 'false' if live_session else 'true' }}" aria-expanded="false" aria-controls="live-popin">
+        <span class="live-button-dot" aria-hidden="true"></span>
+        <span class="live-button-copy">
+            <span class="live-button-label">{% if live_active %}LIVE{% else %}REPLAY{% endif %}</span>
+            <span class="live-button-group">{% if live_session %}{{ live_session.id }}{% endif %}</span>
+        </span>
+    </button>
 
     <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>

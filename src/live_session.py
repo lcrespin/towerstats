@@ -87,13 +87,27 @@ def build_live_session_entry(
     return SessionStatsManager(sessions).build_session_entry(live)
 
 
+def get_live_status_payload(
+    sessions: List[Dict[str, Any]],
+    now: Optional[datetime] = None,
+    demo: Optional[bool] = None,
+) -> Dict[str, Any]:
+    """Return live flag plus the live session, or the latest evening when idle."""
+    if demo is None:
+        demo = is_live_demo()
+    live = find_live_session(sessions, now=now, demo=demo)
+    latest = live or find_live_session(sessions, now=now, demo=True)
+    return {
+        'live': live is not None,
+        'session': build_live_session_entry(sessions, latest),
+    }
+
+
 def get_live_session_payload(
     sessions: List[Dict[str, Any]],
     now: Optional[datetime] = None,
     demo: Optional[bool] = None,
 ) -> Optional[Dict[str, Any]]:
     """Find the live session and return its archive entry, or None."""
-    if demo is None:
-        demo = is_live_demo()
-    live = find_live_session(sessions, now=now, demo=demo)
-    return build_live_session_entry(sessions, live)
+    status = get_live_status_payload(sessions, now=now, demo=demo)
+    return status['session'] if status['live'] else None

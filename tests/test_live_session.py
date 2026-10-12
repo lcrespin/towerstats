@@ -11,6 +11,7 @@ from src.live_session import (
     LIVE_WINDOW_HOURS,
     build_live_session_entry,
     find_live_session,
+    get_live_status_payload,
     is_live_demo,
 )
 from src.seasons import get_current_season_id, season_date_bounds
@@ -114,6 +115,23 @@ def _get_client():
     return app.test_client()
 
 
+def test_status_payload_is_live_when_session_is_in_window():
+    now = datetime(2026, 10, 4, 22, 30, tzinfo=PARIS)
+    live = _session("2026-10-04", 22, {"ERIC": 2, "LOUIS": 1})
+    payload = get_live_status_payload([live], now=now, demo=False)
+    assert payload["live"] is True
+    assert payload["session"]["session_select_id"] == "2026-10-04|ERIC-LOUIS|HeadHunters"
+
+
+def test_status_payload_returns_latest_session_when_not_live():
+    now = datetime(2026, 10, 4, 22, 30, tzinfo=PARIS)
+    older = _session("2026-09-01", 20, {"ERIC": 1, "LOUIS": 2})
+    latest = _session("2026-09-10", 23, {"ERIC": 4, "LOUIS": 1})
+    payload = get_live_status_payload([older, latest], now=now, demo=False)
+    assert payload["live"] is False
+    assert payload["session"]["session_select_id"] == "2026-09-10|ERIC-LOUIS|HeadHunters"
+
+
 @patch.dict(os.environ, {"TOWERSTATS_LIVE_DEMO": ""})
 @patch("src.page.load_win_messages", return_value={})
 @patch("src.main.SessionDataManager.load_all", _fake_load_all)
@@ -121,7 +139,20 @@ def test_api_live_is_false_when_latest_session_is_stale(_messages):
     response = _get_client().get("/api/live")
     assert response.status_code == 200
     payload = response.get_json()
-    assert payload == {"live": False, "session": None}
+    assert payload["live"] is False
+    assert payload["session"]["session_select_id"] == "2026-08-26|ERIC-LOUIS|HeadHunters"
+
+
+@patch.dict(os.environ, {"TOWERSTATS_LIVE_DEMO": ""})
+@patch("src.page.load_win_messages", return_value={})
+@patch("src.main.SessionDataManager.load_all", _fake_load_all)
+def test_stale_page_shows_replay_button(_messages):
+    html = _get_client().get("/").get_data(as_text=True)
+    assert 'id="live-button" class="live-button is-replay"' in html
+    assert "live-button is-hidden" not in html
+    assert ">REPLAY<" in html
+    assert "const liveActive = false;" in html
+    assert "is-replay" in html
 
 
 @patch.dict(os.environ, {"TOWERSTATS_LIVE_DEMO": "1"})

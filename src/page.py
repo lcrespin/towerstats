@@ -8,7 +8,7 @@ from .config import (
     normalize_game_mode,
 )
 from .data_manager import SessionDataManager
-from .live_session import get_live_session_payload
+from .live_session import get_live_status_payload
 from .messages import load_win_messages
 from .seasons import (
     CAREER_SEASON_ID,
@@ -88,6 +88,7 @@ def build_page_context(all_sessions, args) -> tuple:
     )
     template_data = stats_manager.prepare_template_data()
     first_session, last_session = season_spans.get(selected_season, (None, None))
+    live_status = get_live_status_payload(all_sessions)
     template_data.update({
         'selected_date_start': date_start,
         'selected_date_end': date_end,
@@ -113,7 +114,8 @@ def build_page_context(all_sessions, args) -> tuple:
         'season_picker_min': season_start,
         'season_picker_max': season_end,
         'reset_filters_url': build_stats_url(current_season_id, current_season_id),
-        'live_session': get_live_session_payload(all_sessions),
+        'live_session': live_status['session'],
+        'live_active': live_status['live'],
     })
     template_data['season_banner'] = _season_banner(
         selected_season, season_meta, template_data

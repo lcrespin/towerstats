@@ -77,17 +77,75 @@ function renderGroupPodium(ranking) {
     }));
 }
 
-function buildSessionPodium(session) {
-    var entries = session.players
-        .filter(function(p) { return p.today > 0; })
-        .map(function(p) {
-            return { player: p.name, value: p.today, detail: 'victoire' + (p.today > 1 ? 's' : ''), rank: p.rank };
+function podiumWinDetail(score) {
+    return 'victoire' + (score === 1 ? '' : 's');
+}
+
+function buildPodiumEntries(players, scoreKey, useSessionRank) {
+    var list = (players || []).slice();
+    if (!useSessionRank) {
+        list.sort(function(a, b) {
+            var diff = (b[scoreKey] || 0) - (a[scoreKey] || 0);
+            if (diff) return diff;
+            return a.name.localeCompare(b.name);
         });
+    }
+    var entries = [];
+    var currentRank = 0;
+    var prev = null;
+    list.forEach(function(p, i) {
+        var score = p[scoreKey] || 0;
+        var rank;
+        if (useSessionRank && p.rank != null) {
+            rank = p.rank;
+        } else {
+            if (prev === null || score !== prev) currentRank = i + 1;
+            prev = score;
+            rank = currentRank;
+        }
+        entries.push({ player: p.name, value: score, detail: podiumWinDetail(score), rank: rank });
+    });
+    return entries;
+}
+
+function buildPodiumHtml(entries) {
     if (!entries.length) return '';
     return '<div class="pixel-podium pixel-podium--session">' + buildPodiumSlotsHtml(entries) + '</div>';
 }
 
+function buildTitledPodium(title, entries) {
+    return '<div class="session-podium-block">' +
+        '<h4 class="session-podium-title">' + title + '</h4>' +
+        buildPodiumHtml(entries) +
+        '</div>';
+}
+
+function buildSessionPodium(session) {
+    var tonight = buildPodiumEntries(session.players, 'today', true);
+    if (!tonight.length) return '';
+    if (!session.live && !session.replay) return buildPodiumHtml(tonight);
+    return '<div class="session-podiums">' +
+        buildTitledPodium('Soirée', tonight) +
+        buildTitledPodium('Saison', buildPodiumEntries(session.players, 'total', false)) +
+        '</div>';
+}
+
+function formatGroupPodiumTitle(groupId, seasonLabel) {
+    var names = String(groupId || '').split('-').filter(Boolean).map(function(part) {
+        return part.charAt(0).toUpperCase() + part.slice(1).toLowerCase();
+    }).join(' ');
+    var season = String(seasonLabel || '').trim();
+    return [names, season].filter(Boolean).join(' ');
+}
+
+function renderGroupPodiumTitle(groupId) {
+    var title = document.getElementById('group-podium-title');
+    if (!title) return;
+    title.textContent = formatGroupPodiumTitle(groupId, title.getAttribute('data-season-label'));
+}
+
 function updateRanking(groupId) {
+    renderGroupPodiumTitle(groupId);
     if (typeof rankingsByGroup === 'undefined') {
         return;
     }
@@ -300,13 +358,26 @@ function renderSessions() {
     updatePaginationControls();
 }
 
-function renderLatestSessions() {
-    var container = document.getElementById('latest-sessions-list');
-    if (!container || typeof latestSessions === 'undefined') return;
-    container.innerHTML = '';
-    latestSessions.forEach(function(session) {
-        container.appendChild(buildSessionCard(session, false));
-    });
+function sessionSoireeNumber(session) {
+    if (typeof allSessions === 'undefined' || !session) return 0;
+    var index = allSessions.indexOf(session);
+    if (index < 0 && session.session_select_id) {
+        index = allSessions.findIndex(function(item) {
+            return item.session_select_id === session.session_select_id;
+        });
+    }
+    return index >= 0 ? allSessions.length - index : 0;
+}
+
+function buildSessionBadge(session) {
+    if (!session || session.live) return '';
+    var number = sessionSoireeNumber(session);
+    if (!number) return '';
+    var date = session.formatted_date || session.date;
+    var mode = session.game_mode_label || session.game_mode || '';
+    var count = session.players ? session.players.length : 0;
+    return '<div class="session-badge">Soirée #' + number + ' - le ' + date +
+        ' · ' + mode + ' · ' + count + ' joueur(s)</div>';
 }
 
 var KILL_SOURCE_LABELS = {
@@ -336,7 +407,7 @@ function buildSessionHeader(session) {
     if (session.live) {
         parts.push('en cours');
     } else if (details.hour != null) {
-        parts.push('fin vers ' + details.hour + 'h');
+        parts.push('fin à ' + details.hour + 'h');
     }
     parts.push(session.game_mode_label || session.game_mode);
     if (details.match_count) parts.push(details.match_count + ' match' + (details.match_count > 1 ? 's' : ''));
@@ -348,18 +419,16 @@ function buildSessionHeader(session) {
 function buildSessionTable(session) {
     var combat = (session.details && session.details.combat) || {};
     var hasCombat = Object.keys(combat).length > 0;
-    var sessionWins = session.players.reduce(function(sum, p) { return sum + p.today; }, 0);
     var careerTotals = typeof isCareerView !== 'undefined' && isCareerView && !session.live;
-    var head = '<th>Joueur</th><th>Victoires</th><th>%</th><th>' + (careerTotals ? 'All-time' : 'Saison') + '</th>';
+    var head = '<th class="player-column">Joueur</th><th>Victoires</th><th>' + (careerTotals ? 'All-time' : 'Saison') + '</th>';
     if (hasCombat) head += '<th>Kills</th><th>Morts</th><th>Auto</th><th>K/D</th>';
     var rows = '';
     session.players.forEach(function(p) {
         var rank = p.rank != null ? p.rank : 0;
         var rankClass = rank <= 3 ? 'rank-' + rank : '';
         var cell = '<td class="' + rankClass + '">';
-        var pct = sessionWins > 0 ? Math.round(100 * p.today / sessionWins) + '%' : '-';
-        rows += '<tr><td class="' + rankClass + '" style="color: ' + getPlayerColor(p.name) + '; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">' + getMedal(rank) + ' ' + p.name + '</td>' +
-            cell + p.today + '</td>' + cell + pct + '</td>' + cell + p.total + '</td>';
+        rows += '<tr><td class="player-column ' + rankClass + '" style="color: ' + getPlayerColor(p.name) + '; text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">' + getMedal(rank) + ' ' + p.name + '</td>' +
+            cell + p.today + '</td>' + cell + p.total + '</td>';
         if (hasCombat) {
             var c = combat[p.name];
             if (c) {
@@ -522,7 +591,7 @@ function buildDuelMatrix(players, combat) {
             if (killer !== victim) max = Math.max(max, combat[victim].killBy[killer] || 0);
         });
     });
-    var head = '<th>Tueur → Victime</th>' + names.map(function(n) { return '<th>' + playerLabel(n) + '</th>'; }).join('');
+    var head = '<th class="player-column">Tueur → Victime</th>' + names.map(function(n) { return '<th>' + playerLabel(n) + '</th>'; }).join('');
     var rows = names.map(function(killer) {
         var cells = names.map(function(victim) {
             var count = combat[victim].killBy[killer] || 0;
@@ -533,7 +602,7 @@ function buildDuelMatrix(players, combat) {
             var hue = (1 - intensity) * 120;
             return '<td style="background-color: hsla(' + hue + ', 70%, 52%, 0.40);">' + (count || '-') + '</td>';
         }).join('');
-        return '<tr><td>' + playerLabel(killer) + '</td>' + cells + '</tr>';
+        return '<tr><td class="player-column">' + playerLabel(killer) + '</td>' + cells + '</tr>';
     }).join('');
     return '<div class="session-detail-block"><h4 class="session-detail-title">🎯 Duels</h4>' +
         '<div class="ranking-scroll"><table class="ranking-table session-duel-table"><thead><tr>' + head + '</tr></thead><tbody>' + rows + '</tbody></table></div></div>';
@@ -566,6 +635,19 @@ function matchTarget(matches, target) {
     return matches.reduce(function(max, match) {
         return match.winner ? Math.max(max, match.scores[match.winner] || 0) : max;
     }, 0);
+}
+
+function matchGoal(match, fallback) {
+    if (match && match.target) return match.target;
+    var scores = match && match.scores ? match.scores : {};
+    var top = 0;
+    Object.keys(scores).forEach(function(name) {
+        top = Math.max(top, scores[name] || 0);
+    });
+    if (top > 0) {
+        return top % 2 === 0 ? top : top - 1;
+    }
+    return fallback || 0;
 }
 
 function buildCoins(score, target, size) {
@@ -619,9 +701,8 @@ function buildMatchCard(match, index, target, options) {
 
 function buildMatchTimeline(players, matches, target) {
     if (!matches || matches.length === 0) return '';
-    var goal = matchTarget(matches, target);
     var cards = matches.map(function(match, i) {
-        return buildMatchCard(match, i, goal);
+        return buildMatchCard(match, i, matchGoal(match, target));
     }).join('');
     return '<div class="session-detail-block"><h4 class="session-detail-title">📜 Match par match</h4>' +
         '<div class="match-card-grid">' + cards + '</div></div>';
@@ -639,7 +720,6 @@ function bindMatchStrip(card, session) {
     var strip = card.querySelector('.session-match-strip');
     var panel = card.querySelector('.match-panel');
     if (!strip || !panel || matches.length === 0) return;
-    var goal = matchTarget(matches, details.target);
     var grid = card.querySelector('.match-card-grid');
     var controls = card.querySelector('.match-controls');
     var playBtn = controls && controls.querySelector('[data-action="play"]');
@@ -656,7 +736,7 @@ function bindMatchStrip(card, session) {
         chip.classList.add('is-active');
         var matchCard = grid && grid.querySelector('.match-card[data-match-index="' + index + '"]');
         if (matchCard) matchCard.classList.add('is-active');
-        panel.innerHTML = buildMatchPanel(matches[index], index, goal);
+        panel.innerHTML = buildMatchPanel(matches[index], index, matchGoal(matches[index], details.target));
         panel.hidden = false;
         current = index;
         if (prevBtn) prevBtn.disabled = index === 0;
@@ -743,7 +823,7 @@ function buildSessionCard(session, highlight, openDetails) {
     card.className = 'session-card p-2 sm:p-4 md:p-[15px]';
     card.dataset.sessionKey = session.session_select_id;
     if (highlight) card.classList.add('session-card--highlight');
-    card.innerHTML = buildSessionHeader(session) + buildSessionPodium(session) +
+    card.innerHTML = buildSessionBadge(session) + buildSessionHeader(session) + buildSessionPodium(session) +
         buildSessionAwards((session.details || {}).awards) + buildSessionTable(session) + buildSessionDetails(session, openDetails);
     var tbl = card.querySelector('table');
     if (tbl) makeTableSortable(tbl);
@@ -902,33 +982,14 @@ function initSessionsPagination() {
         return;
     }
     
-    const toggleBtn = document.getElementById('toggle-all-sessions');
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', function() {
-            const container = document.getElementById('all-sessions-container');
-            if (!container) return;
-            
-            const isVisible = !container.classList.contains('hidden');
-            if (isVisible) {
-                container.classList.add('hidden');
-                this.textContent = '▼ Voir toutes les sessions';
-            } else {
-                container.classList.remove('hidden');
-                this.textContent = '▲ Masquer toutes les sessions';
-
-                initFilters();
-
-                if (filteredSessions.length === 0 && typeof allSessions !== 'undefined' && allSessions.length > 0) {
-                    filteredSessions = allSessions.slice();
-                    updatePagination();
-                    updateSessionsCount();
-                }
-
-                renderSessions();
-            }
-        });
+    initFilters();
+    if (filteredSessions.length === 0 && typeof allSessions !== 'undefined' && allSessions.length > 0) {
+        filteredSessions = allSessions.slice();
+        updatePagination();
+        updateSessionsCount();
     }
-    
+    renderSessions();
+
     const prevBtn = document.getElementById('prev-page');
     const nextBtn = document.getElementById('next-page');
     
@@ -959,14 +1020,7 @@ function openSessionInArchives(sessionKey) {
     if (!container) {
         return;
     }
-    if (container.classList.contains('hidden')) {
-        container.classList.remove('hidden');
-        var toggleBtn = document.getElementById('toggle-all-sessions');
-        if (toggleBtn) {
-            toggleBtn.textContent = '▲ Masquer toutes les sessions';
-        }
-        initFilters();
-    }
+    initFilters();
 
     currentPlayerFilter = '';
     currentGroupFilter = '';
@@ -1066,6 +1120,31 @@ function scrollToAnchor() {
         var top = el.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
     }
+}
+
+var SCROLL_TOP_THRESHOLD = 400;
+
+function shouldShowScrollTop(scrollY) {
+    return scrollY > SCROLL_TOP_THRESHOLD;
+}
+
+function syncScrollTopButton() {
+    var btn = document.getElementById('scroll-top');
+    if (!btn) return;
+    var show = shouldShowScrollTop(window.scrollY || window.pageYOffset || 0);
+    btn.classList.toggle('is-hidden', !show);
+    btn.setAttribute('aria-hidden', show ? 'false' : 'true');
+}
+
+function initScrollTop() {
+    var btn = document.getElementById('scroll-top');
+    if (!btn) return;
+    btn.addEventListener('click', function() {
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+    });
+    window.addEventListener('scroll', syncScrollTopButton, { passive: true });
+    syncScrollTopButton();
 }
 
 function initAnchorOnLoad() {
@@ -1981,6 +2060,7 @@ function updateOverlayBackdrop() {
     if (liveBtn) {
         var liveVisible = !!liveState.session && !liveOpen;
         liveBtn.classList.toggle('is-hidden', !liveVisible);
+        liveBtn.classList.toggle('is-replay', !liveState.live);
         liveBtn.setAttribute('aria-hidden', liveVisible ? 'false' : 'true');
     }
     backdrop.classList.toggle('active', !!open);
@@ -2586,16 +2666,47 @@ function initBackgroundParallax() {
 var LIVE_POLL_MS = 60000;
 var LIVE_IDLE_POLL_MS = 300000;
 var liveState = {
+    live: (typeof liveActive !== 'undefined') ? !!liveActive : false,
     session: (typeof liveSession !== 'undefined') ? liveSession : null,
     fetchedAt: Date.now(),
     renderedKey: null,
     timer: null
 };
 
+function liveChromeLabel(isLive) {
+    return isLive ? 'LIVE' : 'REPLAY';
+}
+
+function liveStateFromPayload(payload) {
+    if (!payload) {
+        return { live: false, session: null };
+    }
+    return {
+        live: !!payload.live,
+        session: payload.session || null
+    };
+}
+
+function sessionForLivePopin(session, isLive) {
+    if (!session) {
+        return null;
+    }
+    var source = session;
+    if (!isLive && typeof allSessions !== 'undefined') {
+        var match = allSessions.find(function(item) {
+            return item === session || item.session_select_id === session.session_select_id;
+        });
+        if (match) {
+            source = match;
+        }
+    }
+    if (isLive) {
+        return Object.assign({}, source, { live: true });
+    }
+    return Object.assign({}, source, { replay: true });
+}
+
 function setLiveButtonVisible(session) {
-    document.querySelectorAll('#live-button .live-button-group, #live-popin-title .live-button-group').forEach(function(group) {
-        group.textContent = session ? (session.id || '') : '';
-    });
     var btn = document.getElementById('live-button');
     if (!btn) {
         return;
@@ -2605,6 +2716,24 @@ function setLiveButtonVisible(session) {
     var visible = !!session && !popinOpen;
     btn.classList.toggle('is-hidden', !visible);
     btn.setAttribute('aria-hidden', visible ? 'false' : 'true');
+}
+
+function syncLiveChrome(session, isLive) {
+    document.querySelectorAll('#live-button .live-button-label, #live-popin-title .live-button-label').forEach(function(label) {
+        label.textContent = liveChromeLabel(isLive);
+    });
+    document.querySelectorAll('#live-button .live-button-group, #live-popin-title .live-button-group').forEach(function(group) {
+        group.textContent = session ? (session.id || '') : '';
+    });
+    var btn = document.getElementById('live-button');
+    var title = document.getElementById('live-popin-title');
+    if (btn) {
+        btn.classList.toggle('is-replay', !isLive);
+    }
+    if (title) {
+        title.classList.toggle('is-replay', !isLive);
+    }
+    setLiveButtonVisible(session);
 }
 
 function formatLiveUpdated(session, from) {
@@ -2624,7 +2753,9 @@ function updateLiveUpdatedLabel() {
     if (!el) {
         return;
     }
-    el.textContent = liveState.session ? formatLiveUpdated(liveState.session, liveState.fetchedAt) : '';
+    el.textContent = (liveState.live && liveState.session)
+        ? formatLiveUpdated(liveState.session, liveState.fetchedAt)
+        : '';
 }
 
 function renderLivePopin(session) {
@@ -2643,17 +2774,18 @@ function renderLivePopin(session) {
         body.innerHTML = '<p class="live-popin-ended">Session terminée</p>';
         return;
     }
-    body.appendChild(buildSessionCard(Object.assign({}, session, { live: true }), false, true));
+    body.appendChild(buildSessionCard(sessionForLivePopin(session, liveState.live), false, true));
 }
 
 function applyLivePayload(payload) {
-    var session = payload && payload.live ? payload.session : null;
-    liveState.session = session;
+    var next = liveStateFromPayload(payload);
+    liveState.live = next.live;
+    liveState.session = next.session;
     liveState.fetchedAt = Date.now();
-    setLiveButtonVisible(session);
+    syncLiveChrome(liveState.session, liveState.live);
     var popin = document.getElementById('live-popin');
     if (popin && popin.classList.contains('active')) {
-        renderLivePopin(session);
+        renderLivePopin(liveState.session);
         updateLiveUpdatedLabel();
     }
 }
@@ -2723,7 +2855,7 @@ function initLiveSession() {
     if (!btn || !popin) {
         return;
     }
-    setLiveButtonVisible(liveState.session);
+    syncLiveChrome(liveState.session, liveState.live);
     btn.addEventListener('click', function(e) {
         e.stopPropagation();
         if (popin.classList.contains('active')) {
@@ -2756,7 +2888,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initDatePickerToggle();
     initMobileMenu();
     initGroupSelector();
-    renderLatestSessions();
     initSessionsPagination();
     initSortableTables();
     initSmoothScroll();
@@ -2773,6 +2904,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initEveningCurveChart();
     initInfoBubbles();
     initLiveSession();
+    initScrollTop();
     if (hasDetailedStats) {
         initKillModeTabs();
         initRivalryMap();
